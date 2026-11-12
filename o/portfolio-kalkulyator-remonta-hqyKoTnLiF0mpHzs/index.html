@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Калькулятор ремонта — демо</title>
+<meta name="description" content="Демо / пример работы: расчёт стоимости ремонта квартиры за минуту.">
+<style>
+:root{
+  --paper:#EEF1F4; --sheet:#F8FAFB; --ink:#14213D; --steel:#4A5568; --line:#C5CDD8;
+  --signal:#FFB703; --signal-ink:#14213D; --ok:#0B6E4F;
+  --font:"Bahnschrift","Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.5;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:32px 32px;background-position:-1px -1px;}
+body::before{content:"";position:fixed;inset:0;background:var(--paper);opacity:.82;pointer-events:none;z-index:-1}
+a{color:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+.skip{position:absolute;left:-999px}.skip:focus{left:12px;top:12px;background:var(--ink);color:#fff;padding:8px 12px;z-index:9}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+
+header.top{border-bottom:2px solid var(--ink);background:var(--sheet)}
+header.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-top:14px;padding-bottom:14px}
+.brand{font-weight:700;letter-spacing:.01em;text-decoration:none}
+.tel{font-variant-numeric:tabular-nums;text-decoration:none;border-bottom:2px solid var(--signal)}
+
+.hero{padding:44px 0 20px}
+h1{font-size:clamp(2rem,5.4vw,3.6rem);line-height:1.04;margin:0 0 14px;max-width:16ch;font-weight:700;letter-spacing:-.01em}
+.lede{max-width:52ch;color:var(--steel);margin:0}
+
+.calc{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.9fr);gap:24px;align-items:start;padding:20px 0 40px}
+.panel{background:var(--sheet);border:2px solid var(--ink);border-radius:2px}
+.panel>h2{margin:0;padding:12px 18px;border-bottom:2px solid var(--ink);font-size:1.05rem;font-weight:700;background:#E4E9EF}
+fieldset{border:0;border-bottom:1px solid var(--line);margin:0;padding:18px}
+fieldset:last-of-type{border-bottom:0}
+legend{font-weight:700;padding:0;margin-bottom:10px;float:left;width:100%}
+legend+*{clear:both}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.val{font-variant-numeric:tabular-nums;font-weight:700;font-size:1.4rem}
+input[type=range]{width:100%;margin:12px 0 2px;accent-color:var(--ink);height:28px}
+.scale{display:flex;justify-content:space-between;color:var(--steel);font-size:.85rem}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{position:relative;display:block}
+.tile input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.tile span{display:block;height:100%;padding:12px;border:2px solid var(--line);background:#fff;border-radius:2px}
+.tile b{display:block}
+.tile small{color:var(--steel);display:block;line-height:1.3;margin-top:2px}
+.tile input:checked+span{border-color:var(--ink);box-shadow:inset 0 -5px 0 var(--signal)}
+.tile input:focus-visible+span{outline:3px solid var(--ink);outline-offset:2px}
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border:2px solid var(--line);background:#fff;cursor:pointer;border-radius:2px}
+.opt input{margin-top:4px;width:20px;height:20px;accent-color:var(--ink);flex:none}
+.opt:has(input:checked){border-color:var(--ink)}
+.opt .p{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--steel);white-space:nowrap}
+
+.receipt{position:sticky;top:16px}
+.receipt dl{margin:0;padding:6px 18px 0}
+.receipt .ln{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-variant-numeric:tabular-nums}
+.receipt .ln dt{color:var(--steel)}
+.receipt .ln dd{margin:0;font-weight:600;text-align:right}
+.total{padding:16px 18px 18px}
+.total .lbl{color:var(--steel)}
+.total .sum{font-size:clamp(2.3rem,5vw,3.1rem);font-weight:700;line-height:1.05;font-variant-numeric:tabular-nums;
+  background:linear-gradient(transparent 82%,var(--signal) 82%);display:inline-block;margin:2px 0 6px}
+.total .note{font-size:.88rem;color:var(--steel);margin:6px 0 14px}
+.btn{display:inline-block;background:var(--signal);color:var(--signal-ink);border:2px solid var(--ink);padding:13px 22px;font:700 1rem var(--font);border-radius:2px;cursor:pointer;text-decoration:none;min-height:48px}
+.btn:hover{background:#ffc43a}
+.btn:active{transform:translateY(1px)}
+
+.flow{padding:10px 0 40px}
+.flow h2,.apply h2{font-size:1.6rem;margin:0 0 16px}
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;counter-reset:s}
+.steps li{counter-increment:s;background:var(--sheet);border:2px solid var(--ink);padding:16px;border-radius:2px}
+.steps li::before{content:counter(s);display:inline-grid;place-items:center;width:30px;height:30px;border:2px solid var(--ink);font-weight:700;margin-bottom:8px;background:var(--signal)}
+.steps b{display:block}
+
+.apply{padding:0 0 56px}
+.apply form{background:var(--sheet);border:2px solid var(--ink);padding:20px;display:grid;gap:14px;max-width:640px;border-radius:2px}
+label.f{display:grid;gap:4px;font-weight:600}
+input[type=text],input[type=tel]{font:inherit;padding:12px;border:2px solid var(--ink);border-radius:2px;background:#fff;min-height:48px}
+#sum-line{margin:0;color:var(--steel)}
+#ok{margin:0;padding:12px;border:2px solid var(--ok);color:var(--ok);font-weight:600;display:none}
+
+footer{border-top:2px solid var(--ink);background:var(--sheet);padding:18px 0 90px;color:var(--steel);font-size:.92rem}
+.mbar{display:none}
+
+.variant{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;padding:8px 12px;background:var(--ink);color:#fff;font-weight:700;font-size:.95rem}
+.variant button{font:700 .95rem var(--font);min-height:40px;padding:6px 18px;border:2px solid #fff;background:transparent;color:#fff;cursor:pointer;border-radius:2px}
+.variant button[aria-pressed=true]{background:var(--signal);color:var(--ink);border-color:var(--signal)}
+.herowrap{position:relative}
+.credit{display:none}
+body.photo .herowrap{background:url("img/vet_8146144_w1600.jpg") 50% 62%/cover no-repeat;color:#fff;border-bottom:2px solid var(--ink)}
+body.photo .herowrap::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(20,33,61,.93) 0,rgba(20,33,61,.78) 50%,rgba(20,33,61,.25) 100%)}
+body.photo .hero{position:relative;padding:84px 20px 96px}
+body.photo .lede{color:#E3E9F2}
+body.photo .credit{display:inline}
+@media (max-width:860px){
+  body.photo .hero{padding:52px 20px 60px}
+  .calc{grid-template-columns:1fr}
+  .receipt{position:static}
+  .steps{grid-template-columns:1fr}
+  .tiles{grid-template-columns:1fr}
+  .mbar{display:flex;position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:#fff;padding:10px 16px;justify-content:space-between;align-items:center;gap:12px;z-index:5}
+  .mbar b{font-size:1.3rem;font-variant-numeric:tabular-nums}
+  .mbar a{background:var(--signal);color:var(--ink);padding:10px 16px;text-decoration:none;font-weight:700;border-radius:2px;min-height:44px;display:inline-flex;align-items:center}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#calc">К калькулятору</a>
+<div class="variant" role="group" aria-label="Вариант демо"><span>Вариант сайта:</span>
+  <button type="button" data-v="plain" aria-pressed="true">Простой</button>
+  <button type="button" data-v="photo" aria-pressed="false">С фото</button></div>
+<header class="top"><div class="wrap">
+  <a class="brand" href="#">Ремонт квартир · демо</a>
+  <a class="tel" href="#apply">+7 000 000-00-00</a>
+</div></header>
+
+<main>
+<div class="herowrap">
+<section class="hero wrap">
+  <h1>Посчитайте ремонт за минуту</h1>
+  <p class="lede">Двигайте площадь, выбирайте вид работ: сумма и срок пересчитываются сразу. Точную смету мастер составит после замера.</p>
+</section>
+</div>
+
+<section class="wrap calc" id="calc" aria-label="Калькулятор">
+  <form class="panel" id="f" onsubmit="return false">
+    <h2>Параметры квартиры</h2>
+    <fieldset>
+      <legend>Площадь</legend>
+      <div class="row"><span>Общая площадь</span><span class="val"><span id="areaV">54</span> м²</span></div>
+      <input type="range" id="area" min="20" max="150" step="1" value="54" aria-label="Площадь, квадратных метров">
+      <div class="scale"><span>20</span><span>150</span></div>
+    </fieldset>
+    <fieldset>
+      <legend>Вид ремонта</legend>
+      <div class="tiles">
+        <label class="tile"><input type="radio" name="kind" value="cosm" checked><span><b>Косметический</b><small>стены, пол, потолки без переделок</small></span></label>
+        <label class="tile"><input type="radio" name="kind" value="cap"><span><b>Капитальный</b><small>с заменой коммуникаций и стяжкой</small></span></label>
+        <label class="tile"><input type="radio" name="kind" value="design"><span><b>Дизайнерский</b><small>по проекту, индивидуальные решения</small></span></label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Материалы</legend>
+      <div class="tiles">
+        <label class="tile"><input type="radio" name="mat" value="eco"><span><b>Эконом</b><small>базовые материалы</small></span></label>
+        <label class="tile"><input type="radio" name="mat" value="std" checked><span><b>Стандарт</b><small>проверенный средний уровень</small></span></label>
+        <label class="tile"><input type="radio" name="mat" value="prem"><span><b>Премиум</b><small>выбор по каталогу</small></span></label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Добавить к работам</legend>
+      <div class="opts">
+        <label class="opt"><input type="checkbox" id="o-demo"><span>Демонтаж старого покрытия<br><small>включает вывоз мусора</small></span><span class="p">1 200 ₽/м²</span></label>
+        <label class="opt"><input type="checkbox" id="o-el"><span>Замена электрики<br><small>проводка и щиток</small></span><span class="p">650 ₽/м²</span></label>
+        <label class="opt"><input type="checkbox" id="o-wall"><span>Выравнивание стен<br><small>под покраску или обои</small></span><span class="p">900 ₽/м²</span></label>
+        <label class="opt"><input type="checkbox" id="o-fast"><span>Срочно, в сжатые сроки<br><small>больше бригад на объекте</small></span><span class="p">+10%</span></label>
+      </div>
+    </fieldset>
+  </form>
+
+  <aside class="panel receipt" aria-live="polite">
+    <h2>Предварительная смета</h2>
+    <dl id="lines"></dl>
+    <div class="total">
+      <div class="lbl">Итого, примерно</div>
+      <div class="sum" id="sum">0 ₽</div>
+      <p class="note" id="term">Срок: —</p>
+      <a class="btn" href="#apply">Получить точную смету</a>
+    </div>
+  </aside>
+</section>
+
+<section class="wrap flow">
+  <h2>Что будет после заявки</h2>
+  <ol class="steps">
+    <li><b>Звонок</b>Уточним детали и договоримся о времени замера.</li>
+    <li><b>Замер и смета</b>Мастер приедет, посчитает и зафиксирует цену в договоре.</li>
+    <li><b>Работы по этапам</b>Оплата по этапам, акт после каждого.</li>
+  </ol>
+</section>
+
+<section class="wrap apply" id="apply">
+  <h2>Оставить заявку</h2>
+  <form id="lead">
+    <p id="sum-line"></p>
+    <label class="f">Ваше имя<input type="text" id="nm" autocomplete="name" required></label>
+    <label class="f">Телефон<input type="tel" id="ph" autocomplete="tel" inputmode="tel" placeholder="+7" required></label>
+    <button class="btn" type="submit">Отправить заявку</button>
+    <p id="ok" role="status">Демо: заявка никуда не отправлена. В рабочем сайте она придёт вам в Telegram сразу с выбранными параметрами.</p>
+  </form>
+</section>
+</main>
+
+<footer><div class="wrap">Демо / пример работы. Цены, телефон и название условные, сайт показывает, как может выглядеть ваш калькулятор. <span class="credit">Фото: Max Vakhtbovych, Pexels (лицензия Pexels).</span></div></footer>
+
+<div class="mbar" aria-hidden="true"><span>Итого<br><b id="msum">0 ₽</b></span><a href="#apply">Заявка</a></div>
+
+<script>
+document.querySelectorAll('.variant button').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.body.classList.toggle('photo',b.dataset.v==='photo');
+    document.querySelectorAll('.variant button').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});
+  });
+});
+</script>
+<script>
+(function(){
+  var RATE={cosm:6500,cap:12500,design:21000};
+  var KIND={cosm:'Косметический',cap:'Капитальный',design:'Дизайнерский'};
+  var MAT={eco:.9,std:1,prem:1.25};
+  var MATN={eco:'Эконом',std:'Стандарт',prem:'Премиум'};
+  var DAYS={cosm:.45,cap:.9,design:1.3}; // дней на м²
+  var $=function(id){return document.getElementById(id)};
+  var fmt=function(n){return Math.round(n).toLocaleString('ru-RU')+' ₽'};
+  var area=$('area'),shown=0,raf;
+  function val(n){return document.querySelector('input[name='+n+']:checked').value}
+  function calc(){
+    var a=+area.value,k=val('kind'),m=val('mat');
+    var base=a*RATE[k]*MAT[m],lines=[['Площадь',a+' м²'],['Вид ремонта',KIND[k]],['Материалы',MATN[m]],['Работы и материалы',fmt(base)]];
+    var sum=base;
+    if($('o-demo').checked){var d=a*1200;sum+=d;lines.push(['Демонтаж',fmt(d)])}
+    if($('o-el').checked){var e=a*650;sum+=e;lines.push(['Электрика',fmt(e)])}
+    if($('o-wall').checked){var w=a*900;sum+=w;lines.push(['Выравнивание стен',fmt(w)])}
+    var days=a*DAYS[k]/ (a>80?1.6:1.2);
+    if($('o-fast').checked){var f=sum*.1;sum+=f;lines.push(['Срочность +10%',fmt(f)]);days*=.75}
+    var d1=Math.max(7,Math.round(days)),weeks=Math.ceil(d1/7);
+    $('lines').innerHTML=lines.map(function(l){return '<div class="ln"><dt>'+l[0]+'</dt><dd>'+l[1]+'</dd></div>'}).join('');
+    $('term').textContent='Срок: около '+d1+' дн. (≈ '+weeks+' нед.)';
+    $('areaV').textContent=a;
+    count(sum);
+    $('sum-line').textContent='Ваш расчёт: '+a+' м², '+KIND[k].toLowerCase()+', материалы «'+MATN[m].toLowerCase()+'», примерно '+fmt(sum)+'.';
+  }
+  function count(to){
+    cancelAnimationFrame(raf);
+    var from=shown,t0=null,dur=matchMedia('(prefers-reduced-motion: reduce)').matches?0:350;
+    function step(t){
+      if(t0===null)t0=t;
+      var p=dur?Math.min((t-t0)/dur,1):1,v=from+(to-from)*(1-Math.pow(1-p,3));
+      $('sum').textContent=fmt(v);$('msum').textContent=fmt(v);
+      if(p<1)raf=requestAnimationFrame(step);else shown=to;
+    }
+    raf=requestAnimationFrame(step);
+  }
+  $('f').addEventListener('input',calc);
+  $('lead').addEventListener('submit',function(e){e.preventDefault();$('ok').style.display='block';$('ok').scrollIntoView({block:'nearest'})});
+  calc();
+})();
+</script>
+</body>
+</html>
