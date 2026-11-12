@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Мастер на час — демо лендинга</title>
+<meta name="description" content="Демо / пример работы: страница мастера по ремонту в одну колонку с одной главной кнопкой. Цены и контакты условные.">
+<link rel="preload" href="fonts/Manrope-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/Manrope-Bold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/Manrope-ExtraBold.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-Regular.woff2") format("woff2");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-SemiBold.woff2") format("woff2");font-weight:600;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-Bold.woff2") format("woff2");font-weight:700;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-ExtraBold.woff2") format("woff2");font-weight:800 900;font-style:normal;font-display:block}
+/* запасной шрифт подогнан по ширине: если Manrope не загрузится, текст не «поедет» */
+@font-face{font-family:"Manrope Fallback";src:local("Arial");size-adjust:102%}
+:root{
+  --ink:#16181D; --mute:#5B6270; --bg:#F4F1EA; --card:#fff; --line:#DDD8CC; --acc:#FF6A13; --acc-ink:#16181D; --ok:#0B6E4F;
+  --font:"Manrope","Manrope Fallback",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:18px;line-height:1.5}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.skip{position:absolute;left:-999px}.skip:focus{left:12px;top:12px;background:#fff;padding:10px 14px;z-index:9}
+
+/* одна колонка */
+.col{max-width:560px;margin:0 auto;padding:0 20px}
+section{padding:36px 0 8px}
+.top{background:var(--ink);color:#fff}
+.top .col{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-top:14px;padding-bottom:14px}
+.top a{text-decoration:none;font-weight:700}
+.top .tel{color:var(--acc);white-space:nowrap}
+
+h1{font-size:clamp(2.2rem,9vw,3.2rem);line-height:1.02;letter-spacing:-.035em;font-weight:900;margin:34px 0 14px}
+h2{font-size:1.7rem;line-height:1.1;letter-spacing:-.02em;font-weight:800;margin:0 0 16px}
+.lead{color:var(--mute);margin:0 0 22px;font-size:1.1rem}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:0;list-style:none}
+.badges li{background:#fff;border:2px solid var(--ink);border-radius:999px;padding:5px 14px;font-weight:700;font-size:.92rem}
+
+/* единственная кнопка, повторяется */
+.go{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:64px;padding:0 20px;background:var(--acc);color:var(--acc-ink);border:3px solid var(--ink);border-radius:14px;font:800 1.2rem var(--font);text-decoration:none;cursor:pointer;box-shadow:0 5px 0 var(--ink);transition:transform .12s,box-shadow .12s}
+.go:hover{transform:translateY(2px);box-shadow:0 3px 0 var(--ink)}
+.go:active{transform:translateY(5px);box-shadow:0 0 0 var(--ink)}
+.sub{text-align:center;color:var(--mute);font-size:.92rem;margin:10px 0 0}
+
+.card{background:var(--card);border:2px solid var(--ink);border-radius:14px;padding:18px}
+.price{list-style:none;margin:0;padding:0}
+.price li{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.price li:last-child{border-bottom:0}
+.price b{white-space:nowrap}
+.price small{display:block;color:var(--mute)}
+
+/* калькулятор */
+.calc label.f{display:grid;gap:6px;font-weight:700;margin-bottom:14px}
+select,input[type=text],input[type=tel]{font:inherit;font-weight:500;padding:12px;border:2px solid var(--ink);border-radius:10px;background:#fff;min-height:52px;width:100%;color:var(--ink)}
+.qty{display:flex;align-items:center;gap:10px}
+.qty button{width:52px;height:52px;border:2px solid var(--ink);background:#fff;border-radius:10px;font:800 1.5rem var(--font);cursor:pointer;flex:none}
+.qty button:active{background:var(--acc)}
+.qty output{flex:1;text-align:center;font-weight:800;font-size:1.5rem}
+.qty .unit{min-width:46px;color:var(--mute);font-weight:600}
+.chk{display:flex;gap:12px;align-items:center;font-weight:700;margin:4px 0 16px;min-height:44px}
+.chk input{width:24px;height:24px;accent-color:var(--ink);flex:none}
+.res{background:var(--ink);color:#fff;border-radius:12px;padding:16px;margin-top:6px}
+.res .l{color:#C9CDD6;font-size:.95rem}
+.res .sum{font-size:2.4rem;font-weight:900;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1.1}
+.res .n{color:#C9CDD6;font-size:.9rem;margin-top:4px}
+
+.steps{list-style:none;margin:0;padding:0;counter-reset:s;display:grid;gap:12px}
+.steps li{counter-increment:s;display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--acc);border:2px solid var(--ink);font-weight:900}
+.steps b{display:block}
+.steps span{color:var(--mute)}
+
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ba figure{margin:0}
+.ba .pic{aspect-ratio:4/3;border:2px solid var(--ink);border-radius:10px;display:grid;place-items:center;color:var(--mute);font-size:.85rem;text-align:center;padding:6px}
+.ba .b{background:repeating-linear-gradient(45deg,#e6e0d2,#e6e0d2 10px,#ece6d8 10px,#ece6d8 20px)}
+.ba .a{background:#dfe9e3}
+.ba figcaption{font-weight:800;margin-top:6px}
+
+.rev{margin:0 0 12px}
+.rev blockquote{margin:0 0 6px}
+.rev cite{color:var(--mute);font-style:normal;font-size:.92rem}
+.tag{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--ink);padding:1px 7px;border-radius:6px;margin-right:6px}
+
+details{border-bottom:1px solid var(--line);padding:6px 0}
+summary{cursor:pointer;font-weight:700;min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:12px;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:1.5rem}
+details[open] summary::after{content:"−"}
+details p{margin:0 0 10px;color:var(--mute)}
+
+form{display:grid;gap:14px}
+label.f2{display:grid;gap:6px;font-weight:700}
+.agree{display:flex;gap:12px;align-items:flex-start;font-size:.88rem;color:var(--mute)}
+.agree input{width:22px;height:22px;margin-top:2px;flex:none;accent-color:var(--ink)}
+#sumline{margin:0;padding:10px 12px;background:#fff7ec;border:2px dashed var(--acc);border-radius:10px;font-weight:600;display:none}
+#ok{display:none;margin:0;padding:14px;border:2px solid var(--ok);border-radius:10px;color:var(--ok);font-weight:700;background:#fff}
+.contacts{font-style:normal;display:grid;gap:6px}
+.contacts b{color:var(--mute);font-weight:600;display:inline-block;min-width:92px}
+footer{padding:30px 0 110px;color:var(--mute);font-size:.88rem}
+
+/* закреплённая кнопка */
+.fix{position:fixed;left:0;right:0;bottom:0;z-index:5;background:rgba(244,241,234,.96);border-top:2px solid var(--ink);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.fix .col{padding:0;display:flex;gap:10px}
+.fix .go{min-height:56px;font-size:1.05rem;box-shadow:none}
+.fix .call{flex:none;width:56px;min-height:56px;border:3px solid var(--ink);border-radius:14px;display:grid;place-items:center;background:#fff;text-decoration:none;font-size:1.4rem}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#zayavka">К заявке</a>
+<header class="top"><div class="col"><a href="#">Мастер на час · демо</a><a class="tel" href="tel:+70000000000">+7 000 000-00-00</a></div></header>
+
+<main class="col">
+<section style="padding-top:0">
+  <h1>Починю быстро и по честной цене</h1>
+  <p class="lead">Сантехника, электрика, мелкий ремонт и сборка. Приеду сегодня, цену скажу до начала работы.</p>
+  <ul class="badges"><li>Выезд от 1 часа</li><li>Гарантия 12 мес.</li><li>Замер бесплатно</li></ul>
+  <a class="go" href="#zayavka">Вызвать мастера</a>
+  <p class="sub">Перезвоню за 10 минут в рабочее время</p>
+</section>
+
+<section id="raschet">
+  <h2>Посчитайте за минуту</h2>
+  <div class="card calc">
+    <form id="calc" onsubmit="return false">
+      <label class="f">Что нужно сделать
+        <select id="svc"></select></label>
+      <div class="f" style="margin-bottom:14px"><span style="font-weight:700;display:block;margin-bottom:6px">Сколько</span>
+        <div class="qty"><button type="button" id="minus" aria-label="Меньше">−</button><output id="qv" aria-live="polite">1</output><button type="button" id="plus" aria-label="Больше">+</button><span class="unit" id="unit">шт</span></div></div>
+      <label class="chk"><input type="checkbox" id="fast"> Срочно, в течение 2 часов (+30%)</label>
+    </form>
+    <div class="res" aria-live="polite">
+      <div class="l">Итого, примерно</div>
+      <div class="sum" id="sum">0 ₽</div>
+      <div class="n" id="note"></div>
+    </div>
+    <p style="margin:16px 0 0"><a class="go" href="#zayavka" id="fromcalc">Вызвать мастера</a></p>
+  </div>
+</section>
+
+<section>
+  <h2>Что делаю и сколько стоит</h2>
+  <div class="card"><ul class="price">
+    <li><span>Замена розетки или выключателя<small>с материалами мастера — от +100 ₽</small></span><b>400 ₽</b></li>
+    <li><span>Установка смесителя</span><b>1 500 ₽</b></li>
+    <li><span>Установка межкомнатной двери</span><b>3 500 ₽</b></li>
+    <li><span>Поклейка обоев, за м²</span><b>350 ₽</b></li>
+    <li><span>Укладка ламината, за м²</span><b>450 ₽</b></li>
+    <li><span>Сборка мебели, за час</span><b>800 ₽</b></li>
+  </ul></div>
+  <p class="sub" style="text-align:left">Минимальный выезд — 1 000 ₽. Цены условные.</p>
+</section>
+
+<section>
+  <h2>Как это будет</h2>
+  <ol class="steps">
+    <li><div><b>Звоните или оставьте заявку</b><span>Скажете, что сломалось.</span></div></li>
+    <li><div><b>Бесплатный замер и цена</b><span>Приеду, посмотрю, назову точную сумму.</span></div></li>
+    <li><div><b>Делаю и убираю за собой</b><span>Оплата после работы, акт и гарантия.</span></div></li>
+  </ol>
+</section>
+
+<section>
+  <h2>До и после</h2>
+  <div class="ba">
+    <figure><div class="pic b">место для фото «до»</div><figcaption>До</figcaption></figure>
+    <figure><div class="pic a">место для фото «после»</div><figcaption>После</figcaption></figure>
+  </div>
+  <p class="sub" style="text-align:left">В рабочем сайте — ваши реальные объекты.</p>
+</section>
+
+<section>
+  <h2>Гарантия и договор</h2>
+  <div class="card">
+    <p style="margin:0 0 8px"><b>12 месяцев</b> на работу, письменно в акте.</p>
+    <p style="margin:0 0 8px"><b>Фиксированная цена</b> — не вырастет по ходу работы.</p>
+    <p style="margin:0"><b>Договор</b> для тех, кому нужен чек и закрывающие документы.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Отзывы</h2>
+  <div class="card rev"><blockquote><span class="tag">пример</span>Приехал в тот же день, поменял смеситель за час, всё убрал.</blockquote><cite>Пример отзыва, Анна</cite></div>
+  <div class="card rev"><blockquote><span class="tag">пример</span>Назвал цену заранее, итог не отличался. Рекомендую.</blockquote><cite>Пример отзыва, Игорь</cite></div>
+</section>
+
+<section>
+  <h2>Где работаю</h2>
+  <div class="card"><p style="margin:0 0 6px"><b>Город и пригород</b> — до 30 км от центра.</p><p style="margin:0">Ежедневно 8:00–21:00. Срочный выезд — в течение 2 часов.</p></div>
+</section>
+
+<section>
+  <h2>Частые вопросы</h2>
+  <details><summary>Вы берёте за выезд?</summary><p>Замер бесплатный, если вы заказываете работу. Если отказались после замера — 500 ₽ за выезд.</p></details>
+  <details><summary>Материалы чьи?</summary><p>Можно ваши или мои: куплю по чеку без наценки.</p></details>
+  <details><summary>Работаете в выходные?</summary><p>Да, без наценки, кроме срочных вызовов ночью.</p></details>
+</section>
+
+<section id="zayavka">
+  <h2>Вызвать мастера</h2>
+  <div class="card">
+    <form id="lead" onsubmit="return false">
+      <p id="sumline"></p>
+      <label class="f2">Как вас зовут<input type="text" id="nm" autocomplete="name" required></label>
+      <label class="f2">Телефон<input type="tel" id="ph" autocomplete="tel" inputmode="tel" placeholder="+7" required></label>
+      <label class="agree"><input type="checkbox" id="ag" required><span>Согласен на обработку персональных данных (условная политика конфиденциальности).</span></label>
+      <button class="go" type="submit">Отправить заявку</button>
+      <p id="ok" role="status"></p>
+    </form>
+  </div>
+  <address class="contacts" style="margin-top:24px">
+    <div><b>Телефон</b>+7 000 000-00-00</div>
+    <div><b>Часы</b>ежедневно 8:00–21:00</div>
+    <div><b>Зона</b>город и пригород</div>
+  </address>
+</section>
+</main>
+
+<footer><div class="col">Демо / пример работы. Имя, цены и телефон условные. Реквизиты (условно): самозанятый Фамилия И. О., ИНН 000000000000 · Политика конфиденциальности</div></footer>
+<div class="fix"><div class="col"><a class="go" href="#zayavka">Вызвать мастера</a><a class="call" href="tel:+70000000000" aria-label="Позвонить"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></a></div></div>
+
+<script>
+(function(){
+  var S=[
+    {n:'Замена розетки или выключателя',p:400,u:'шт',min:1,max:30},
+    {n:'Установка смесителя',p:1500,u:'шт',min:1,max:10},
+    {n:'Установка межкомнатной двери',p:3500,u:'шт',min:1,max:10},
+    {n:'Поклейка обоев',p:350,u:'м²',min:5,max:200,step:5},
+    {n:'Укладка ламината',p:450,u:'м²',min:5,max:200,step:5},
+    {n:'Сборка мебели',p:800,u:'ч',min:1,max:12}
+  ];
+  var MINVISIT=1000;
+  var $=function(i){return document.getElementById(i)};
+  var fmt=function(n){return Math.round(n).toLocaleString('ru-RU')+' ₽'};
+  var sel=$('svc'),q=S[0].min;
+  S.forEach(function(s,i){var o=document.createElement('option');o.value=i;o.textContent=s.n+' — '+s.p+' ₽/'+s.u;sel.appendChild(o)});
+  function calc(){
+    var s=S[+sel.value],raw=s.p*q,sum=Math.max(raw,MINVISIT),fast=$('fast').checked;
+    if(fast)sum*=1.3;
+    $('qv').textContent=q;$('unit').textContent=s.u;
+    $('sum').textContent=fmt(sum);
+    $('note').textContent=(raw<MINVISIT?'Применён минимальный выезд '+fmt(MINVISIT)+'. ':'')+(fast?'Срочность +30%. ':'')+'Точную цену назову после замера.';
+    var line=$('sumline');line.style.display='block';
+    line.textContent='Ваш расчёт: '+s.n.toLowerCase()+', '+q+' '+s.u+(fast?', срочно':'')+' — примерно '+fmt(sum)+'.';
+  }
+  function step(d){var s=S[+sel.value],st=s.step||1;q=Math.min(s.max,Math.max(s.min,q+d*st));calc()}
+  sel.addEventListener('change',function(){q=S[+sel.value].min;calc()});
+  $('minus').addEventListener('click',function(){step(-1)});
+  $('plus').addEventListener('click',function(){step(1)});
+  $('fast').addEventListener('change',calc);
+  $('lead').addEventListener('submit',function(e){e.preventDefault();var ok=$('ok');ok.textContent='Демо: заявка никуда не отправлена. В рабочем сайте она придёт мастеру в Telegram вместе с расчётом.';ok.style.display='block'});
+  calc();
+})();
+</script>
+</body>
+</html>
