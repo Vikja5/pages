@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Пример: таблица учёта заявок и затрат по АЗС</title>
+<style>
+:root{--bg:#f6f7f5;--fg:#1d2420;--mut:#5a645e;--card:#fff;--line:#cfd6d0;--g:#e2f4e2;--r:#f4a6a6;--rt:#9c0006;--ac:#2d6a4f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+.w{max-width:1000px;margin:0 auto;padding:0 16px 40px}
+.tag{background:#fff3c4;border-bottom:1px solid #e5d27a;padding:8px 16px;text-align:center;font-size:14px}
+h1{font-size:26px;line-height:1.25;margin:24px 0 8px}h2{font-size:20px;margin:32px 0 8px}
+p{margin:8px 0}.mut{color:var(--mut);font-size:14px}
+.sc{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;white-space:nowrap;background:#fff}
+th{background:#ddd;position:sticky;top:0;white-space:normal;min-width:80px}
+td.g,th.g{background:var(--g)}td.n{text-align:right}
+tr.r td{background:var(--r);color:var(--rt)}tr.r td.g{background:var(--r)}
+tr.t td{font-weight:700}tr.t.r td,tr.t.r td.g{background:var(--r);color:var(--rt)}
+.leg{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0}
+.leg span{display:inline-flex;align-items:center;gap:8px;font-size:15px}
+.sw{width:22px;height:22px;border:1px solid #888;border-radius:4px;display:inline-block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 16px}
+ol,ul{padding-left:22px;margin:8px 0}li{margin:6px 0}
+.bar{font-size:13px;color:var(--mut);margin:0 0 6px}
+@media print{.tag{display:none}}
+</style></head><body>
+<div class="tag"><b>Демо / пример работы.</b> Данные условные.</div>
+<div class="w">
+<h1>Таблица учёта заявок и затрат по АЗС</h1>
+<p>Так будет выглядеть таблица в Google Таблицах: лист «Заявки» для ввода, листы «По месяцам» и «По АЗС» считаются сами. В рабочем файле лист «Заявки» будет пустым, здесь в нём условные данные для примера. Ниже условный пример на 10 строках; в рабочей таблице строк хватит на ~200 АЗС и больше.</p>
+
+<h2>Лист «Заявки»</h2>
+<p class="bar">Заголовки закреплены, на всех колонках автофильтр: по номеру АЗС находится в пару кликов (и Ctrl+F тоже работает).</p>
+<div class="sc"><table><thead><tr><th>Номер АЗС</th><th>Адрес АЗС</th><th>Дата и номер заявки</th><th>Проводимые работы</th><th>Дата закрытия</th><th>ФИО исполнителя</th><th>Контакт ответственного</th><th>Номер счёта</th><th>Затраты (факт)</th><th>Затраты по смете</th><th class=g>Месяц</th></tr></thead><tbody><tr><td class=''>101</td><td class=''>г. Условный, ул. Образцовая, 1</td><td class=''>03.01.2026 № 1</td><td class=''>Замена фильтра ТРК</td><td class=''>14.01.2026</td><td class=''>Исполнитель А.</td><td class=''>+7 (000) 000-00-01</td><td class=''>1001</td><td class=' n'>12 400</td><td class=' n'>12 000</td><td class='g'>январь</td></tr><tr><td class=''>102</td><td class=''>г. Условный, ул. Образцовая, 5</td><td class=''>10.01.2026 № 2</td><td class=''>Ремонт кассового узла</td><td class=''>25.01.2026</td><td class=''>Исполнитель Б.</td><td class=''>+7 (000) 000-00-02</td><td class=''>1002</td><td class=' n'>8 300</td><td class=' n'>9 000</td><td class='g'>январь</td></tr><tr><td class=''>103</td><td class=''>г. Пример, пр. Тестовый, 12</td><td class=''>02.02.2026 № 3</td><td class=''>Покраска ограждения</td><td class=''>11.02.2026</td><td class=''>Исполнитель В.</td><td class=''>+7 (000) 000-00-03</td><td class=''>1003</td><td class=' n'>15 000</td><td class=' n'>14 000</td><td class='g'>февраль</td></tr><tr><td class=''>104</td><td class=''>г. Пример, пр. Тестовый, 20</td><td class=''>15.02.2026 № 4</td><td class=''>Замена освещения</td><td class=''>27.02.2026</td><td class=''>Исполнитель А.</td><td class=''>+7 (000) 000-00-01</td><td class=''>1004</td><td class=' n'>6 900</td><td class=' n'>7 500</td><td class='g'>февраль</td></tr><tr><td class=''>105</td><td class=''>г. Условный, ул. Образцовая, 9</td><td class=''>01.03.2026 № 5</td><td class=''>Ремонт навеса</td><td class=''>09.03.2026</td><td class=''>Исполнитель Г.</td><td class=''>+7 (000) 000-00-04</td><td class=''>1005</td><td class=' n'>22 000</td><td class=' n'>20 000</td><td class='g'>март</td></tr><tr><td class=''>106</td><td class=''>г. Пример, ул. Вымышленная, 3</td><td class=''>12.03.2026 № 6</td><td class=''>Чистка очистных</td><td class=''>30.03.2026</td><td class=''>Исполнитель Б.</td><td class=''>+7 (000) 000-00-02</td><td class=''>1006</td><td class=' n'>9 800</td><td class=' n'>10 000</td><td class='g'>март</td></tr><tr><td class=''>107</td><td class=''>г. Условный, ул. Образцовая, 14</td><td class=''>04.04.2026 № 7</td><td class=''>Поверка датчиков</td><td class=''>18.04.2026</td><td class=''>Исполнитель В.</td><td class=''>+7 (000) 000-00-03</td><td class=''>1007</td><td class=' n'>5 200</td><td class=' n'>5 000</td><td class='g'>апрель</td></tr><tr><td class=''>108</td><td class=''>г. Пример, пр. Тестовый, 31</td><td class=''>20.04.2026 № 8</td><td class=''>Замена шлангов ТРК</td><td class=''>06.05.2026</td><td class=''>Исполнитель А.</td><td class=''>+7 (000) 000-00-01</td><td class=''>1008</td><td class=' n'>17 600</td><td class=' n'>18 000</td><td class='g'>май</td></tr><tr><td class=''>109</td><td class=''>г. Условный, ул. Образцовая, 21</td><td class=''>11.05.2026 № 9</td><td class=''>Ремонт покрытия</td><td class=''>22.05.2026</td><td class=''>Исполнитель Г.</td><td class=''>+7 (000) 000-00-04</td><td class=''>1009</td><td class=' n'>31 000</td><td class=' n'>30 000</td><td class='g'>май</td></tr><tr><td class=''>110</td><td class=''>г. Пример, ул. Вымышленная, 8</td><td class=''></td><td class=''>Диагностика оборудования</td><td class=''></td><td class=''>Исполнитель Б.</td><td class=''>+7 (000) 000-00-02</td><td class=''></td><td class=' n'></td><td class=' n'>4 000</td><td class='g'></td></tr></tbody></table></div>
+<p class="mut">Последняя строка без даты закрытия: заявка ещё открыта, месяц не считается, в итоги не попадает. Таблицу можно листать вбок.</p>
+
+<h2>Лист «По месяцам»</h2>
+<p class="bar">Все ячейки зелёные: это формулы, их руками не трогаем. Новые строки из «Заявки» подхватываются сами.</p>
+<div class="sc"><table><thead><tr><th>Месяц</th><th class="g">Затраты</th><th class="g">Затраты по смете</th><th class="g">Смета минус факт</th></tr></thead>
+<tbody><tr><td>январь</td><td class='g n'>20 700</td><td class='g n'>21 000</td><td class='g n'>300</td></tr><tr class=r><td>февраль</td><td class='g n'>21 900</td><td class='g n'>21 500</td><td class='g n'>-400</td></tr><tr class=r><td>март</td><td class='g n'>31 800</td><td class='g n'>30 000</td><td class='g n'>-1 800</td></tr><tr class=r><td>апрель</td><td class='g n'>5 200</td><td class='g n'>5 000</td><td class='g n'>-200</td></tr><tr class=r><td>май</td><td class='g n'>48 600</td><td class='g n'>48 000</td><td class='g n'>-600</td></tr><tr><td>июнь</td><td class='g n'>0</td><td class='g n'>0</td><td class='g n'>0</td></tr><tr><td>июль</td><td class='g n'>0</td><td class='g n'>0</td><td class='g n'>0</td></tr><tr><td>август</td><td class='g n'>0</td><td class='g n'>0</td><td class='g n'>0</td></tr><tr><td>сентябрь</td><td class='g n'>0</td><td class='g n'>0</td><td class='g n'>0</td></tr><tr><td>октябрь</td><td class='g n'>0</td><td class='g n'>0</td><td class='g n'>0</td></tr><tr><td>ноябрь</td><td class='g n'>0</td><td class='g n'>0</td><td class='g n'>0</td></tr><tr><td>декабрь</td><td class='g n'>0</td><td class='g n'>0</td><td class='g n'>0</td></tr><tr class="t r"><td>Итого за год</td><td class="g n">128 200</td><td class="g n">125 500</td><td class="g n">-2 700</td></tr></tbody></table></div>
+<p class="mut">Красным подсвечены месяцы и итог года, где факт больше сметы. Подсветка включается и выключается сама.</p>
+
+<h2>Лист «По АЗС»</h2>
+<p>Делаю сводку по каждой АЗС: по одной строке на номер, затраты за год и смета считаются сами. Строка загорается красным, когда затраты больше сметы, так перерасход видно сразу по конкретной АЗС. Итог по всей сети я оставляю на листе «По месяцам».</p>
+<p class="bar">Ячейки зелёные: это формулы. Ниже условный пример на 6 АЗС, две из них красные.</p>
+<div class="sc"><table><thead><tr><th>Номер АЗС</th><th class="g">Затраты за год (факт)</th><th class="g">Затраты по смете за год</th><th class="g">Перерасход</th></tr></thead>
+<tbody><tr class=r><td>101</td><td class='g n'>12 400</td><td class='g n'>12 000</td><td class='g n'>400</td></tr><tr><td>102</td><td class='g n'>8 300</td><td class='g n'>9 000</td><td class='g n'>0</td></tr><tr><td>104</td><td class='g n'>6 900</td><td class='g n'>7 500</td><td class='g n'>0</td></tr><tr><td>106</td><td class='g n'>9 800</td><td class='g n'>10 000</td><td class='g n'>0</td></tr><tr><td>108</td><td class='g n'>17 600</td><td class='g n'>18 000</td><td class='g n'>0</td></tr><tr class=r><td>109</td><td class='g n'>31 000</td><td class='g n'>30 000</td><td class='g n'>1 000</td></tr></tbody></table></div>
+<p class="mut">Красные строки: факт больше сметы по этой АЗС. Демо / пример работы, данные условные.</p>
+
+<h2>Зоны таблицы</h2>
+<div class="leg"><span><i class="sw" style="background:#fff"></i> белый: ручной ввод</span><span><i class="sw" style="background:var(--g)"></i> светло-зелёный: формулы</span><span><i class="sw" style="background:var(--r)"></i> красный: перерасход</span></div>
+
+<h2>Инструкция на 1 страницу</h2>
+<div class="card">
+<p><b>Как добавить заявку.</b></p>
+<ol><li>Откройте лист «Заявки», спуститесь на первую пустую строку.</li><li>Заполните белые ячейки: номер АЗС, адрес, дата и номер заявки, работы, исполнитель, контакт, номер счёта, суммы.</li><li>Когда заявка закрыта, впишите дату закрытия: «Месяц» появится сам.</li></ol>
+<p><b>Как найти АЗС.</b> Нажмите значок фильтра в заголовке «Номер АЗС» и введите номер, либо Ctrl+F.</p>
+<p><b>Где итоги.</b> Лист «По месяцам»: суммы факта и сметы по каждому месяцу, внизу итог за год.</p>
+<p><b>Где итоги по каждой АЗС.</b> Лист «По АЗС»: затраты за год, смета и перерасход по каждому номеру.</p>
+<p><b>Что значит красный.</b> Факт больше сметы: за месяц (красная строка), за год (красный итог) или по конкретной АЗС (красная строка на листе «По АЗС»).</p>
+<p><b>Как очистить в конце года.</b></p>
+<ol><li>Лист «Заявки»: выделите белые ячейки с данными (без строки заголовков и без зелёной колонки «Месяц»).</li><li>Нажмите Delete. Формулы и итоги останутся и обнулятся сами.</li></ol>
+<p class="mut">Совет: перед очисткой сделайте копию файла (Файл, Создать копию) для архива.</p>
+</div>
+<p class="mut" style="margin-top:24px">Демо / пример работы, данные условные. Образец с теми же листами и формулами: файл primer_tablitsa.xlsx рядом.</p>
+</div></body></html>
