@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Презентация-каталог моделей — пример работы</title>
+<style>
+:root{--bg:#0e1116;--panel:#171c24;--panel2:#1e2530;--line:#2b3442;--tx:#eef1f5;--mut:#9aa6b6;--acc:#ff6a1a;--acc2:#ffb347;--cool:#4cc3ff;--r:18px}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{background:var(--bg);color:var(--tx);font-family:"Segoe UI",Roboto,Arial,sans-serif;line-height:1.45;overflow-x:hidden}
+.top{position:sticky;top:0;z-index:10;background:rgba(14,17,22,.94);border-bottom:1px solid var(--line)}
+.top-in{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.badge{font-size:12px;font-weight:600;color:#1a1208;background:var(--acc2);padding:5px 10px;border-radius:99px}
+.nav{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.nav a{color:var(--mut);text-decoration:none;font-size:13px;padding:5px 9px;border:1px solid var(--line);border-radius:99px}
+.nav a:hover,.nav a.on{color:var(--tx);border-color:var(--acc)}
+.bar{height:3px;background:var(--acc);width:0;transition:width .15s}
+main{max-width:1100px;margin:0 auto;padding:20px 16px 60px;display:grid;gap:28px}
+.hint{color:var(--mut);font-size:14px;text-align:center}
+.slide{position:relative;background:linear-gradient(160deg,var(--panel),#12161d);border:1px solid var(--line);border-radius:var(--r);padding:clamp(18px,4vw,44px);overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.slide::before{content:"";position:absolute;right:-120px;top:-120px;width:320px;height:320px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,106,26,.22),transparent)}
+.foot{display:flex;justify-content:space-between;gap:10px;margin-top:22px;padding-top:12px;border-top:1px solid var(--line);color:var(--mut);font-size:12px;position:relative}
+.kick{color:var(--acc);font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;position:relative}
+h1{font-size:clamp(30px,6vw,60px);line-height:1.05;margin:10px 0 14px;position:relative}
+h2{font-size:clamp(22px,3.6vw,36px);line-height:1.15;margin:8px 0 16px;position:relative}
+p.lead{color:var(--mut);font-size:clamp(15px,2vw,19px);max-width:620px;position:relative}
+.grid2{display:grid;grid-template-columns:1.1fr 1fr;gap:24px;align-items:center;position:relative}
+.photo{background:linear-gradient(180deg,#26303f,#161b24);border:1px dashed #3a475a;border-radius:14px;padding:12px;position:relative}
+.photo svg{width:100%;height:auto;display:block}
+.photo small{display:block;text-align:center;color:var(--mut);font-size:12px;margin-top:6px}
+table{width:100%;border-collapse:collapse;font-size:15px;position:relative}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line)}
+th{color:var(--mut);font-weight:500;width:42%}
+td{font-weight:600}
+.tbl-h{font-size:13px;color:var(--acc2);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.tag{font-size:12px;padding:4px 10px;border-radius:99px;background:var(--panel2);border:1px solid var(--line);color:var(--mut)}
+.scheme{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;position:relative}
+.scheme span{flex:1 1 90px;text-align:center;padding:10px 6px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);font-size:13px}
+.scheme span.act{border-color:var(--acc);color:var(--acc2)}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:16px;position:relative}
+.cmp .c{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:14px}
+.cmp h3{font-size:18px;margin-bottom:8px}
+.row{margin:9px 0}
+.row .l{display:flex;justify-content:space-between;font-size:13px;color:var(--mut);margin-bottom:4px}
+.row .l b{color:var(--tx)}
+.meter{height:8px;border-radius:9px;background:#0c0f14;overflow:hidden}
+.meter i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+.meter i.b{background:linear-gradient(90deg,#2a8fd0,var(--cool))}
+.cats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;position:relative}
+.cat{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
+.cat svg{width:100%;height:56px;color:var(--acc2)}
+.cat b{display:block;margin-top:6px}
+.cat span{color:var(--mut);font-size:12px}
+.toc{display:grid;grid-template-columns:repeat(20,1fr);gap:4px;position:relative;margin-top:8px}
+.toc i{aspect-ratio:1;border-radius:4px;font-style:normal;font-size:9px;display:flex;align-items:center;justify-content:center;color:#10141a;font-weight:700}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;font-size:13px;color:var(--mut);position:relative}
+.legend s{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px;text-decoration:none}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;position:relative;counter-reset:s}
+.st{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:14px;counter-increment:s}
+.st::before{content:counter(s);display:flex;width:28px;height:28px;border-radius:50%;background:var(--acc);color:#1a1208;font-weight:800;align-items:center;justify-content:center;margin-bottom:8px}
+.st b{display:block;margin-bottom:4px;font-size:15px}
+.st span{color:var(--mut);font-size:13px}
+.out{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;position:relative}
+.out span{padding:8px 16px;border-radius:99px;font-weight:700;font-size:14px;border:1px solid var(--acc);color:var(--acc2)}
+.note{margin-top:14px;color:var(--mut);font-size:13px;position:relative}
+@media (max-width:860px){.steps{grid-template-columns:1fr 1fr}.toc{grid-template-columns:repeat(12,1fr)}}
+@media (max-width:640px){
+ .grid2,.cmp{grid-template-columns:1fr}
+ .steps{grid-template-columns:1fr}
+ .cats{grid-template-columns:1fr 1fr}
+ .toc{grid-template-columns:repeat(10,1fr)}
+ .toc i{font-size:7px}
+ .nav{margin-left:0}
+ th,td{padding:8px 6px;font-size:14px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+<div class="top-in">
+<span class="badge">Демо / пример работы, данные условные</span>
+<nav class="nav" id="nav">
+<a href="#s1">Титул</a><a href="#s2">Оглавление</a><a href="#s3">Категория</a><a href="#s4">Модель</a><a href="#s5">Сравнение</a><a href="#s6">Как соберу</a>
+</nav>
+</div>
+<div class="bar" id="bar"></div>
+</header>
+
+<main>
+<p class="hint">Так будет выглядеть ваш каталог из 120 моделей. Листайте вниз или нажимайте на разделы вверху. Марка, модели и характеристики вымышленные.</p>
+
+<section class="slide" id="s1">
+<div class="kick">Каталог моделей мототехники</div>
+<h1>Модельный ряд<br>«Модель А / Б»</h1>
+<p class="lead">Презентация для клиентов: 120 моделей, у каждой название, фото и техническая информация в едином макете.</p>
+<div class="photo" style="margin-top:22px;max-width:640px">
+<svg viewBox="0 0 400 170" aria-hidden="true"><use href="#moto"/></svg>
+</div>
+<div class="foot"><span>Демо / пример работы, данные условные</span><span>1 / 6</span></div>
+</section>
+
+<section class="slide" id="s2">
+<div class="kick">Навигация</div>
+<h2>Оглавление: 120 моделей</h2>
+<p class="lead">Шесть категорий по 20 моделей. Каждая клетка — одна модель со своим номером; из оглавления в PPTX и PDF можно перейти на нужный слайд.</p>
+<div class="toc" id="toc"></div>
+<div class="legend" id="legend"></div>
+<div class="foot"><span>Демо / пример работы, данные условные</span><span>2 / 6</span></div>
+</section>
+
+<section class="slide" id="s3">
+<div class="kick">Категория 02</div>
+<h2>Дорожные туристы</h2>
+<p class="lead">Слайд-разделитель: название категории, короткое описание и перечень моделей внутри.</p>
+<div class="cats" style="margin-top:16px">
+<div class="cat"><svg viewBox="0 0 400 170" aria-hidden="true"><use href="#moto"/></svg><b>Модель А-201</b><span>слайд 21</span></div>
+<div class="cat"><svg viewBox="0 0 400 170" aria-hidden="true"><use href="#moto"/></svg><b>Модель А-202</b><span>слайд 22</span></div>
+<div class="cat"><svg viewBox="0 0 400 170" aria-hidden="true"><use href="#moto"/></svg><b>Модель Б-203</b><span>слайд 23</span></div>
+</div>
+<p class="note">Остальные модели категории идут на следующих слайдах.</p>
+<div class="foot"><span>Демо / пример работы, данные условные</span><span>3 / 6</span></div>
+</section>
+
+<section class="slide" id="s4">
+<div class="kick">Модель 021 · Дорожные туристы</div>
+<h2>Модель А-201</h2>
+<div class="grid2">
+<div class="photo">
+<svg viewBox="0 0 400 170" role="img" aria-label="Силуэт мотоцикла на месте фото"><use href="#moto"/></svg>
+<small>Здесь будет ваше фото модели</small>
+</div>
+<div>
+<div class="tbl-h">Технические характеристики</div>
+<table>
+<tr><th>Двигатель</th><td>Рядный, 2 цилиндра, 650 см³</td></tr>
+<tr><th>Мощность</th><td>68 л. с.</td></tr>
+<tr><th>Вес</th><td>212 кг</td></tr>
+<tr><th>Бак</th><td>17 л</td></tr>
+<tr><th>Коробка</th><td>6 передач</td></tr>
+</table>
+<div class="tags"><span class="tag">Туризм</span><span class="tag">ABS</span><span class="tag">Цепной привод</span></div>
+</div>
+</div>
+<div class="scheme"><span class="act">Модель</span><span class="act">Фото</span><span class="act">Техническая информация</span></div>
+<div class="foot"><span>Демо / пример работы, данные условные</span><span>4 / 6</span></div>
+</section>
+
+<section class="slide" id="s5">
+<div class="kick">Сравнение</div>
+<h2>Модель А-201 и Модель Б-203</h2>
+<div class="cmp">
+<div class="c"><h3>Модель А-201</h3>
+<div class="row"><div class="l"><span>Мощность</span><b>68 л. с.</b></div><div class="meter"><i style="width:68%"></i></div></div>
+<div class="row"><div class="l"><span>Вес</span><b>212 кг</b></div><div class="meter"><i style="width:70%"></i></div></div>
+<div class="row"><div class="l"><span>Бак</span><b>17 л</b></div><div class="meter"><i style="width:68%"></i></div></div>
+<div class="row"><div class="l"><span>Двигатель</span><b>650 см³</b></div><div class="meter"><i style="width:54%"></i></div></div>
+</div>
+<div class="c"><h3>Модель Б-203</h3>
+<div class="row"><div class="l"><span>Мощность</span><b>95 л. с.</b></div><div class="meter"><i class="b" style="width:95%"></i></div></div>
+<div class="row"><div class="l"><span>Вес</span><b>236 кг</b></div><div class="meter"><i class="b" style="width:78%"></i></div></div>
+<div class="row"><div class="l"><span>Бак</span><b>20 л</b></div><div class="meter"><i class="b" style="width:80%"></i></div></div>
+<div class="row"><div class="l"><span>Двигатель</span><b>900 см³</b></div><div class="meter"><i class="b" style="width:75%"></i></div></div>
+</div>
+</div>
+<p class="note">Полоски показывают соотношение внутри пары. Пары для сравнения выбираем по вашему списку.</p>
+<div class="foot"><span>Демо / пример работы, данные условные</span><span>5 / 6</span></div>
+</section>
+
+<section class="slide" id="s6">
+<div class="kick">Порядок работы</div>
+<h2>Как я соберу 120 моделей</h2>
+<div class="steps">
+<div class="st"><b>Ваши данные</b><span>Excel-таблица и папка с фото. Название, характеристики и имя файла фото в одной строке.</span></div>
+<div class="st"><b>Проверка</b><span>Ищу пропуски, дубли и фото без пары; вопросы по спорным строкам задам до вёрстки.</span></div>
+<div class="st"><b>Единый макет</b><span>Одна форма слайда для всех моделей: название, фото, таблица.</span></div>
+<div class="st"><b>Сборка</b><span>Слайды создаются автоматически по строкам таблицы, с нумерацией.</span></div>
+<div class="st"><b>Навигация</b><span>Оглавление, разделы по категориям, переход из оглавления на слайд.</span></div>
+</div>
+<div class="out"><span>Итог: PPTX</span><span>Итог: PDF</span></div>
+<p class="note">Фото приводятся к одному размеру и пропорциям. Правка макета вносится один раз и применяется ко всем 120 слайдам.</p>
+<div class="foot"><span>Демо / пример работы, данные условные</span><span>6 / 6</span></div>
+</section>
+</main>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+<g id="moto" fill="none" stroke="#ffb347" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+<circle cx="90" cy="120" r="34"/><circle cx="90" cy="120" r="8" fill="#ffb347"/>
+<circle cx="310" cy="120" r="34"/><circle cx="310" cy="120" r="8" fill="#ffb347"/>
+<path d="M90 120 L150 70 L240 70 L310 120"/>
+<path d="M150 70 L175 120 L240 120 L240 70"/>
+<path d="M240 70 L262 40 L290 40"/>
+<path d="M120 66 Q165 50 215 56 L240 70" stroke="#ff6a1a" stroke-width="9"/>
+<path d="M255 62 L282 98 L310 120"/>
+<path d="M165 120 H215" stroke-width="9"/>
+</g>
+</defs>
+</svg>
+
+<script>
+(function(){
+var cats=[["Городские","#ffb347"],["Дорожные туристы","#ff6a1a"],["Спорт","#4cc3ff"],["Эндуро","#8be28b"],["Круизеры","#d49cff"],["Лёгкие","#ff8fa3"]];
+var toc=document.getElementById("toc"),lg=document.getElementById("legend"),h="";
+for(var i=0;i<120;i++){var c=cats[Math.floor(i/20)];h+='<i style="background:'+c[1]+'" title="Модель '+(i+1)+', '+c[0]+'">'+(i+1)+'</i>'}
+toc.innerHTML=h;
+lg.innerHTML=cats.map(function(c,k){return '<span><s style="background:'+c[1]+'"></s>'+c[0]+' ('+(k*20+1)+'–'+(k*20+20)+')</span>'}).join("");
+var links=[].slice.call(document.querySelectorAll("#nav a")),secs=links.map(function(a){return document.querySelector(a.getAttribute("href"))}),bar=document.getElementById("bar");
+function cur(){var y=window.scrollY+120,c=0;secs.forEach(function(s,i){if(s.offsetTop<=y)c=i});return c}
+function upd(){
+var c=cur();
+links.forEach(function(a,i){a.classList.toggle("on",i===c)});
+var m=document.documentElement.scrollHeight-window.innerHeight;
+bar.style.width=(m>0?window.scrollY/m*100:0)+"%";
+}
+window.addEventListener("scroll",upd,{passive:true});upd();
+document.addEventListener("keydown",function(e){
+var c=cur();
+if(e.key==="ArrowRight"&&c<secs.length-1)secs[c+1].scrollIntoView();
+if(e.key==="ArrowLeft"&&c>0)secs[c-1].scrollIntoView();
+});
+})();
+</script>
+</body>
+</html>
