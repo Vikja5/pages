@@ -1,0 +1,253 @@
+<!doctype html>
+<!--
+СКЕЛЕТ. Конструктор 6: «Мягкий клей» (округлые крупные формы, карточки-«таблетки», пилюли-кнопки, пружинная анимация нажатия).
+Подходит для групп ниш: 1 «Медицина и уход» (базовый уровень: ветеринария, клиника, салон), 4 «Спорт и обучение» (стандарт: детское, курсы, школы).
+Вмещает обязательные блоки: ядро (первый экран с кнопкой, услуги с ценой «от», как записаться, отзывы, контакты, форма, подвал) + специалисты (врачи/мастера/тренеры), частые вопросы, плавающая кнопка срочной связи (экстренный контакт). Места для: лицензий и документов (добавить ряд карточек после «Специалистов»), «как проходит приём» (использовать блок шагов), ухода после приёма (текстовая карточка).
+СЛОТЫ (что субагент заменяет под заказ):
+  ТЕКСТЫ: все строки в [квадратных скобках]; название; телефон, адрес, часы.
+  ЦВЕТА: переменные в :root (--ink, --bg, --card, --tint1, --tint2, --tint3, --accent, --accent-ink). Сейчас нейтральные серые; --tint1..3 красят иконки и аватары.
+  ФОТО: .blobs в первом экране (три серые формы: заменить на фото в форме клякс или иллюстрацию), .ic иконки услуг, .av аватары специалистов.
+  ЛОГОТИП: .logo i (серый круг) + текст.
+  ПОВЕДЕНИЕ: форма (демо), список вариантов в select «Кто / Услуга» повторяет услуги; плавающая кнопка .sos.
+Объёмные «клейкие» тени намеренно убраны: объём вернуть цветом и тенью под заказ (--clay).
+Шрифт: Manrope из ../../_fonts/ (если файлов нет, запасной Arial с подгонкой).
+-->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Скелет — мягкий клей</title>
+<meta name="description" content="Скелет конструктора 6: округлые формы. Тексты-заглушки.">
+<link rel="preload" href="../../_fonts/Manrope-Regular.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="../../_fonts/Manrope-ExtraBold.ttf" as="font" type="font/ttf" crossorigin>
+<style>
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Regular.ttf") format("truetype");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Bold.ttf") format("truetype");font-weight:700;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-ExtraBold.ttf") format("truetype");font-weight:800 900;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope Fallback";src:local("Arial");size-adjust:102%}
+:root{
+  --bg:#f4f4f4; --ink:#2f2f2f; --card:#fff; --line:#bdbdbd; --muted:#666;
+  --tint1:#e2e2e2; --tint2:#d6d6d6; --tint3:#cacaca; --accent:#4a4a4a; --accent-ink:#fff;
+  --font:"Manrope","Manrope Fallback",Arial,sans-serif;
+  --clay:none; /* слот: объёмная тень под бренд */
+  --spring:cubic-bezier(.34,1.56,.64,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:18px;line-height:1.55;overflow-x:hidden}
+a{color:inherit}
+.wrap{max-width:1100px;margin:0 auto;padding:0 20px}
+:focus-visible{outline:4px solid var(--accent);outline-offset:3px}
+.skip{position:absolute;left:-999px}.skip:focus{left:12px;top:12px;background:#fff;padding:10px 14px;border-radius:14px;z-index:20}
+
+.clay{background:var(--card);border:3px solid var(--line);border-radius:26px;box-shadow:var(--clay)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:12px 26px;border:3px solid var(--accent);border-radius:999px;background:var(--accent);color:var(--accent-ink);font:800 1.05rem var(--font);text-decoration:none;cursor:pointer;transition:transform .25s var(--spring)}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(3px) scale(.97)}
+.btn.alt{background:#fff;color:var(--ink);border-color:var(--line)}
+
+header.top{padding:18px 0}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:1.2rem;text-decoration:none;white-space:nowrap}
+.logo i{width:40px;height:40px;border-radius:50%;background:var(--tint2);border:3px solid var(--line);flex:none}
+nav.m{display:flex;gap:6px;flex-wrap:wrap}
+nav.m a{padding:8px 14px;border-radius:999px;text-decoration:none;font-weight:700;white-space:nowrap}
+nav.m a:hover{background:var(--tint1)}
+
+.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:30px;align-items:center;padding:20px 0 50px}
+h1{font-size:clamp(2rem,5.6vw,3.8rem);line-height:1.05;margin:0 0 16px;font-weight:900;overflow-wrap:anywhere}
+.hero p{margin:0 0 24px;max-width:46ch;color:var(--muted)}
+.cta{display:flex;gap:14px;flex-wrap:wrap}
+.blobs{position:relative;aspect-ratio:1/1;max-width:430px;margin-inline:auto;width:100%}
+.blob{position:absolute;border:3px solid var(--line);display:grid;place-items:center;text-align:center;color:var(--muted);font-size:.8rem;padding:8px}
+.b1{inset:6% 8% 10% 4%;background:var(--tint1);border-radius:58% 42% 55% 45%/50% 55% 45% 50%}
+.b2{width:44%;aspect-ratio:1;right:0;top:0;background:var(--tint2);border-radius:50%}
+.b3{width:34%;aspect-ratio:1;left:0;bottom:2%;background:var(--tint3);border-radius:46% 54% 50% 50%}
+@media (prefers-reduced-motion:no-preference){
+  .b2{animation:bob 5s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-8px)}}
+}
+
+section{padding:36px 0}
+h2{font-size:clamp(1.6rem,3.6vw,2.4rem);margin:0 0 8px;font-weight:900}
+.sub{margin:0 0 24px;color:var(--muted);max-width:56ch}
+
+.svc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.svc article{padding:22px;display:flex;flex-direction:column;gap:6px;transition:transform .3s var(--spring)}
+.svc article:hover{transform:translateY(-4px) rotate(-.6deg)}
+.svc .ic{width:54px;height:54px;border-radius:18px;border:3px solid var(--line);margin-bottom:6px;font-size:.7rem;color:var(--muted);display:grid;place-items:center}
+.svc h3{margin:0;font-size:1.25rem}
+.svc p{margin:0;color:var(--muted);font-size:1rem}
+.svc .pr{margin-top:auto;padding-top:10px;font-weight:900;font-size:1.15rem}
+.c1 .ic,.c4 .ic{background:var(--tint1)}.c2 .ic,.c5 .ic{background:var(--tint2)}.c3 .ic,.c6 .ic{background:var(--tint3)}
+
+.team{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.team article{padding:22px;text-align:center}
+.team .av{width:92px;height:92px;border-radius:50%;margin:0 auto 12px;border:3px solid var(--line);display:grid;place-items:center;font-size:.72rem;color:var(--muted);padding:6px}
+.team h3{margin:0 0 2px}.team p{margin:0;color:var(--muted)}
+
+.rev{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.rev blockquote{margin:0;padding:22px}
+.rev .tag{display:inline-block;background:var(--tint1);border:2px solid var(--line);border-radius:999px;padding:2px 12px;font-weight:800;font-size:.85rem;margin-bottom:10px}
+
+.form{padding:28px;display:grid;gap:14px;max-width:620px}
+label.f{display:grid;gap:5px;font-weight:800}
+.form input[type=text],.form input[type=tel],.form select{font:inherit;font-weight:600;min-height:52px;padding:12px 16px;border:3px solid var(--line);border-radius:18px;background:#fff;color:var(--ink);width:100%}
+.ck{display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:start;font-size:.9rem;color:var(--muted);font-weight:400}
+.ck input{width:22px;height:22px;margin:1px 0 0;accent-color:var(--accent)}
+.form #ok{display:none;margin:0;padding:14px 18px;border:3px solid var(--line);border-radius:18px;background:var(--tint1);font-weight:700}
+
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;counter-reset:s}
+.steps li{counter-increment:s;padding:20px;background:#fff;border:3px solid var(--line);border-radius:26px}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--accent);color:#fff;font-weight:900;margin-bottom:8px}
+.steps b{display:block;font-size:1.15rem}
+.faqc details{background:#fff;border:3px solid var(--line);border-radius:22px;padding:14px 20px;margin-bottom:12px}
+.faqc summary{cursor:pointer;font-weight:800;list-style:none;display:flex;justify-content:space-between;gap:12px;min-height:44px;align-items:center}
+.faqc summary::-webkit-details-marker{display:none}
+.faqc summary::after{content:"+";font-size:1.5rem;line-height:1}
+.faqc details[open] summary::after{content:"\2013"}
+.faqc p{margin:8px 0 0;color:var(--muted)}
+.cont{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.cont div{padding:20px;background:#fff;border:3px solid var(--line);border-radius:26px}
+.cont small{display:block;color:var(--muted);font-weight:700}.cont b{font-size:1.1rem;overflow-wrap:anywhere}
+
+.sos{position:fixed;right:16px;bottom:16px;z-index:10;display:flex;align-items:center;padding:12px 20px;border-radius:999px;background:var(--accent);color:#fff;border:3px solid var(--line);text-decoration:none;font-weight:900;transition:transform .25s var(--spring);white-space:nowrap}
+.sos:hover{transform:scale(1.05)}
+.sos small{display:block;font-weight:700;font-size:.78rem;line-height:1.1}
+footer{padding:30px 0 100px;color:var(--muted);font-size:.95rem}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:minmax(0,1fr)}
+  .blobs{max-width:320px;order:-1}
+  .svc,.team{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .rev,.steps,.cont{grid-template-columns:minmax(0,1fr)}
+  nav.m{display:none}
+}
+@media (max-width:560px){
+  body{font-size:17px}
+  .svc,.team{grid-template-columns:minmax(0,1fr)}
+  .sos{padding:10px 16px;font-size:.95rem}
+  .form{padding:20px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">К содержанию</a>
+<header class="top"><div class="wrap">
+  <a class="logo" href="#"><i aria-hidden="true"></i>[Название]</a>
+  <nav class="m" aria-label="Разделы"><a href="#uslugi">[Услуги]</a><a href="#vrachi">[Специалисты]</a><a href="#otzyvy">[Отзывы]</a><a href="#kontakty">[Контакты]</a><a href="#zapis">[Запись]</a></nav>
+</div></header>
+
+<main id="main">
+<!-- первый экран: оффер, две кнопки, три формы-заглушки под фото -->
+<section class="wrap hero" style="padding-top:20px">
+  <div>
+    <h1>[Заголовок: оффер, одна фраза]</h1>
+    <p>[Подзаголовок: для кого и что получит клиент, 1–2 предложения]</p>
+    <div class="cta"><a class="btn" href="#zapis">[Главная кнопка]</a><a class="btn alt" href="#uslugi">[Вторая кнопка: услуги и цены]</a></div>
+  </div>
+  <div class="blobs" role="img" aria-label="Место под главное фото">
+    <div class="blob b1">фото: главный кадр, клиент или результат</div><div class="blob b2">фото: деталь</div><div class="blob b3">фото: деталь</div>
+  </div>
+</section>
+
+<!-- услуги: 6 карточек с ценой «от» -->
+<section class="wrap" id="uslugi">
+  <h2>[Заголовок: услуги и цены]</h2>
+  <p class="sub">[Пояснение к ценам, одна строка]</p>
+  <div class="svc">
+    <article class="clay c1"><div class="ic" aria-hidden="true">значок</div><h3>[Услуга 1]</h3><p>[Описание, одна строка]</p><span class="pr">[от 000 ₽]</span></article>
+    <article class="clay c2"><div class="ic" aria-hidden="true">значок</div><h3>[Услуга 2]</h3><p>[Описание, одна строка]</p><span class="pr">[от 000 ₽]</span></article>
+    <article class="clay c3"><div class="ic" aria-hidden="true">значок</div><h3>[Услуга 3]</h3><p>[Описание, одна строка]</p><span class="pr">[от 000 ₽]</span></article>
+    <article class="clay c4"><div class="ic" aria-hidden="true">значок</div><h3>[Услуга 4]</h3><p>[Описание, одна строка]</p><span class="pr">[от 000 ₽]</span></article>
+    <article class="clay c5"><div class="ic" aria-hidden="true">значок</div><h3>[Услуга 5]</h3><p>[Описание, одна строка]</p><span class="pr">[от 000 ₽]</span></article>
+    <article class="clay c6"><div class="ic" aria-hidden="true">значок</div><h3>[Услуга 6]</h3><p>[Описание, одна строка]</p><span class="pr">[от 000 ₽]</span></article>
+  </div>
+</section>
+
+<!-- специалисты (должности, без выдуманных имён) -->
+<section class="wrap" id="vrachi">
+  <h2>[Заголовок: специалисты]</h2>
+  <p class="sub">[Пояснение, одна строка]</p>
+  <div class="team">
+    <article class="clay"><div class="av" style="background:var(--tint1)" aria-hidden="true">фото</div><h3>[Должность 1]</h3><p>[Специализация]</p></article>
+    <article class="clay"><div class="av" style="background:var(--tint2)" aria-hidden="true">фото</div><h3>[Должность 2]</h3><p>[Специализация]</p></article>
+    <article class="clay"><div class="av" style="background:var(--tint3)" aria-hidden="true">фото</div><h3>[Должность 3]</h3><p>[Специализация]</p></article>
+  </div>
+</section>
+
+<!-- отзывы (в демо с меткой «пример») -->
+<section class="wrap" id="otzyvy">
+  <h2>[Заголовок: отзывы]</h2>
+  <p class="sub">[Пояснение, одна строка]</p>
+  <div class="rev">
+    <blockquote class="clay"><span class="tag">пример отзыва</span><br>[Текст отзыва, 1–2 предложения]</blockquote>
+    <blockquote class="clay"><span class="tag">пример отзыва</span><br>[Текст отзыва, 1–2 предложения]</blockquote>
+  </div>
+</section>
+
+<!-- как записаться: 3 шага -->
+<section class="wrap" id="kak">
+  <h2>[Заголовок: как записаться или как мы работаем]</h2>
+  <p class="sub">[Пояснение, одна строка]</p>
+  <ol class="steps">
+    <li><b>[Шаг 1]</b>[Что делает клиент]</li>
+    <li><b>[Шаг 2]</b>[Что делаем мы]</li>
+    <li><b>[Шаг 3]</b>[Результат]</li>
+  </ol>
+</section>
+
+<!-- частые вопросы -->
+<section class="wrap faqc" id="voprosy">
+  <h2>[Заголовок: частые вопросы]</h2>
+  <details><summary>[Вопрос 1]</summary><p>[Ответ на вопрос 1]</p></details>
+  <details><summary>[Вопрос 2]</summary><p>[Ответ на вопрос 2]</p></details>
+  <details><summary>[Вопрос 3]</summary><p>[Ответ на вопрос 3]</p></details>
+</section>
+
+<!-- контакты: адрес, часы, срочная связь -->
+<section class="wrap" id="kontakty">
+  <h2>[Заголовок: контакты]</h2>
+  <div class="cont">
+    <div><small>Адрес</small><b>[Город, улица, дом]</b></div>
+    <div><small>Часы работы</small><b>[дни и часы]</b></div>
+    <div><small>[Срочная связь]</small><b>[+7 000 000-00-00]</b></div>
+  </div>
+</section>
+
+<!-- форма записи -->
+<section class="wrap" id="zapis">
+  <h2>[Заголовок: запись или заявка]</h2>
+  <p class="sub">[Пояснение: что будет после отправки]</p>
+  <form class="form clay" id="lead" novalidate>
+    <label class="f">[Кто / для кого]
+      <select id="who"><option>[Вариант 1]</option><option>[Вариант 2]</option><option>[Вариант 3]</option></select></label>
+    <label class="f">[Услуга]
+      <select id="svc"><option>[Услуга 1]</option><option>[Услуга 2]</option><option>[Услуга 3]</option><option>[Услуга 4]</option><option>[Услуга 5]</option><option>[Услуга 6]</option></select></label>
+    <label class="f">Ваше имя<input id="nm" type="text" autocomplete="name" required></label>
+    <label class="f">Телефон<input id="ph" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7" pattern="\+?[0-9\s\(\)\-]{10,}" required></label>
+    <label class="ck"><input type="checkbox" id="ag" required><span>Согласен на обработку персональных данных ([ссылка на политику]).</span></label>
+    <button class="btn" type="submit">[Записаться]</button>
+    <p id="ok" role="status">Заявка принята (демо: никуда не отправлена).</p>
+  </form>
+</section>
+</main>
+
+<footer><div class="wrap">[Название, год] · [Реквизиты] · [Политика конфиденциальности]</div></footer>
+
+<a class="sos" href="tel:+70000000000"><span><small>[Срочная связь]</small>+7 000 000-00-00</span></a>
+
+<script>
+(function(){
+  var f=document.getElementById('lead'),ok=document.getElementById('ok');
+  f.addEventListener('submit',function(e){
+    e.preventDefault();
+    if(!f.checkValidity()){f.reportValidity();return}
+    ok.style.display='block';ok.scrollIntoView({block:'nearest'});
+  });
+})();
+</script>
+</body>
+</html>

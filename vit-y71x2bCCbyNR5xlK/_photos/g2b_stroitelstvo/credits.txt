@@ -1,0 +1,12 @@
+Фото: Pexels (Pexels License, коммерческое использование разрешено, указание автора не обязательно)
+Файл | Автор | Страница на Pexels | Размер | Что на кадре
+hero_01.jpg | d-goug | https://www.pexels.com/photo/38210398/ | 1920x1078, 286 KB | каркасные дома, синее небо
+hero_02.jpg | d-goug | https://www.pexels.com/photo/39151690/ | 1920x1078, 341 KB | дом со строительными лесами
+hero_03.jpg | jaffer-m | https://www.pexels.com/photo/40252120/ | 1920x1080, 461 KB | дом с синим стальным каркасом, вид сверху
+hero_04.jpg | d-goug | https://www.pexels.com/photo/39988462/ | 1920x1078, 335 KB | двухэтажный дом, кровля и леса
+hero_05.jpg | Muca | https://www.pexels.com/photo/36841057/ | 1920x1280, 459 KB | цветные фасады, красная кровля
+card_01.jpg | Benjamin Kupke | https://www.pexels.com/photo/17314421/ | 1000x1500, 140 KB | красная черепичная крыша, вертикаль
+card_02.jpg | Brandic Digital | https://www.pexels.com/photo/37426166/ | 1000x1500, 123 KB | шале с деревянной отделкой, вертикаль
+card_03.jpg | Otat | https://www.pexels.com/photo/27258292/ | 1000x1500, 88 KB | современный фасад, вертикаль
+card_04.jpg | jaimejoelvh18 | https://www.pexels.com/photo/39576121/ | 1000x1333, 314 KB | каменщик на стройке (вдали), вертикаль
+card_05.jpg | robertkso | https://www.pexels.com/photo/20296316/ | 1920x1592, 552 KB | современный двухэтажный дом

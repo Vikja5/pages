@@ -1,0 +1,467 @@
+<!doctype html>
+<!--
+=====================================================================
+СКЕЛЕТ: ВЕБ-ИНСТРУМЕНТ, УРОВЕНЬ «ПРЕМИУМ» (конструктор 12, калькулятор)
+Файлы рядом: index.html (этот), admin.html (админка), prices.json (цены).
+=====================================================================
+ЧТО ЭТО
+  Калькулятор, у которого цены не зашиты в код, а берутся из таблицы (prices.json),
+  расчёты сохраняются и открываются по ссылке, есть админка и личный кабинет-заглушка.
+  Без картинок, графики, фирменных цветов, теней и логотипов; серая палитра.
+  Адаптивность 375 / 768 / 1280. Шрифт Manrope из ../../_fonts/ (относительный путь;
+  при переносе папки поправить url(...) в @font-face).
+
+ЧТО ВНУТРИ (уровень премиум; стандарт + следующее)
+  1. Цены из prices.json. Порядок источников: (а) правки из админки в localStorage этого браузера,
+     (б) файл prices.json рядом, (в) копия цен, встроенная в этот файл (FALLBACK_PRICES), если
+     страница открыта двойным щелчком по файлу (браузер не даёт читать файлы с диска).
+     В боевой версии вместо prices.json - запрос к базе / Google-таблице / API (функция loadPrices()).
+  2. Сохранение расчёта: кнопка «Сохранить расчёт» кладёт его в localStorage (история) и даёт ссылку
+     вида index.html#calc=... ; по ссылке расчёт открывается. На боевом сайте история хранится на сервере.
+  3. Админка admin.html: правка цен в таблице, скачивание prices.json. Защита - заглушка.
+  4. Уведомления: sendToTelegram() и notify() - заглушки (куда вставить токен и chat_id - в функции).
+     В notify() оставлено место под e-mail, CRM, Google-таблицу.
+  5. Личный кабинет-заглушка: «вход» без пароля, история расчётов, открыть/удалить.
+  6. Всё из стандарта: форма заявки, звонок/написать, «как считаем», отзывы-примеры.
+
+СЛОТЫ ДЛЯ ЗАМЕНЫ
+  CONFIG (в скрипте): название, телефон, ссылка «написать», тексты, qty min/max, формула calculate().
+  prices.json: виды работ (kinds), уровни (levels), опции (options), валюта, единица.
+  Для КВИЗА/КОНФИГУРАТОРА: поля берутся из prices.json (виды/уровни/опции = вопросы/комплектующие);
+  меняется calculate() и подписи. Тексты [ВСТАВИТЬ ...] - слоты под данные заказчика.
+
+КАК ПОДКЛЮЧИТЬ TELEGRAM
+  1. @BotFather -> /newbot -> токен. 2. Написать боту, узнать chat_id (@userinfobot).
+  3. Вставить в sendToTelegram() ниже. Токен в открытом JS виден всем: на боевом сайте отправку делают
+  через свой сервер или облачную функцию. В скелете токенов нет.
+
+ПРОВЕРИТЬ ПЕРЕД ОТДАЧЕЙ
+  375 px без прокрутки вбок; все символы есть в Manrope; консоль без ошибок; значки только SVG;
+  формулу сверить на 5-7 примерах; правка цены в админке меняет итог здесь; расчёт открывается по ссылке.
+=====================================================================
+-->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Калькулятор — скелет, премиум</title>
+<meta name="description" content="Скелет веб-инструмента: цены из таблицы, сохранение расчёта, админка, кабинет.">
+<link rel="preload" href="../../_fonts/Manrope-Regular.ttf" as="font" type="font/ttf" crossorigin>
+<style>
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Regular.ttf") format("truetype");font-weight:400;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Bold.ttf") format("truetype");font-weight:700;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-ExtraBold.ttf") format("truetype");font-weight:800;font-display:block}
+@font-face{font-family:"Manrope Fallback";src:local("Arial");size-adjust:102%;ascent-override:100%;descent-override:25%}
+:root{
+  --bg:#F3F4F5; --card:#FFFFFF; --ink:#1F2328; --muted:#5B6470; --line:#D5D9DE; --soft:#E8EAED;
+  --accent:#3A424D; --accent-ink:#FFFFFF; --ok:#2F5D3F; --err:#8A2E2E;
+  --font:"Manrope","Manrope Fallback",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5}
+a{color:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+.skip{position:absolute;left:-999px}.skip:focus{left:12px;top:12px;background:var(--ink);color:#fff;padding:8px 12px;z-index:9}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.ico{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+header.top{background:var(--card);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:60px}
+.brand{font-weight:800;text-decoration:none;white-space:nowrap}
+.nav{display:flex;gap:16px;align-items:center}
+.nav a{text-decoration:none;font-weight:600;white-space:nowrap}
+.tel{display:inline-flex;gap:8px;align-items:center;font-weight:700;white-space:nowrap}
+.hero{padding:32px 0 8px}
+h1{font-size:clamp(1.7rem,5vw,2.8rem);line-height:1.12;margin:0 0 10px;font-weight:800;max-width:20ch}
+.lede{margin:0;color:var(--muted);max-width:56ch}
+.slot{font-size:.82rem;color:var(--muted);border:1px dashed var(--line);padding:2px 8px;display:inline-block;margin-top:8px;border-radius:4px}
+.calc{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.9fr);gap:20px;align-items:start;padding:20px 0 32px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;min-width:0}
+.panel>h2{margin:0;padding:14px 18px;border-bottom:1px solid var(--line);font-size:1.05rem;font-weight:700}
+fieldset{border:0;border-bottom:1px solid var(--line);margin:0;padding:16px 18px;min-width:0}
+fieldset:last-of-type{border-bottom:0}
+legend{font-weight:700;padding:0;margin-bottom:10px;float:left;width:100%}
+legend+*{clear:both}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.val{font-weight:800;font-size:1.3rem;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;margin:12px 0 2px;accent-color:var(--accent);height:28px}
+.scale{display:flex;justify-content:space-between;color:var(--muted);font-size:.85rem}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.tile{position:relative;display:block;min-width:0}
+.tile input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.tile span{display:block;height:100%;padding:12px;border:2px solid var(--line);background:#fff;border-radius:6px}
+.tile b{display:block}
+.tile small{color:var(--muted);display:block;line-height:1.3;margin-top:2px}
+.tile input:checked+span{border-color:var(--accent);background:var(--soft)}
+.tile input:focus-visible+span{outline:3px solid var(--ink);outline-offset:2px}
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border:2px solid var(--line);background:#fff;cursor:pointer;border-radius:6px}
+.opt input{margin-top:3px;width:20px;height:20px;accent-color:var(--accent);flex:none}
+.opt:has(input:checked){border-color:var(--accent);background:var(--soft)}
+.opt .p{margin-left:auto;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.opt small{color:var(--muted)}
+.receipt{position:sticky;top:16px}
+.receipt dl{margin:0;padding:6px 18px 0}
+.ln{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-variant-numeric:tabular-nums}
+.ln dt{color:var(--muted)}
+.ln dd{margin:0;font-weight:600;text-align:right}
+.total{padding:16px 18px 18px}
+.total .lbl{color:var(--muted)}
+.total .sum{font-size:clamp(2rem,5vw,2.8rem);font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums;margin:2px 0 6px;overflow-wrap:anywhere}
+.total .note{font-size:.88rem;color:var(--muted);margin:6px 0 14px}
+.btn{display:inline-flex;gap:8px;align-items:center;justify-content:center;background:var(--accent);color:var(--accent-ink);border:2px solid var(--accent);padding:12px 20px;font:700 1rem var(--font);border-radius:6px;cursor:pointer;text-decoration:none;min-height:48px;white-space:nowrap}
+.btn:hover{background:#2B323B}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{background:var(--soft)}
+.btn.sm{min-height:40px;padding:6px 12px;font-size:.9rem}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.actions .btn{flex:1 1 auto}
+.msg{font-size:.9rem;color:var(--ok);margin:8px 0 0;min-height:1.2em;overflow-wrap:anywhere}
+.src{font-size:.8rem;color:var(--muted);margin:10px 0 0}
+section.blk{padding:8px 0 32px}
+section.blk h2{font-size:1.5rem;margin:0 0 14px}
+.how{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:18px;max-width:760px}
+.how p{margin:0 0 8px}.how p:last-child{margin:0}
+.reviews{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.rev{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;margin:0}
+.rev blockquote{margin:0 0 8px}
+.rev figcaption{color:var(--muted);font-size:.9rem}
+.tag{display:inline-block;font-size:.75rem;font-weight:700;border:1px solid var(--line);border-radius:4px;padding:0 6px;margin-left:6px;color:var(--muted);background:var(--soft)}
+/* Кабинет */
+.cab{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:18px}
+.cab .login{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.cab .login label{flex:1 1 220px}
+.tblwrap{overflow-x:auto;margin-top:14px}
+table{border-collapse:collapse;width:100%;min-width:480px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-weight:600;font-size:.9rem}
+td.r,th.r{text-align:right}
+.empty{color:var(--muted);margin:12px 0 0}
+.apply form{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:20px;display:grid;gap:14px;max-width:640px}
+label.f{display:grid;gap:4px;font-weight:600}
+input[type=text],input[type=tel],textarea{font:inherit;padding:12px;border:2px solid var(--line);border-radius:6px;background:#fff;min-height:48px;width:100%}
+textarea{min-height:90px;resize:vertical}
+#sum-line{margin:0;color:var(--muted)}
+#ok{margin:0;padding:12px;border:2px solid var(--ok);color:var(--ok);font-weight:600;display:none;border-radius:6px}
+#err{margin:0;color:var(--err);font-weight:600;display:none}
+footer{border-top:1px solid var(--line);background:var(--card);padding:18px 0 90px;color:var(--muted);font-size:.92rem}
+.mbar{display:none}
+@media (max-width:860px){
+  .calc{grid-template-columns:1fr}
+  .receipt{position:static}
+  .nav a.hide-s{display:none}
+  .mbar{display:flex;position:fixed;left:0;right:0;bottom:0;background:var(--accent);color:#fff;padding:10px 16px;justify-content:space-between;align-items:center;gap:12px;z-index:5}
+  .mbar b{font-size:1.25rem;font-variant-numeric:tabular-nums}
+  .mbar a{background:#fff;color:var(--ink);padding:10px 16px;text-decoration:none;font-weight:700;border-radius:6px;min-height:44px;display:inline-flex;align-items:center;white-space:nowrap}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+@media print{header,.hero,#f,.actions,.btn,.msg,footer,#apply{display:none!important}.calc{display:block}.receipt{box-shadow:none;border:0}}
+</style>
+</head>
+<body>
+<a class="skip" href="#calc">К калькулятору</a>
+<header class="top"><div class="wrap">
+  <a class="brand" href="#" id="brand">[ВСТАВИТЬ название компании]</a>
+  <nav class="nav" aria-label="Разделы">
+    <a href="admin.html" class="hide-s">Админка</a>
+    <span class="tel"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg><span id="telText"></span></span>
+  </nav>
+</div></header>
+
+<main>
+<section class="hero wrap">
+  <h1 id="h1"></h1>
+  <p class="lede" id="lede"></p>
+  <span class="slot">Скелет «премиум»: цены из prices.json, сохранение расчёта. Без картинок и логотипа</span>
+</section>
+
+<section class="wrap calc" id="calc" aria-label="Калькулятор">
+  <form class="panel" id="f" onsubmit="return false">
+    <h2>Параметры</h2>
+    <div id="fields"><p class="empty" style="padding:0 18px">Загрузка цен…</p></div>
+  </form>
+  <aside class="panel receipt" aria-live="polite">
+    <h2>Предварительный расчёт</h2>
+    <dl id="lines"></dl>
+    <div class="total">
+      <div class="lbl">Итого, примерно</div>
+      <div class="sum" id="sum">0</div>
+      <p class="note" id="term"></p>
+      <a class="btn" href="#apply">Получить точный расчёт</a>
+      <div class="actions" style="margin-top:10px">
+        <button class="btn ghost" type="button" id="saveCalc"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></svg>Сохранить расчёт</button>
+        <button class="btn ghost" type="button" id="pdfCalc"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14"/></svg>Сохранить в PDF</button>
+        <a class="btn ghost" href="#" id="callBtn"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>Позвонить</a>
+        <a class="btn ghost" href="#" id="writeBtn" target="_blank" rel="noopener"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>Написать</a>
+      </div>
+      <p class="msg" id="saveMsg" role="status"></p>
+      <p class="src" id="src"></p>
+    </div>
+  </aside>
+</section>
+
+<section class="wrap blk"><h2>Как мы считаем</h2><div class="how" id="how"></div></section>
+
+<!-- Личный кабинет-ЗАГЛУШКА: «вход» без пароля; история хранится в этом браузере (localStorage).
+     В боевой версии: настоящий вход (e-mail/телефон + код) и история на сервере. -->
+<section class="wrap blk" id="cabinet" hidden style="display:none">
+  <h2>Личный кабинет</h2>
+  <div class="cab">
+    <div id="loginBox" class="login">
+      <label class="f">Имя или телефон (заглушка входа, пароль не нужен)<input type="text" id="cabName" autocomplete="username"></label>
+      <button class="btn" type="button" id="cabLogin">Войти</button>
+    </div>
+    <div id="cabBox" hidden>
+      <div class="row"><span>Вы вошли как <b id="cabWho"></b></span><button class="btn ghost sm" type="button" id="cabOut">Выйти</button></div>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Дата</th><th>Параметры</th><th class="r">Итого</th><th></th></tr></thead>
+        <tbody id="hist"></tbody>
+      </table></div>
+      <p class="empty" id="histEmpty">Сохранённых расчётов пока нет. Нажмите «Сохранить расчёт» выше.</p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap blk"><h2>Отзывы</h2><div class="reviews" id="reviews"></div></section>
+
+<section class="wrap blk apply" id="apply">
+  <h2>Оставить заявку</h2>
+  <form id="lead" novalidate>
+    <p id="sum-line"></p>
+    <label class="f">Ваше имя<input type="text" id="nm" autocomplete="name" required></label>
+    <label class="f">Телефон<input type="tel" id="ph" autocomplete="tel" inputmode="tel" placeholder="+7" required pattern="\+?[0-9\s\(\)\-]{10,}"></label>
+    <label class="f">Комментарий (по желанию)<textarea id="cm"></textarea></label>
+    <button class="btn" type="submit">Отправить заявку</button>
+    <p id="err" role="alert">Проверьте имя и телефон.</p>
+    <p id="ok" role="status"></p>
+  </form>
+</section>
+</main>
+
+<footer><div class="wrap">Скелет-демо. Тексты, цены и контакты условные: заменить данными заказчика. Отзывы помечены «пример». <a href="admin.html">Админка</a></div></footer>
+<div class="mbar" aria-hidden="true"><span>Итого<br><b id="msum">0</b></span><a href="#apply">Заявка</a></div>
+
+<script>
+/* ===================== CONFIG: что менять под нишу ===================== */
+var CONFIG = {
+  brand: '[ВСТАВИТЬ название компании]',
+  phone: '+7 000 000-00-00',
+  messengerUrl: 'https://t.me/your_username',   // слот; реальный адрес заказчика
+  title: 'Посчитайте стоимость за минуту',
+  lede: 'Цены берутся из актуального прайса. Сохраните расчёт и откройте его позже по ссылке.',
+  qty: {id: 'qty', label: 'Количество (площадь, штуки, человек)', min: 10, max: 200, step: 1, value: 50},
+  how: [
+    'Сумма = количество × цена вида работ × коэффициент уровня + дополнительные опции.',
+    'Цены хранятся в таблице и обновляются без программиста. [ВСТАВИТЬ уточнения заказчика]'
+  ],
+  reviews: [
+    {text: '[ВСТАВИТЬ отзыв клиента]', who: 'Имя, город'},
+    {text: '[ВСТАВИТЬ отзыв клиента]', who: 'Имя, город'},
+    {text: '[ВСТАВИТЬ отзыв клиента]', who: 'Имя, город'}
+  ],
+  LS_PRICES: 'tool_prices_override',   // общий ключ с admin.html
+  LS_CALCS: 'tool_calcs',
+  LS_USER: 'tool_user'
+};
+
+/* Копия prices.json на случай открытия файла с диска (fetch там запрещён). Держать в синхроне. */
+var FALLBACK_PRICES = {"version":1,"currency":"₽","unit":"м²","minTotal":0,
+ "kinds":[{"id":"a","label":"Вариант А","hint":"[ВСТАВИТЬ описание]","price":3000},{"id":"b","label":"Вариант Б","hint":"[ВСТАВИТЬ описание]","price":5000},{"id":"c","label":"Вариант В","hint":"[ВСТАВИТЬ описание]","price":8000}],
+ "levels":[{"id":"eco","label":"Базовый","hint":"[ВСТАВИТЬ]","k":0.9},{"id":"std","label":"Стандарт","hint":"[ВСТАВИТЬ]","k":1},{"id":"top","label":"Расширенный","hint":"[ВСТАВИТЬ]","k":1.25}],
+ "options":[{"id":"o1","label":"Опция 1","hint":"[ВСТАВИТЬ]","type":"perUnit","value":500},{"id":"o2","label":"Опция 2","hint":"[ВСТАВИТЬ]","type":"fixed","value":15000},{"id":"rush","label":"Срочно","hint":"ускоренный срок","type":"pct","value":10}]};
+
+/* ===================== TELEGRAM И УВЕДОМЛЕНИЯ: ЗАГЛУШКИ ===================== */
+function sendToTelegram(text) {
+  var BOT_TOKEN = '';   // <- токен бота от @BotFather (у заказчика). В скелете пусто.
+  var CHAT_ID = '';     // <- chat_id чата заказчика
+  if (!BOT_TOKEN || !CHAT_ID) return Promise.resolve({demo: true});
+  return fetch('https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({chat_id: CHAT_ID, text: text})
+  }).then(function (r) { if (!r.ok) throw new Error('telegram ' + r.status); return r.json(); });
+}
+/* Единая точка уведомлений: заявка и (по желанию) сохранённый расчёт.
+   Сюда же добавляют e-mail, CRM, запись в Google-таблицу (через веб-хук/сервер). */
+function notify(kind, text) {
+  var jobs = [sendToTelegram('[' + kind + '] ' + text)];
+  // jobs.push(sendEmail(text));       // <- слот: e-mail
+  // jobs.push(sendToCrm(kind, text)); // <- слот: CRM / Google-таблица
+  return Promise.all(jobs).then(function (a) { return a[0]; });
+}
+
+/* ===================== ЦЕНЫ ===================== */
+var PRICES = null, PRICES_SRC = '';
+function loadPrices() {
+  try {
+    var o = localStorage.getItem(CONFIG.LS_PRICES);
+    if (o) { PRICES = JSON.parse(o); PRICES_SRC = 'Цены: правки из админки (сохранены в этом браузере)'; return Promise.resolve(); }
+  } catch (e) {}
+  return fetch('prices.json', {cache: 'no-store'}).then(function (r) { if (!r.ok) throw 0; return r.json(); })
+    .then(function (j) { PRICES = j; PRICES_SRC = 'Цены: файл prices.json'; })
+    .catch(function () { PRICES = FALLBACK_PRICES; PRICES_SRC = 'Цены: встроенная копия (файл prices.json недоступен при открытии с диска)'; });
+}
+
+/* ===================== ФОРМУЛА ===================== */
+/* v = {qty, kind, level, opts:[id]}; цены только из PRICES. Заменить под нишу. */
+function calculate(v) {
+  var P = PRICES, byId = function (a, id) { return a.filter(function (x) { return x.id === id; })[0] || a[0]; };
+  var kind = byId(P.kinds, v.kind), lvl = byId(P.levels, v.level);
+  var money = function (n) { return Math.round(n).toLocaleString('ru-RU') + ' ' + P.currency; };
+  var base = v.qty * kind.price * lvl.k;
+  var lines = [['Количество', v.qty + ' ' + P.unit], ['Вид работ', kind.label], ['Уровень', lvl.label], ['Базовая стоимость', money(base)]];
+  var total = base, pct = 0;
+  v.opts.forEach(function (id) {
+    var o = byId(P.options, id);
+    if (o.type === 'perUnit') { var s = v.qty * o.value; total += s; lines.push([o.label, money(s)]); }
+    else if (o.type === 'fixed') { total += o.value; lines.push([o.label, money(o.value)]); }
+    else if (o.type === 'pct') pct += o.value;
+  });
+  if (pct) { var add = total * pct / 100; total += add; lines.push(['Срочность +' + pct + '%', money(add)]); }
+  if (P.minTotal && total < P.minTotal) { total = P.minTotal; lines.push(['Минимальный заказ', money(total)]); }
+  var days = Math.max(3, Math.round(v.qty * 0.2 * (pct ? 0.75 : 1)));
+  return {lines: lines, total: total, money: money, term: 'Срок: около ' + days + ' дн. [ВСТАВИТЬ свою логику срока или удалить]'};
+}
+
+/* ===================== ДВИЖОК ===================== */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+  var shown = 0, raf, last = null;
+
+  function lsGet(k, d) { try { var s = localStorage.getItem(k); return s ? JSON.parse(s) : d; } catch (e) { return d; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+
+  function build() {
+    var P = PRICES, q = CONFIG.qty, money = function (n) { return Math.round(n).toLocaleString('ru-RU') + ' ' + P.currency; };
+    var tiles = function (name, arr, def) {
+      return '<div class="tiles">' + arr.map(function (o, i) {
+        return '<label class="tile"><input type="radio" name="' + name + '" value="' + o.id + '"' + (o.id === def || (!def && i === 0) ? ' checked' : '') + '><span><b>' + esc(o.label) + '</b><small>' + esc(o.hint || '') + '</small></span></label>';
+      }).join('') + '</div>';
+    };
+    $('fields').innerHTML =
+      '<fieldset><legend>' + esc(q.label) + '</legend><div class="row"><span>Значение</span><span class="val"><span id="v_qty">' + q.value + '</span> ' + esc(P.unit) + '</span></div>' +
+      '<input type="range" id="qty" min="' + q.min + '" max="' + q.max + '" step="' + q.step + '" value="' + q.value + '" aria-label="' + esc(q.label) + '"><div class="scale"><span>' + q.min + '</span><span>' + q.max + '</span></div></fieldset>' +
+      '<fieldset><legend>Вид работ</legend>' + tiles('kind', P.kinds, P.kinds[1] && P.kinds[1].id) + '</fieldset>' +
+      '<fieldset><legend>Уровень</legend>' + tiles('level', P.levels, 'std') + '</fieldset>' +
+      '<fieldset><legend>Дополнительно</legend><div class="opts">' + P.options.map(function (o) {
+        var p = o.type === 'perUnit' ? money(o.value) + '/' + P.unit : o.type === 'fixed' ? money(o.value) : '+' + o.value + '%';
+        return '<label class="opt"><input type="checkbox" name="opts" value="' + o.id + '"><span>' + esc(o.label) + '<br><small>' + esc(o.hint || '') + '</small></span><span class="p">' + p + '</span></label>';
+      }).join('') + '</div></fieldset>';
+    $('src').textContent = PRICES_SRC;
+  }
+  function read() {
+    return {
+      qty: +$('qty').value,
+      kind: document.querySelector('input[name=kind]:checked').value,
+      level: document.querySelector('input[name=level]:checked').value,
+      opts: [].map.call(document.querySelectorAll('input[name=opts]:checked'), function (x) { return x.value; })
+    };
+  }
+  function write(v) {
+    if (v.qty) $('qty').value = v.qty;
+    ['kind', 'level'].forEach(function (n) { var r = document.querySelector('input[name=' + n + '][value="' + v[n] + '"]'); if (r) r.checked = true; });
+    [].forEach.call(document.querySelectorAll('input[name=opts]'), function (c) { c.checked = (v.opts || []).indexOf(c.value) > -1; });
+  }
+  function count(to, money) {
+    cancelAnimationFrame(raf);
+    var from = shown, t0 = null, dur = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 300;
+    function step(t) {
+      if (t0 === null) t0 = t;
+      var p = dur ? Math.min((t - t0) / dur, 1) : 1, x = from + (to - from) * (1 - Math.pow(1 - p, 3));
+      $('sum').textContent = money(x); $('msum').textContent = money(x);
+      if (p < 1) raf = requestAnimationFrame(step); else shown = to;
+    }
+    raf = requestAnimationFrame(step);
+  }
+  function calc() {
+    var v = read(), r = calculate(v);
+    $('v_qty').textContent = v.qty;
+    $('lines').innerHTML = r.lines.map(function (l) { return '<div class="ln"><dt>' + esc(l[0]) + '</dt><dd>' + esc(l[1]) + '</dd></div>'; }).join('');
+    $('term').textContent = r.term;
+    count(r.total, r.money);
+    last = {v: v, r: r};
+    $('sum-line').textContent = 'Ваш расчёт: ' + r.lines.slice(0, 3).map(function (l) { return l[1]; }).join(', ') + ', итого около ' + r.money(r.total) + '.';
+  }
+
+  /* Сохранение расчёта: история (localStorage) + ссылка с параметрами */
+  function linkFor(v) { return location.href.split('#')[0] + '#calc=' + encodeURIComponent(JSON.stringify(v)); }
+  $('saveCalc').addEventListener('click', function () {
+    var calcs = lsGet(CONFIG.LS_CALCS, []);
+    calcs.unshift({id: Date.now().toString(36), ts: new Date().toISOString(), v: last.v, total: last.r.total, cur: PRICES.currency});
+    var ok = lsSet(CONFIG.LS_CALCS, calcs.slice(0, 50));
+    var url = linkFor(last.v);
+    try { history.replaceState(null, '', url); } catch (e) {}
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).catch(function () {});
+    $('saveMsg').textContent = (ok ? 'Расчёт сохранён. ' : 'Не удалось сохранить в этом браузере. ') + 'Ссылка на расчёт скопирована (или возьмите её из адресной строки).';
+    renderHist();
+    notify('Расчёт сохранён', last.r.lines.map(function (l) { return l[0] + ': ' + l[1]; }).join('; ') + '; итого ' + last.r.money(last.r.total)).catch(function () {});
+  });
+  /* PDF: печать только блока расчёта; в окне печати выбрать «Сохранить как PDF» */
+  $('pdfCalc').addEventListener('click', function () { window.print(); });
+  function restore() {
+    var m = /#calc=(.+)$/.exec(location.hash);
+    if (!m) return;
+    try { write(JSON.parse(decodeURIComponent(m[1]))); } catch (e) {}
+  }
+
+  /* Кабинет-заглушка */
+  function renderHist() {
+    var user = lsGet(CONFIG.LS_USER, null), calcs = lsGet(CONFIG.LS_CALCS, []);
+    $('loginBox').hidden = !!user; $('cabBox').hidden = !user;
+    if (!user) return;
+    $('cabWho').textContent = user;
+    $('histEmpty').hidden = calcs.length > 0;
+    $('hist').innerHTML = calcs.map(function (c) {
+      var d = new Date(c.ts), vv = c.v, names = [];
+      try { var r = calculate(vv); names = [r.lines[0][1], r.lines[1][1], r.lines[2][1]]; } catch (e) { names = [vv.qty]; }
+      return '<tr><td>' + d.toLocaleDateString('ru-RU') + '</td><td>' + esc(names.join(', ')) + '</td><td class="r">' + Math.round(c.total).toLocaleString('ru-RU') + ' ' + esc(c.cur) + '</td>' +
+        '<td class="r"><button class="btn ghost sm" type="button" data-open="' + c.id + '">Открыть</button> <button class="btn ghost sm" type="button" data-del="' + c.id + '">Удалить</button></td></tr>';
+    }).join('');
+  }
+  $('cabLogin').addEventListener('click', function () {
+    var n = $('cabName').value.trim(); if (!n) { $('cabName').focus(); return; }
+    lsSet(CONFIG.LS_USER, n); renderHist();
+  });
+  $('cabOut').addEventListener('click', function () { try { localStorage.removeItem(CONFIG.LS_USER); } catch (e) {} renderHist(); });
+  $('hist').addEventListener('click', function (e) {
+    var o = e.target.getAttribute('data-open'), d = e.target.getAttribute('data-del');
+    var calcs = lsGet(CONFIG.LS_CALCS, []);
+    if (o) { var c = calcs.filter(function (x) { return x.id === o; })[0]; if (c) { write(c.v); calc(); try { history.replaceState(null, '', linkFor(c.v)); } catch (er) {} document.getElementById('calc').scrollIntoView(); } }
+    if (d) { lsSet(CONFIG.LS_CALCS, calcs.filter(function (x) { return x.id !== d; })); renderHist(); }
+  });
+
+  /* Заявка */
+  $('lead').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var ok = $('nm').value.trim() && $('ph').value.trim() && $('ph').checkValidity();
+    $('err').style.display = ok ? 'none' : 'block';
+    if (!ok) return;
+    $('err').textContent = 'Проверьте имя и телефон.';
+    var text = 'Имя: ' + $('nm').value + '; телефон: ' + $('ph').value + '; комментарий: ' + $('cm').value + '\n' +
+      last.r.lines.map(function (l) { return l[0] + ': ' + l[1]; }).join('\n') + '\nИтого: ' + last.r.money(last.r.total) + '\nСсылка: ' + linkFor(last.v);
+    notify('Новая заявка', text).then(function (res) {
+      $('ok').textContent = res && res.demo
+        ? 'Демо: заявка никуда не отправлена. В рабочей версии она придёт вам в Telegram вместе с расчётом и ссылкой на него.'
+        : 'Спасибо! Заявка отправлена, мы свяжемся с вами.';
+      $('ok').style.display = 'block';
+    }).catch(function () { $('err').textContent = 'Не удалось отправить. Позвоните нам по телефону выше.'; $('err').style.display = 'block'; });
+  });
+
+  /* Старт */
+  $('brand').textContent = CONFIG.brand; $('h1').textContent = CONFIG.title; $('lede').textContent = CONFIG.lede;
+  $('telText').textContent = CONFIG.phone;
+  var tel = 'tel:' + CONFIG.phone.replace(/[^+0-9]/g, ''); $('callBtn').href = tel; $('writeBtn').href = CONFIG.messengerUrl;
+  $('how').innerHTML = CONFIG.how.map(function (t) { return '<p>' + esc(t) + '</p>'; }).join('');
+  $('reviews').innerHTML = CONFIG.reviews.map(function (r) { return '<figure class="rev"><blockquote>' + esc(r.text) + '</blockquote><figcaption>' + esc(r.who) + '<span class="tag">пример</span></figcaption></figure>'; }).join('');
+  renderHist();
+  loadPrices().then(function () {
+    build(); restore();
+    $('f').addEventListener('input', calc);
+    calc();
+  });
+})();
+</script>
+</body>
+</html>

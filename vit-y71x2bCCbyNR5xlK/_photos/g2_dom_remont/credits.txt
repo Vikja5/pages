@@ -1,0 +1,12 @@
+Фото: Pexels (Pexels License, коммерческое использование разрешено, указание автора не обязательно)
+Файл | Автор | Страница на Pexels | Размер | Что на кадре
+hero_01.jpg | valentin-ivantsov | https://www.pexels.com/photo/36035073/ | 1920x1280, 170 KB | кухня в ремонте, стремянка
+hero_02.jpg | Artbovich | https://www.pexels.com/photo/8082327/ | 1920x1281, 192 KB | мансарда, кирпичная колонна
+hero_03.jpg | Artbovich | https://www.pexels.com/photo/8146336/ | 1920x1281, 143 KB | чистая комната, паркет
+hero_04.jpg | kseniachernaya | https://www.pexels.com/photo/5691495/ | 1920x1282, 166 KB | трубы и проводка, светлая кухня
+people_01.jpg | Tima Miroshnichenko | https://www.pexels.com/photo/6474482/ | 1920x1280, 211 KB | пара красит стену
+card_01.jpg | Heiko Ruth | https://www.pexels.com/photo/7859953/ | 1920x1280, 191 KB | руки мастера, котёл
+card_02.jpg | Okan Yasar | https://www.pexels.com/photo/29871587/ | 1000x1499, 254 KB | электрик в ремонте, вертикаль
+card_03.jpg | Kindelmedia | https://www.pexels.com/photo/8486978/ | 1000x1333, 123 KB | мастер с разводным ключом, вертикаль
+card_04.jpg | Tima Miroshnichenko | https://www.pexels.com/photo/6196694/ | 1000x1500, 126 KB | клинер с пылесосом, вертикаль
+card_05.jpg | Tima Miroshnichenko | https://www.pexels.com/photo/6195277/ | 1920x1280, 208 KB | клининг гостиной (две сотрудницы)

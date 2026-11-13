@@ -1,0 +1,250 @@
+<!doctype html>
+<!--
+=====================================================================
+СКЕЛЕТ: АДМИНКА ВЕБ-ИНСТРУМЕНТА (уровень «премиум»), страница admin.html
+Файлы рядом: index.html (калькулятор), prices.json (цены).
+=====================================================================
+ЧТО ЭТО
+  Страница, где владелец правит цены в таблице без программиста.
+  Серая палитра, без картинок; Manrope из ../../_fonts/ (при переносе поправить url()).
+
+ЧТО ВНУТРИ
+  - Таблицы: виды работ (kinds), уровни (levels), опции (options) + валюта, единица, минимальный заказ.
+  - «Сохранить в этом браузере»: правки кладутся в localStorage (ключ tool_prices_override), и index.html
+    сразу считает по ним. Это ДЕМО-механика: правки видны только в этом браузере.
+  - «Скачать prices.json»: готовый файл, его кладут рядом с index.html вместо старого.
+  - «Загрузить prices.json», «Сбросить к файлу» (убирает локальные правки).
+  В боевой версии кнопка «Сохранить» отправляет цены на сервер/в базу/в Google-таблицу.
+
+СЛОТЫ ДЛЯ ЗАМЕНЫ
+  ADMIN_CODE (ниже) - заглушка защиты. TITLE/подписи колонок - под нишу.
+  Если в index.html добавлены поля, добавьте строки в таблицы (структура = prices.json).
+
+ЗАЩИТА - ЗАГЛУШКА (важно)
+  Пароль в JavaScript виден любому, кто откроет код страницы. Это НЕ защита, а только
+  «чтобы клиент случайно не зашёл». Реальных паролей в файле нет и быть не должно.
+  Для боевой версии: вход на стороне сервера (логин и пароль у хостинга/Netlify Identity/свой backend),
+  запись цен только через защищённый запрос.
+=====================================================================
+-->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Админка — скелет, премиум</title>
+<style>
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Regular.ttf") format("truetype");font-weight:400;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Bold.ttf") format("truetype");font-weight:700;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-ExtraBold.ttf") format("truetype");font-weight:800;font-display:block}
+@font-face{font-family:"Manrope Fallback";src:local("Arial");size-adjust:102%;ascent-override:100%;descent-override:25%}
+:root{--bg:#F3F4F5;--card:#fff;--ink:#1F2328;--muted:#5B6470;--line:#D5D9DE;--soft:#E8EAED;--accent:#3A424D;--ok:#2F5D3F;--err:#8A2E2E;
+  --font:"Manrope","Manrope Fallback",Arial,sans-serif}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5}
+a{color:inherit}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+header.top{background:var(--card);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:60px}
+.brand{font-weight:800;white-space:nowrap}
+h1{font-size:clamp(1.5rem,4.5vw,2.2rem);margin:24px 0 6px;font-weight:800}
+.lede{color:var(--muted);margin:0 0 16px;max-width:60ch}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:18px;margin-bottom:16px;min-width:0}
+.card h2{margin:0 0 10px;font-size:1.15rem}
+.tblwrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:520px}
+th,td{text-align:left;padding:6px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{color:var(--muted);font-weight:600;font-size:.85rem}
+input,select{font:inherit;padding:8px 10px;border:2px solid var(--line);border-radius:6px;background:#fff;min-height:44px;width:100%;min-width:0}
+td input[type=number]{max-width:130px}
+.btn{display:inline-flex;gap:8px;align-items:center;justify-content:center;background:var(--accent);color:#fff;border:2px solid var(--accent);padding:10px 18px;font:700 1rem var(--font);border-radius:6px;cursor:pointer;min-height:44px;white-space:nowrap}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.sm{min-height:40px;padding:4px 10px;font-size:.9rem}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.gen{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+label.f{display:grid;gap:4px;font-weight:600}
+.msg{margin:10px 0 0;min-height:1.3em;color:var(--ok);font-weight:600}
+.msg.err{color:var(--err)}
+.note{color:var(--muted);font-size:.9rem}
+.login{max-width:420px;margin:40px auto}
+.ico{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+@media (max-width:600px){.bar .btn{flex:1 1 100%}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap"><span class="brand">Админка · скелет</span><a href="index.html">К калькулятору</a></div></header>
+
+<main class="wrap">
+
+<!-- ЗАГЛУШКА ЗАЩИТЫ. Реальных паролей в файле нет. См. комментарий в начале файла. -->
+<section id="gate" class="card login">
+  <h1 style="margin-top:0">Вход</h1>
+  <p class="note">Заглушка защиты: в скелете достаточно нажать «Войти» (код пустой). Для боевой версии включить настоящий вход на сервере.</p>
+  <label class="f">Код доступа
+    <input type="password" id="code" autocomplete="off" placeholder="в скелете оставьте пустым">
+  </label>
+  <div class="bar"><button class="btn" type="button" id="enter">Войти</button></div>
+  <p class="msg err" id="gateMsg" role="alert"></p>
+</section>
+
+<section id="panel" hidden>
+  <h1>Цены</h1>
+  <p class="lede">Правьте значения в таблицах. «Сохранить в этом браузере» сразу меняет расчёт в калькуляторе; «Скачать prices.json» даёт файл для публикации.</p>
+
+  <div class="card">
+    <h2>Общее</h2>
+    <div class="gen">
+      <label class="f">Валюта<input type="text" id="cur"></label>
+      <label class="f">Единица (м², шт., чел.)<input type="text" id="unit"></label>
+      <label class="f">Минимальный заказ (0 - нет)<input type="number" id="minT" min="0" step="1"></label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Виды работ (цена за единицу)</h2>
+    <div class="tblwrap"><table><thead><tr><th>Название</th><th>Описание</th><th>Цена</th><th></th></tr></thead><tbody id="t_kinds"></tbody></table></div>
+    <div class="bar"><button class="btn ghost sm" type="button" data-add="kinds">+ строка</button></div>
+  </div>
+
+  <div class="card">
+    <h2>Уровни (коэффициент: 1 = без изменений)</h2>
+    <div class="tblwrap"><table><thead><tr><th>Название</th><th>Описание</th><th>Коэффициент</th><th></th></tr></thead><tbody id="t_levels"></tbody></table></div>
+    <div class="bar"><button class="btn ghost sm" type="button" data-add="levels">+ строка</button></div>
+  </div>
+
+  <div class="card">
+    <h2>Дополнительные опции</h2>
+    <div class="tblwrap"><table><thead><tr><th>Название</th><th>Описание</th><th>Как считается</th><th>Значение</th><th></th></tr></thead><tbody id="t_options"></tbody></table></div>
+    <div class="bar"><button class="btn ghost sm" type="button" data-add="options">+ строка</button></div>
+    <p class="note">«За единицу» - умножается на количество; «фиксированно» - прибавляется одной суммой; «процент» - надбавка к итогу.</p>
+  </div>
+
+  <div class="card">
+    <div class="bar" style="margin-top:0">
+      <button class="btn" type="button" id="save">Сохранить в этом браузере</button>
+      <button class="btn ghost" type="button" id="download"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14"/></svg>Скачать prices.json</button>
+      <label class="btn ghost" for="upload" style="margin:0"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V5m0 0-4 4m4-4 4 4M5 20h14"/></svg>Загрузить prices.json</label>
+      <input type="file" id="upload" accept="application/json,.json" hidden>
+      <button class="btn ghost" type="button" id="reset">Сбросить к файлу</button>
+    </div>
+    <p class="msg" id="msg" role="status"></p>
+    <p class="note" id="src"></p>
+  </div>
+</section>
+</main>
+
+<script>
+/* ЗАГЛУШКА ЗАЩИТЫ: пустой код = вход без пароля. Видна в исходнике, это не защита.
+   Пароль в этот файл НЕ писать; для боевой версии - вход на сервере. */
+var ADMIN_CODE = '';
+var LS_PRICES = 'tool_prices_override';   // тот же ключ, что в index.html
+/* Копия prices.json для открытия с диска (fetch недоступен). Держать в синхроне с prices.json. */
+var FALLBACK = {"version":1,"currency":"₽","unit":"м²","minTotal":0,
+ "kinds":[{"id":"a","label":"Вариант А","hint":"[ВСТАВИТЬ описание]","price":3000},{"id":"b","label":"Вариант Б","hint":"[ВСТАВИТЬ описание]","price":5000},{"id":"c","label":"Вариант В","hint":"[ВСТАВИТЬ описание]","price":8000}],
+ "levels":[{"id":"eco","label":"Базовый","hint":"[ВСТАВИТЬ]","k":0.9},{"id":"std","label":"Стандарт","hint":"[ВСТАВИТЬ]","k":1},{"id":"top","label":"Расширенный","hint":"[ВСТАВИТЬ]","k":1.25}],
+ "options":[{"id":"o1","label":"Опция 1","hint":"[ВСТАВИТЬ]","type":"perUnit","value":500},{"id":"o2","label":"Опция 2","hint":"[ВСТАВИТЬ]","type":"fixed","value":15000},{"id":"rush","label":"Срочно","hint":"ускоренный срок","type":"pct","value":10}]};
+
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+  var D = null;
+
+  function say(t, bad) { $('msg').textContent = t; $('msg').className = 'msg' + (bad ? ' err' : ''); }
+  function fromFile() {
+    return fetch('prices.json', {cache: 'no-store'}).then(function (r) { if (!r.ok) throw 0; return r.json(); }).catch(function () { return JSON.parse(JSON.stringify(FALLBACK)); });
+  }
+  function load() {
+    try { var o = localStorage.getItem(LS_PRICES); if (o) { D = JSON.parse(o); $('src').textContent = 'Показаны правки, сохранённые в этом браузере.'; return Promise.resolve(); } } catch (e) {}
+    return fromFile().then(function (j) { D = j; $('src').textContent = 'Показаны цены из prices.json.'; });
+  }
+
+  var typeSel = function (v) {
+    return '<select data-f="type">' + [['perUnit', 'за единицу'], ['fixed', 'фиксированно'], ['pct', 'процент']].map(function (t) {
+      return '<option value="' + t[0] + '"' + (t[0] === v ? ' selected' : '') + '>' + t[1] + '</option>'; }).join('') + '</select>';
+  };
+  function rows(name) {
+    $('t_' + name).innerHTML = D[name].map(function (r, i) {
+      var num = name === 'kinds' ? ['price', r.price, 1] : name === 'levels' ? ['k', r.k, 0.01] : ['value', r.value, 0.01];
+      return '<tr data-i="' + i + '"><td><input data-f="label" value="' + esc(r.label) + '" aria-label="Название"></td>' +
+        '<td><input data-f="hint" value="' + esc(r.hint || '') + '" aria-label="Описание"></td>' +
+        (name === 'options' ? '<td>' + typeSel(r.type) + '</td>' : '') +
+        '<td><input type="number" data-f="' + num[0] + '" value="' + num[1] + '" step="' + num[2] + '" min="0" aria-label="Значение"></td>' +
+        '<td><button class="btn ghost sm" type="button" data-del="' + name + ':' + i + '" aria-label="Удалить строку">Удалить</button></td></tr>';
+    }).join('');
+  }
+  function render() {
+    $('cur').value = D.currency; $('unit').value = D.unit; $('minT').value = D.minTotal || 0;
+    ['kinds', 'levels', 'options'].forEach(rows);
+  }
+  /* Собрать данные из полей обратно в D */
+  function collect() {
+    D.currency = $('cur').value || '₽'; D.unit = $('unit').value || 'шт.'; D.minTotal = +$('minT').value || 0;
+    ['kinds', 'levels', 'options'].forEach(function (name) {
+      [].forEach.call($('t_' + name).querySelectorAll('tr'), function (tr) {
+        var r = D[name][+tr.getAttribute('data-i')];
+        [].forEach.call(tr.querySelectorAll('[data-f]'), function (el) {
+          var f = el.getAttribute('data-f'); r[f] = el.type === 'number' ? (parseFloat(el.value) || 0) : el.value;
+        });
+      });
+    });
+    D.updated = new Date().toISOString().slice(0, 10);
+    return D;
+  }
+  function validate() {
+    var bad = [];
+    ['kinds', 'levels', 'options'].forEach(function (n) { if (!D[n].length) bad.push('в таблице «' + n + '» нет строк'); D[n].forEach(function (r) { if (!String(r.label).trim()) bad.push('пустое название'); }); });
+    return bad;
+  }
+  var nid = function (name) { return name.charAt(0) + Date.now().toString(36); };
+
+  $('enter').addEventListener('click', function () {
+    if ($('code').value === ADMIN_CODE) { $('gate').hidden = true; $('panel').hidden = false; load().then(render); }
+    else $('gateMsg').textContent = 'Неверный код.';
+  });
+  document.addEventListener('click', function (e) {
+    var a = e.target.getAttribute && e.target.getAttribute('data-add'), d = e.target.getAttribute && e.target.getAttribute('data-del');
+    if (a) {
+      collect();
+      D[a].push(a === 'kinds' ? {id: nid(a), label: 'Новый вид', hint: '', price: 0} : a === 'levels' ? {id: nid(a), label: 'Новый уровень', hint: '', k: 1} : {id: nid(a), label: 'Новая опция', hint: '', type: 'fixed', value: 0});
+      rows(a);
+    }
+    if (d) { collect(); var p = d.split(':'); D[p[0]].splice(+p[1], 1); rows(p[0]); }
+  });
+  $('save').addEventListener('click', function () {
+    collect(); var bad = validate();
+    if (bad.length) { say('Проверьте: ' + bad.join('; '), true); return; }
+    try { localStorage.setItem(LS_PRICES, JSON.stringify(D)); say('Сохранено в этом браузере. Откройте калькулятор: итог уже пересчитан по новым ценам.'); }
+    catch (e) { say('Не удалось сохранить в браузере. Скачайте файл.', true); }
+  });
+  $('download').addEventListener('click', function () {
+    collect(); var bad = validate();
+    if (bad.length) { say('Проверьте: ' + bad.join('; '), true); return; }
+    var blob = new Blob([JSON.stringify(D, null, 2)], {type: 'application/json'}), a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'prices.json'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    say('Файл prices.json скачан. Положите его рядом с index.html вместо старого.');
+  });
+  $('upload').addEventListener('change', function () {
+    var f = this.files[0]; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () {
+      try {
+        var j = JSON.parse(rd.result);
+        if (!j.kinds || !j.levels || !j.options) throw 0;
+        D = j; render(); say('Файл загружен в таблицу. Нажмите «Сохранить», чтобы применить.');
+      } catch (e) { say('Это не похоже на prices.json (нужны kinds, levels, options).', true); }
+    };
+    rd.readAsText(f);
+    this.value = '';
+  });
+  $('reset').addEventListener('click', function () {
+    try { localStorage.removeItem(LS_PRICES); } catch (e) {}
+    fromFile().then(function (j) { D = j; render(); $('src').textContent = 'Показаны цены из prices.json.'; say('Локальные правки сброшены, калькулятор считает по файлу.'); });
+  });
+})();
+</script>
+</body>
+</html>

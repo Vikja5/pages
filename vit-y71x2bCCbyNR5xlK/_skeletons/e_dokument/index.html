@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Разборы и отчёты — демо</title>
+<style>
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-display:swap}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Bold.ttf") format("truetype");font-weight:700;font-display:swap}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-ExtraBold.ttf") format("truetype");font-weight:800;font-display:swap}
+:root{--ink:#1f2a33;--mute:#5d6b76;--bg:#f2f4f6;--card:#fff;--line:#d9e0e6;--acc:#3b6a8f;--accbg:#e7eff6;--ok:#2f7d57;--gold:#f2c14e;--font:"Manrope","Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.5}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px}
+header{padding:28px 0 8px}
+.tag{display:inline-block;font-weight:700;font-size:.85rem;color:var(--mute);background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px}
+h1{font-size:clamp(1.7rem,6vw,2.7rem);line-height:1.12;margin:12px 0 10px;font-weight:800}
+.lede{color:var(--mute);margin:0 0 10px;max-width:64ch;font-size:1.05rem}
+.gets{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+.get{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.get b{display:block;color:var(--ok);margin-bottom:2px}.get span{color:var(--mute);font-size:.95rem}
+h2.sec{font-size:1.3rem;margin:26px 0 6px}
+.sub{color:var(--mute);margin:0 0 10px}
+.hint{display:inline-block;margin:4px 0 10px;font-weight:700;padding:8px 16px;border-radius:999px;background:var(--gold);color:#1b2733}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.tabs button{min-height:46px;padding:8px 18px;border-radius:999px;border:1px solid var(--line);background:#fff;font:700 1rem var(--font);cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.ba{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:stretch;margin-bottom:14px}
+.box{border-radius:16px;padding:16px;border:1px solid var(--line);background:#fff}
+.box small{display:block;font-weight:800;text-transform:uppercase;letter-spacing:.05em;font-size:.78rem;margin-bottom:6px;color:var(--mute)}
+.box.after{background:var(--accbg);border-color:#c5d8e8}.box.after small{color:var(--acc)}
+.box p{margin:0;font-size:1.08rem;font-weight:700}
+.mid{align-self:center;color:var(--acc);font-weight:800;font-size:1.6rem}
+.doc{background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px rgba(31,42,51,.1);padding:clamp(16px,4vw,32px)}
+.doc h3{margin:0 0 12px;font-size:1.2rem}
+.doc h4{margin:16px 0 6px;font-size:1rem;color:var(--acc)}
+.doc ul{margin:0 0 6px;padding-left:1.1em;display:grid;gap:4px}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;min-width:420px;font-size:.95rem}
+th,td{text-align:left;padding:9px 11px;border:1px solid var(--line)}th{background:#f6f8fa}
+.stamp{color:var(--mute);font-size:.88rem;border-top:1px dashed var(--line);margin-top:14px;padding-top:10px}
+.forms{display:flex;flex-wrap:wrap;gap:8px}
+.fm{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 14px;font-weight:700}
+.price{margin:14px 0 12px;border:2px solid var(--acc);border-radius:16px;background:#fff;overflow:hidden;box-shadow:0 6px 18px rgba(59,106,143,.16)}
+.price .ph{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;padding:7px 14px;background:var(--acc);color:#fff;font-weight:800;font-size:.95rem}
+.price .ph span{font-weight:600;font-size:.82rem;opacity:.95}
+.price .pr{display:grid;grid-template-columns:1fr 1fr}
+.price .pi{display:flex;flex-direction:column;padding:10px 14px}
+.price .pi+.pi{border-left:1px solid var(--line)}
+.price .pi small{color:var(--mute);font-weight:700;font-size:.84rem;line-height:1.3}
+.price .pi b{color:var(--acc);font-size:1.5rem;font-weight:800;white-space:nowrap;line-height:1.2}
+@media(max-width:600px){.price .pr{grid-template-columns:1fr}.price .pi{flex-direction:row;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px}.price .pi+.pi{border-left:0;border-top:1px solid var(--line)}.price .pi b{font-size:1.3rem}}
+.cta{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:11px 14px;border-radius:14px;background:var(--gold);color:#1b2733;font-weight:800;text-decoration:none;line-height:1.3;box-shadow:0 4px 0 rgba(27,39,51,.18);transition:transform .2s}
+.cta:hover,.cta:focus-visible{transform:translateY(-2px)}
+.cta i{font-style:normal;flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#1b2733;color:var(--gold);animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+@media(prefers-reduced-motion:reduce){.cta i{animation:none}}
+
+footer{padding:20px 0 50px;color:var(--mute);font-size:.92rem}
+@media(max-width:760px){.gets{grid-template-columns:1fr}.ba{grid-template-columns:1fr}.mid{transform:rotate(90deg);justify-self:center}}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <span class="tag">Демо / пример работы</span>
+  <h1 id="h1">Прочитаем, разберём и соберём главное в понятный документ</h1>
+  <div class="price" role="group" aria-label="Стоимость">
+    <div class="ph">Стоимость <span>Цены «от». Точную назову, когда увижу ваше задание</span></div>
+    <div class="pr">
+      <div class="pi"><small>Текст или документ: выжимка, сравнение, отчёт</small><b>от 500 ₽</b></div>
+      <div class="pi"><small>Сложное: обзор рынка, много файлов</small><b>от 2 000 ₽</b></div>
+    </div>
+  </div>
+  <a class="cta" href="#tabs"><i aria-hidden="true">↓</i><span>Это живой пример: выберите, что у вас есть (документ, таблицы, интернет), увидите, какой получится результат</span></a>
+  <p class="lede" id="lede">Из ваших документов, таблиц или данных из интернета. Вы получаете короткий результат, который можно сразу использовать: выжимку, сравнение, отчёт с выводами.</p>
+  <div class="gets" id="gets"></div>
+</header>
+<main class="wrap">
+  <h2 class="sec">Что у вас есть, из этого и сделаем</h2>
+  <span class="hint">👆 Нажмите на вариант, документ ниже поменяется</span>
+  <div class="tabs" id="tabs" tabindex="-1" role="group" aria-label="Исходные материалы"></div>
+  <div class="ba"><div class="box"><small>Было</small><p id="was"></p></div><div class="mid" aria-hidden="true">→</div><div class="box after"><small>Стало</small><p id="now"></p></div></div>
+  <article class="doc" id="doc" aria-live="polite"></article>
+
+  <h2 class="sec">В каком виде получите</h2>
+  <div class="forms" id="forms"></div>
+
+</main>
+<footer class="wrap">Демо / пример работы. Цифры и тексты условные. В вашей версии каждое число будет с источником.</footer>
+<script>
+/* ===== Подстановка под заказ: меняется только этот блок ===== */
+var E = {
+  gets: [['Экономит часы', 'Вместо чтения и сравнения вы получаете итог'], ['Находит пропущенное', 'Риски, расхождения и важные детали собираются вместе'], ['Готово к использованию', 'Структура, таблицы и выводы, а не черновик']],
+  forms: ['Краткая выжимка на 1 страницу', 'Подробный отчёт', 'Таблица сравнения', 'Презентация-сводка', 'Документ в вашем оформлении'],
+  tabs: [
+    { name: 'Ваш документ', was: '40 страниц договора, читать целый вечер', now: '1 страница: суть, суммы, сроки и риски', title: 'Выжимка по документу',
+      secs: [{ h: 'Суть' , ul: ['О чём документ и между кем', 'Что каждая сторона обязуется сделать']}, { h: 'Сроки и суммы', table: [['Что', 'Значение'], ['[срок]', '[дата]'], ['[сумма]', '[число]']] }, { h: 'На что обратить внимание', ul: ['[пункт, который стоит уточнить]', '[пункт с рискованной формулировкой]']}] },
+    { name: 'Много документов', was: '30 отчётов и писем в одной папке', now: 'Сводка: что общего, что расходится, что делать', title: 'Сводка по папке документов',
+      secs: [{ h: 'Что общего', ul: ['[общая тема документов]', '[повторяющиеся выводы]']}, { h: 'Где расходятся', table: [['Вопрос', 'Документ А', 'Документ Б'], ['[вопрос 1]', '[позиция]', '[позиция]'], ['[вопрос 2]', '[позиция]', '[позиция]']] }, { h: 'Что делать дальше', ul: ['[рекомендация 1]', '[рекомендация 2]']}] },
+    { name: 'Интернет', was: 'Нужно понять рынок, а сотни сайтов читать некогда', now: 'Обзор с источниками: кто, что предлагает, по каким ценам', title: 'Обзор рынка из открытых источников',
+      secs: [{ h: 'Как собирали', ul: ['Подключаем парсер: он сам собирает данные с нужных сайтов', 'Каждое утверждение отмечено ссылкой на источник']}, { h: 'Игроки рынка', table: [['Компания', 'Предложение', 'Источник'], ['[компания 1]', '[что предлагает]', '[ссылка]'], ['[компания 2]', '[что предлагает]', '[ссылка]']] }, { h: 'Выводы', ul: ['[вывод 1]', '[вывод 2]']}] },
+    { name: 'Таблицы', was: 'Выгрузка на тысячи строк, в ней не видно картины', now: 'Понятный разбор: итоги, тенденции, что выбивается', title: 'Разбор данных из таблицы',
+      secs: [{ h: 'Главное в цифрах', table: [['Показатель', 'Значение'], ['[итог]', '[число]'], ['[изменение]', '[число]']] }, { h: 'Тенденции', ul: ['[что растёт]', '[что падает]']}, { h: 'Что выбивается', ul: ['[необычное значение и возможная причина]']}] }
+  ]
+};
+/* ============================================================ */
+(function(){
+  var $ = function(i){ return document.getElementById(i); };
+  function el(t, c, x){ var e = document.createElement(t); if (c) e.className = c; if (x !== undefined) e.textContent = x; return e; }
+  E.gets.forEach(function(g){ var d = el('div','get'); d.appendChild(el('b','',g[0])); d.appendChild(el('span','',g[1])); $('gets').appendChild(d); });
+  E.forms.forEach(function(f){ $('forms').appendChild(el('div','fm',f)); });
+  var btns = [];
+  function show(i){
+    var t = E.tabs[i];
+    btns.forEach(function(b,k){ b.setAttribute('aria-pressed', k === i); });
+    $('was').textContent = t.was; $('now').textContent = t.now;
+    var d = $('doc'); d.textContent = ''; d.appendChild(el('h3','',t.title));
+    t.secs.forEach(function(s){
+      d.appendChild(el('h4','',s.h));
+      if (s.ul) { var u = el('ul'); s.ul.forEach(function(x){ u.appendChild(el('li','',x)); }); d.appendChild(u); }
+      if (s.table) { var w = el('div','tw'), tb = el('table'); s.table.forEach(function(r,k){ var tr = el('tr'); r.forEach(function(c){ tr.appendChild(el(k ? 'td' : 'th','',c)); }); tb.appendChild(tr); }); w.appendChild(tb); d.appendChild(w); }
+    });
+    d.appendChild(el('p','stamp','Пример структуры. Цифры и тексты условные.'));
+  }
+  E.tabs.forEach(function(t,i){ var b = el('button','',t.name); b.type = 'button'; b.addEventListener('click', function(){ show(i); }); btns.push(b); $('tabs').appendChild(b); });
+  show(0);
+})();
+</script>
+</body>
+</html>

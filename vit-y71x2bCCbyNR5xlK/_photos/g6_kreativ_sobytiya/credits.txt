@@ -1,0 +1,14 @@
+Фото: Pexels (Pexels License, коммерческое использование разрешено, указание автора не обязательно)
+Файл | Автор | Страница на Pexels | Размер | Что на кадре
+hero_01.jpg | wal_ | https://www.pexels.com/photo/37764947/ | 1920x1280, 410 KB | винтажная барбершоп, зелёные кресла
+hero_02.jpg | Dacosta Shotit | https://www.pexels.com/photo/39714849/ | 1920x1280, 224 KB | фотостудия с софтбоксами
+hero_03.jpg | elurias | https://www.pexels.com/photo/31649138/ | 1920x1280, 284 KB | горы и лучи света (туры)
+hero_04.jpg | meraloral21 | https://www.pexels.com/photo/37630236/ | 1920x1440, 232 KB | горная долина, голубое небо (туры)
+card_01.jpg | Nguyen Tien Thanh | https://www.pexels.com/photo/33072063/ | 1920x1280, 187 KB | фотограф с камерой
+card_02.jpg | Amar | https://www.pexels.com/photo/10840188/ | 1920x1280, 296 KB | чёрно-белая свадьба, лепестки
+card_03.jpg | th2city | https://www.pexels.com/photo/2061820/ | 1000x1500, 218 KB | парикмахер за работой, вертикаль
+card_04.jpg | cottonbro | https://www.pexels.com/photo/3998407/ | 1000x1500, 174 KB | барбер готовит клиента, вертикаль
+card_05.jpg | Oguzhan Ozdemir | https://www.pexels.com/photo/37380420/ | 1000x1500, 237 KB | пара на свадьбе в саду, вертикаль
+card_06.jpg | kanishkamg | https://www.pexels.com/photo/30153930/ | 1000x1499, 180 KB | пара молодожёнов с цветами, вертикаль
+card_07.jpg | daka | https://www.pexels.com/photo/13385183/ | 1000x1503, 318 KB | туристка с камерой в старом городе, вертикаль
+card_08.jpg | mibernaa | https://www.pexels.com/photo/39527593/ | 1000x1500, 147 KB | пара туристов в Каппадокии, вертикаль

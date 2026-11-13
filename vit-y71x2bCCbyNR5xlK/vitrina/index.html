@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Все витрины — что видит заказчик</title>
+<style>
+@font-face{font-family:"Manrope";src:url("../_fonts/Manrope-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"Manrope";src:url("../_fonts/Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-display:swap}
+@font-face{font-family:"Manrope";src:url("../_fonts/Manrope-Bold.ttf") format("truetype");font-weight:700;font-display:swap}
+@font-face{font-family:"Manrope";src:url("../_fonts/Manrope-ExtraBold.ttf") format("truetype");font-weight:800;font-display:swap}
+:root{--ink:#1B2733;--mute:#586674;--bg:#F1F4F8;--card:#fff;--line:#D8E0E8;
+--c1:#5B7083;--c2:#2F5D8A;--c3:#1F2A44;--gold:#F2C14E;
+--font:"Manrope","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;--ease:cubic-bezier(.2,.7,.1,1)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.5}
+a{color:inherit}:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 20px}
+.back{display:inline-block;margin-top:20px;font-weight:700;color:var(--mute);text-decoration:none}
+.back:hover{color:var(--ink);text-decoration:underline}
+header{padding:clamp(24px,5vw,60px) 0 clamp(16px,3vw,30px);text-align:center}
+.who{display:inline-block;font-weight:700;color:var(--mute);margin-bottom:12px}
+h1{font-size:clamp(1.9rem,5vw,3.4rem);line-height:1.1;margin:0 auto 14px;max-width:22ch;font-weight:800;letter-spacing:-.015em}
+.lead{max-width:58ch;margin:0 auto;color:var(--mute);font-size:1.1rem}
+.hint{display:inline-block;margin-top:20px;font-weight:700;padding:9px 18px;border-radius:999px;background:#fff;border:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(18px,2.4vw,34px);align-items:stretch;padding:clamp(20px,4vw,44px) 0 30px}
+.grid.two{max-width:920px;margin:0 auto}
+.opt{position:relative;display:flex;flex-direction:column;background:var(--card);border-radius:22px;overflow:hidden;text-decoration:none;color:inherit;box-shadow:0 2px 0 rgba(20,35,43,.04),0 22px 50px rgba(20,35,43,.12);transition:transform .45s var(--ease),box-shadow .45s var(--ease)}
+.opt:hover,.opt:focus-visible{transform:translateY(-8px);box-shadow:0 34px 70px rgba(20,35,43,.2)}
+.opt.star{outline:4px solid var(--gold);outline-offset:-4px}
+.band{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 22px;min-height:84px;color:#fff}
+.band b{display:flex;flex-direction:column;align-items:flex-start;gap:6px;font-size:1.25rem}
+.band span{font-size:1.3rem;font-weight:800;white-space:nowrap}
+.band i{font-style:normal;font-weight:700;font-size:.8rem;line-height:1;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.18)}
+.star .band i{background:var(--gold);color:var(--ink);font-weight:800}
+.c1 .band{background:var(--c1)}.c2 .band{background:var(--c2)}.c3 .band{background:var(--c3)}
+.shot{position:relative;aspect-ratio:16/10;overflow:hidden;background:#dfe6ea;border-block:1px solid var(--line)}
+.shot iframe{position:absolute;left:0;top:0;width:1280px;height:800px;border:0;transform-origin:0 0;pointer-events:none;background:#fff}
+.shot::before{content:"";position:absolute;inset:0;background:rgba(20,35,43,0);transition:background .3s;z-index:1}
+.opt:hover .shot::before,.opt:focus-visible .shot::before{background:rgba(20,35,43,.42)}
+.tap{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:2;display:inline-flex;align-items:center;gap:9px;white-space:nowrap;background:#fff;color:var(--ink);font-weight:800;font-size:1rem;padding:11px 20px;border-radius:999px;box-shadow:0 10px 26px rgba(20,35,43,.3);transition:transform .3s var(--ease)}
+.opt:hover .tap,.opt:focus-visible .tap{transform:translateX(-50%) scale(1.07)}
+.body{padding:20px 22px 24px;display:flex;flex-direction:column;gap:12px;flex:1}
+.body h2{margin:0;font-size:1.25rem}
+.body p{margin:0;color:var(--mute);font-size:1rem}
+.price{font-weight:800;font-size:1.05rem}
+.go{margin-top:auto;display:inline-flex;align-items:center;justify-content:center;min-height:48px;border-radius:12px;font-weight:800;padding:10px 20px;color:#fff}
+.c1 .go{background:var(--c1)}.c2 .go{background:var(--c2)}.c3 .go{background:var(--c3)}
+.compare{margin:20px 0 0;background:#fff;border-radius:18px;border:1px solid var(--line);overflow:hidden}
+.compare table{width:100%;border-collapse:collapse;font-size:1rem}
+.compare th,.compare td{padding:14px 18px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+.compare th{font-weight:800;background:#F7F9FB}.compare tr:last-child td{border-bottom:0}
+.compare td:first-child{font-weight:700;width:26%}
+.note{padding:26px 0 70px;color:var(--mute);font-size:.95rem;text-align:center}
+@media (max-width:980px){.grid,.grid.two{grid-template-columns:1fr;max-width:560px;margin:0 auto}.band{min-height:0}.compare{overflow-x:auto}.compare table{min-width:520px}}
+@media (max-width:480px){.wrap{padding:0 16px}.band span{font-size:1.15rem}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+.ul{margin:0;padding:0 0 0 1.1em;display:grid;gap:5px;font-size:1rem}
+.idx{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding:20px 0 30px}
+.ic{display:flex;flex-direction:column;gap:8px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;text-decoration:none;box-shadow:0 14px 34px rgba(20,35,43,.08);transition:transform .3s var(--ease)}
+.ic:hover,.ic:focus-visible{transform:translateY(-4px)}
+.ic h2{margin:0;font-size:1.2rem}.ic p{margin:0;color:var(--mute)}
+.ic .price{font-weight:800;font-size:1rem}.ic .vp{gap:8px;font-size:.98rem}.ic .vp b{white-space:nowrap}
+.ic .k{font-size:.85rem;font-weight:700;color:var(--c2)}.ic .go{background:var(--c2);margin-top:8px;align-self:flex-start}
+.ic{border:2px solid transparent}
+.ic:hover,.ic:focus-visible{border-color:var(--c2);box-shadow:0 22px 48px rgba(47,93,138,.22)}
+.ic .pl{display:grid;grid-template-columns:1fr 1fr;gap:0 10px;border:2px solid var(--c2);border-radius:14px;background:#EAF1F8;padding:8px 12px}
+.ic .pl .pt{grid-column:1/-1;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--c2)}
+.ic .pp{display:flex;flex-direction:column}
+.ic .pp em{font-style:normal;font-size:.85rem;font-weight:700;color:var(--mute)}
+.ic .pp b{font-size:1.2rem;font-weight:800;color:var(--c3);white-space:nowrap}
+.ic .pl.p3,.ic .pl.p1{grid-template-columns:1fr}
+.ic .pl.p3 .pp,.ic .pl.p1 .pp{flex-direction:row;justify-content:space-between;align-items:baseline;gap:10px}
+.ic .pl.p3 .pp+.pp{border-top:1px solid #C9D8E8}
+.ic .pl.p3 .pp b,.ic .pl.p1 .pp b{font-size:1.1rem}
+.ic .pl.p3 .pp em,.ic .pl.p1 .pp em{font-size:.82rem}
+@media (max-width:360px){.ic .pp b{font-size:1.05rem}}
+.ic .go::after{content:"\00a0\2192";transition:transform .3s var(--ease)}
+.ic:hover .go::after,.ic:focus-visible .go::after{transform:translateX(5px)}
+.ic .go{transition:filter .3s}.ic:hover .go{filter:brightness(1.12)}
+.vid{grid-column:1/-1;gap:14px}
+.vid:hover{transform:none}
+.vid .lead2{margin:0;color:var(--mute)}
+.lv3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.lvl{display:flex;flex-direction:column;gap:8px;border:2px solid var(--line);border-radius:16px;padding:16px;background:#fff}
+.lvl.l2{border-color:#9DB6CF}.lvl.l3{border-color:var(--c2);background:#F3F7FB}
+.lvl h3{margin:0;font-size:1.15rem}
+.lvl .lp{display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 8px;border:2px solid var(--c2);border-radius:12px;background:#EAF1F8;padding:6px 12px}
+.lvl .lp b{font-size:1.45rem;font-weight:800;color:var(--c3);white-space:nowrap}
+.lvl .lp span{font-size:.85rem;font-weight:700;color:var(--mute)}
+.lvl .inc{font-weight:800;font-size:.92rem;color:var(--c2);margin:2px 0 0}
+.lvl ul{margin:0;padding:0 0 0 1.1em;display:grid;gap:4px;font-size:.98rem}
+.alone{border:2px dashed var(--line);border-radius:16px;padding:14px 16px;background:#fff}
+.alone h3{margin:0 0 8px;font-size:1.05rem}
+.alone ul{margin:0;padding:0 0 0 1.1em;display:grid;gap:5px;font-size:1rem}
+.alone b{white-space:nowrap}
+@media (max-width:980px){.lv3{grid-template-columns:1fr}}
+@media (max-width:980px){.idx{grid-template-columns:1fr 1fr}}
+@media (max-width:620px){.idx{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <span class="who">Для Alex, внутренняя страница</span>
+  <h1>Что видит заказчик в каждой группе</h1>
+  <p class="lead">Витрины: сайты, инструменты, боты, а внизу образцы для групп В, Г, Е, Ж. Откройте любую, чтобы увидеть её так, как её увидит заказчик.</p>
+</header>
+<main class="wrap">
+  <div class="idx">
+<a class="ic" href="g1_medicina_uhod/index.html"><span class="pl p3"><span class="pt">Стоимость, ориентир</span><span class="pp"><em>Базовый, 5–15 тыс.</em><b>от 5 000 ₽</b></span><span class="pp"><em>Стандарт, 15–25 тыс.</em><b>от 15 000 ₽</b></span><span class="pp"><em>Премиум, от 40 тыс.</em><b>от 40 000 ₽</b></span></span><span class="k">g1_medicina_uhod</span><h2>Медицина и уход</h2><p>Три варианта сайта для клиники, стоматологии, ветеринарии, салона или СПА: базовый, стандарт, премиум.</p><span class="go">Открыть витрину</span></a>
+<a class="ic" href="g2_dom_remont/index.html"><span class="pl p3"><span class="pt">Стоимость, ориентир</span><span class="pp"><em>Базовый, 5–15 тыс.</em><b>от 5 000 ₽</b></span><span class="pp"><em>Стандарт, 15–25 тыс.</em><b>от 15 000 ₽</b></span><span class="pp"><em>Премиум, от 40 тыс.</em><b>от 40 000 ₽</b></span></span><span class="k">g2_dom_remont</span><h2>Дом и ремонт</h2><p>Три варианта сайта для ремонта квартир, мастера, сантехника или клининга: базовый, стандарт, премиум.</p><span class="go">Открыть витрину</span></a>
+<a class="ic" href="g2b_stroitelstvo/index.html"><span class="pl p3"><span class="pt">Стоимость, ориентир</span><span class="pp"><em>Базовый, 5–15 тыс.</em><b>от 5 000 ₽</b></span><span class="pp"><em>Стандарт, 15–25 тыс.</em><b>от 15 000 ₽</b></span><span class="pp"><em>Премиум, от 40 тыс.</em><b>от 40 000 ₽</b></span></span><span class="k">g2b_stroitelstvo</span><h2>Строительство</h2><p>Три варианта сайта для строительной компании: базовый, стандарт, премиум.</p><span class="go">Открыть витрину</span></a>
+<a class="ic" href="g3_eda/index.html"><span class="pl p3"><span class="pt">Стоимость, ориентир</span><span class="pp"><em>Базовый, 5–15 тыс.</em><b>от 5 000 ₽</b></span><span class="pp"><em>Стандарт, 15–25 тыс.</em><b>от 15 000 ₽</b></span><span class="pp"><em>Премиум, от 40 тыс.</em><b>от 40 000 ₽</b></span></span><span class="k">g3_eda</span><h2>Еда</h2><p>Три варианта сайта для кафе, ресторана или кондитерской: базовый, стандарт, премиум.</p><span class="go">Открыть витрину</span></a>
+<a class="ic" href="g4_sport_obuchenie/index.html"><span class="pl p3"><span class="pt">Стоимость, ориентир</span><span class="pp"><em>Базовый, 5–15 тыс.</em><b>от 5 000 ₽</b></span><span class="pp"><em>Стандарт, 15–25 тыс.</em><b>от 15 000 ₽</b></span><span class="pp"><em>Премиум, от 40 тыс.</em><b>от 40 000 ₽</b></span></span><span class="k">g4_sport_obuchenie</span><h2>Спорт и обучение</h2><p>Три варианта сайта для фитнеса, курсов или школы: базовый, стандарт, премиум.</p><span class="go">Открыть витрину</span></a>
+<a class="ic" href="g5_uslugi_doverie/index.html"><span class="pl p3"><span class="pt">Стоимость, ориентир</span><span class="pp"><em>Базовый, 5–15 тыс.</em><b>от 5 000 ₽</b></span><span class="pp"><em>Стандарт, 15–25 тыс.</em><b>от 15 000 ₽</b></span><span class="pp"><em>Премиум, от 40 тыс.</em><b>от 40 000 ₽</b></span></span><span class="k">g5_uslugi_doverie</span><h2>Услуги и доверие</h2><p>Три варианта сайта для юриста, бухгалтера, консалтинга или страхования: базовый, стандарт, премиум.</p><span class="go">Открыть витрину</span></a>
+<a class="ic" href="g6_kreativ_sobytiya/index.html"><span class="pl p3"><span class="pt">Стоимость, ориентир</span><span class="pp"><em>Базовый, 5–15 тыс.</em><b>от 5 000 ₽</b></span><span class="pp"><em>Стандарт, 15–25 тыс.</em><b>от 15 000 ₽</b></span><span class="pp"><em>Премиум, от 40 тыс.</em><b>от 40 000 ₽</b></span></span><span class="k">g6_kreativ_sobytiya</span><h2>Креатив и события</h2><p>Три варианта сайта для фотографа, свадеб, туров или барбершопа: базовый, стандарт, премиум.</p><span class="go">Открыть витрину</span></a>
+<a class="ic" href="tools/index.html"><span class="pl "><span class="pt">Стоимость, ориентир</span><span class="pp"><em>Стандарт</em><b>от 5 000 ₽</b></span><span class="pp"><em>Премиум</em><b>от 15 000 ₽</b></span></span><span class="k">tools</span><h2>Веб-инструменты</h2><p>Два варианта калькулятора или расчёта: стандарт и премиум.</p><span class="go">Открыть витрину</span></a>
+<a class="ic" href="bots/index.html"><span class="pl p1"><span class="pt">Стоимость, ориентир</span><span class="pp"><em>Один вариант, по набору функций</em><b>от 3 000 до 15 000 ₽</b></span></span><span class="k">bots</span><h2>Боты</h2><p>Бот в Telegram со всеми возможностями: запись, заявки, оплата, рассылки. Можно прокликать.</p><span class="go">Открыть витрину</span></a>
+<a class="ic" href="../_skeletons/v_dannye/index.html"><span class="pl"><span class="pt">Стоимость, ориентир</span><span class="pp"><em>Простой</em><b>от 1 000 ₽</b></span><span class="pp"><em>Сложный</em><b>от 5 000 ₽</b></span></span><span class="k">В · данные и скрипты</span><h2>Парсер и выгрузка данных</h2><p>Как работает сбор данных: три шага и таблица результата с фильтром.</p><span class="go">Открыть пример</span></a>
+<a class="ic" href="../_skeletons/g_avtomatizaciya/index.html"><span class="pl"><span class="pt">Стоимость, ориентир</span><span class="pp"><em>Простая</em><b>от 1 000 ₽</b></span><span class="pp"><em>Сложная</em><b>от 5 000 ₽</b></span></span><span class="k">Г · ИИ и автоматизация</span><h2>Схема автоматизации</h2><p>Make или n8n: цепочка шагов, на каждый можно нажать и увидеть, что происходит.</p><span class="go">Открыть пример</span></a>
+<a class="ic" href="../_skeletons/e_dokument/index.html"><span class="pl"><span class="pt">Стоимость, ориентир</span><span class="pp"><em>Документ</em><b>от 500 ₽</b></span><span class="pp"><em>Сложное</em><b>от 2 000 ₽</b></span></span><span class="k">Е · тексты и документы</span><h2>Образец документа</h2><p>Структура отчёта: содержание, первый раздел, таблица, выводы. Цифры условные.</p><span class="go">Открыть пример</span></a>
+<a class="ic" href="../_skeletons/zh_skript/index.html"><span class="pl"><span class="pt">Стоимость, ориентир</span><span class="pp"><em>Скрипт</em><b>от 500 ₽</b></span><span class="pp"><em>Серверы и системы</em><b>от 2 000 ₽</b></span></span><span class="k">Ж · серверы и скрипты</span><h2>Пример скрипта</h2><p>Скрипт для Windows с комментариями и описанием: что делает, когда запускается, что на выходе.</p><span class="go">Открыть пример</span></a>
+<a class="ic" href="d_video/index.html"><span class="pl p3"><span class="pt">Стоимость, ориентир, за минуту видео</span><span class="pp"><em>Лёгкий</em><b>от 100 ₽</b></span><span class="pp"><em>Стандарт</em><b>от 250 ₽</b></span><span class="pp"><em>Насыщенный</em><b>от 450 ₽</b></span></span><span class="k">Д · видео</span><h2>Видео: шортсы и обработка длинного видео</h2><p>Нарезка шортсов от 300 ₽, рекламные шортсы, обработка длинного видео в трёх уровнях. Демо / пример работы.</p><span class="go">Открыть пример</span></a>
+  </div>
+  <p class="note">Демо / пример работы, тексты и цены условные.</p>
+</main>
+</body>
+</html>

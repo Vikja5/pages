@@ -1,0 +1,14 @@
+Фото: Pexels (Pexels License, коммерческое использование разрешено, указание автора не обязательно)
+Файл | Автор | Страница на Pexels | Размер | Что на кадре
+hero_01.jpg | pavel-danilyuk | https://www.pexels.com/photo/8111868/ | 1920x1282, 306 KB | светлый кабинет юриста
+hero_02.jpg | ekaterina-bolovtsova | https://www.pexels.com/photo/6077091/ | 1920x1280, 222 KB | кабинет с книгами и статуэткой Фемиды
+hero_03.jpg | pavel-danilyuk | https://www.pexels.com/photo/8112112/ | 1920x1282, 208 KB | юрист за столом
+ins_01.jpg | Kampus | https://www.pexels.com/photo/8441861/ | 1920x1282, 166 KB | страховой консультант со счастливой парой
+ins_02.jpg | Kampus | https://www.pexels.com/photo/8441820/ | 1920x1282, 200 KB | консультация по страхованию, документы
+ins_03.jpg | Mikhail Nilov | https://www.pexels.com/photo/7734599/ | 1000x1345, 113 KB | агент со страховым полисом и клиентами, вертикаль
+acc_01.jpg | Mikhail Nilov | https://www.pexels.com/photo/8297351/ | 1920x1280, 253 KB | бухгалтер с калькулятором за столом
+acc_02.jpg | Jakub Zerdzicki | https://www.pexels.com/photo/17065743/ | 1920x1281, 186 KB | калькулятор, очки и папки на столе
+acc_03.jpg | Mikhail Nilov | https://www.pexels.com/photo/8297211/ | 1000x1500, 159 KB | бухгалтер считает, документы, вертикаль
+acc_04.jpg | Karola G | https://www.pexels.com/photo/4476378/ | 1000x1500, 117 KB | руки с калькулятором и записями, вертикаль
+card_01.jpg | august-de-richelieu | https://www.pexels.com/photo/4427501/ | 1000x1498, 128 KB | две сотрудницы с документами, вертикаль
+card_02.jpg | pavel-danilyuk | https://www.pexels.com/photo/7654168/ | 1000x1498, 189 KB | команда за столом, вертикаль

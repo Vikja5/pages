@@ -1,0 +1,14 @@
+Фото: Pexels (Pexels License, коммерческое использование разрешено, указание автора не обязательно)
+Файл | Автор | Страница на Pexels | Размер | Что на кадре
+hero_01.jpg | Artbovich | https://www.pexels.com/photo/7598366/ | 1920x1281, 347 KB | spa-кабинет, дерево и сухоцветы
+hero_02.jpg | Pavel Danilyuk | https://www.pexels.com/photo/6809642/ | 1920x1282, 260 KB | светлая стоматология, кресло
+hero_03.jpg | Artbovich | https://www.pexels.com/photo/7750114/ | 1920x1269, 281 KB | просторный салон красоты, зеркала
+vet_01.jpg | Tima Miroshnichenko | https://www.pexels.com/photo/6235650/ | 1920x1280, 133 KB | ветеринар со стетоскопом осматривает шпица, спокойно
+vet_02.jpg | Tima Miroshnichenko | https://www.pexels.com/photo/6234975/ | 1000x1500, 91 KB | ветеринар в белом халате со шпицем на столе, вертикаль
+vet_03.jpg | DCC Pets | https://www.pexels.com/photo/22504402/ | 1920x1280, 268 KB | ветеринар и хозяйка осматривают собаку
+vet_04.jpg | Italo Crespi | https://www.pexels.com/photo/15551426/ | 1920x1280, 252 KB | ветеринар в халате за столом в кабинете
+vet_05.jpg | Ali Merchant | https://www.pexels.com/photo/39550277/ | 1000x1333, 170 KB | осмотр рыжего кота со стетоскопом, вертикаль
+spa_01.jpg | Denys | https://www.pexels.com/photo/12115040/ | 1920x1280, 172 KB | косметолог в перчатках, уход за лицом
+spa_02.jpg | cottonbro | https://www.pexels.com/photo/7581075/ | 1920x1280, 204 KB | процедура для лица в спа-клинике
+spa_03.jpg | cottonbro | https://www.pexels.com/photo/3992875/ | 1920x1280, 257 KB | стилист и клиентка в салоне
+spa_04.jpg | davegarcia | https://www.pexels.com/photo/37229301/ | 1000x1500, 178 KB | маска для лица в спа, вертикаль

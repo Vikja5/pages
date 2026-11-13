@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Парсер новостей и данных — демо</title>
+<style>
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-display:swap}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Bold.ttf") format("truetype");font-weight:700;font-display:swap}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-ExtraBold.ttf") format("truetype");font-weight:800;font-display:swap}
+:root{--ink:#1f2a33;--mute:#5d6b76;--bg:#f2f4f6;--card:#fff;--line:#d9e0e6;--acc:#3b6a8f;--accbg:#e7eff6;--gold:#f2c14e;--ok:#2f7d57;--font:"Manrope","Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.5}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px}
+header{padding:28px 0 8px}
+.tag{display:inline-block;font-weight:700;font-size:.85rem;color:var(--mute);background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px}
+h1{font-size:clamp(1.7rem,6vw,2.6rem);line-height:1.15;margin:12px 0 8px;font-weight:800}
+.lede{color:var(--mute);margin:0 0 8px;max-width:64ch}
+.hint{display:inline-block;margin:10px 0 4px;font-weight:700;padding:9px 16px;border-radius:999px;background:var(--gold);color:#1b2733}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.card h2{margin:0 0 4px;font-size:1.1rem;display:flex;align-items:center;gap:10px}
+.card h2 i{font-style:normal;display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--acc);color:#fff;font-weight:800;font-size:.9rem}
+.card p.s{margin:0 0 10px;color:var(--mute);font-size:.95rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--accbg);border:1px solid #c5d8e8;border-radius:999px;padding:4px 6px 4px 12px;font-weight:600;font-size:.95rem}
+.chip button{min-width:32px;min-height:32px;border:0;border-radius:50%;background:transparent;cursor:pointer;font-size:1rem;color:var(--acc)}
+.chip button:hover{background:#fff}
+.add{display:flex;gap:8px}
+.add input,select{flex:1;min-height:48px;border:1px solid var(--line);border-radius:12px;padding:8px 12px;font:inherit;background:#fff;color:inherit;min-width:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:10px 18px;border:0;border-radius:12px;background:var(--acc);color:#fff;font:700 1rem var(--font);cursor:pointer}
+.btn.light{background:#fff;color:var(--acc);border:1px solid var(--acc)}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.opt input{width:22px;height:22px;margin-top:2px;accent-color:var(--acc)}
+.tg{display:flex;flex-wrap:wrap;gap:8px}
+.tg label{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:6px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;cursor:pointer;font-weight:600}
+.tg input{accent-color:var(--acc);width:18px;height:18px}
+.runhint{margin:6px 0 0;text-align:center;font-weight:800;color:var(--acc)}
+.run{display:flex;justify-content:center;margin:6px 0 18px}
+.run .btn{min-width:min(100%,360px);min-height:56px;font-size:1.1rem;background:var(--ok)}
+.res{display:none;margin-bottom:20px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+.stat b{display:block;font-size:1.6rem}.stat span{color:var(--mute);font-size:.85rem}
+.posts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.post{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.cover{min-height:120px;padding:14px;display:flex;align-items:flex-end;color:#fff;font-weight:800;line-height:1.2;background:linear-gradient(135deg,#3b6a8f,#1f2a44)}
+.cover.c2{background:linear-gradient(135deg,#6a5b8f,#2a2144)}.cover.c3{background:linear-gradient(135deg,#2f7d57,#1f4a36)}
+.pb{padding:12px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.pb p{margin:0;font-size:.98rem}
+.meta{display:flex;flex-wrap:wrap;gap:6px;color:var(--mute);font-size:.82rem}
+.badge{background:var(--accbg);color:var(--acc);border-radius:999px;padding:2px 9px;font-weight:700}
+.sent{color:var(--ok);font-weight:700;font-size:.88rem;margin-top:auto}
+.empty{padding:16px;color:var(--mute)}
+.also{margin:4px 0 8px;color:var(--mute);font-size:.95rem}
+.price{margin:14px 0 12px;border:2px solid var(--acc);border-radius:16px;background:#fff;overflow:hidden;box-shadow:0 6px 18px rgba(59,106,143,.16)}
+.price .ph{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;padding:7px 14px;background:var(--acc);color:#fff;font-weight:800;font-size:.95rem}
+.price .ph span{font-weight:600;font-size:.82rem;opacity:.95}
+.price .pr{display:grid;grid-template-columns:1fr 1fr}
+.price .pi{display:flex;flex-direction:column;padding:10px 14px}
+.price .pi+.pi{border-left:1px solid var(--line)}
+.price .pi small{color:var(--mute);font-weight:700;font-size:.84rem;line-height:1.3}
+.price .pi b{color:var(--acc);font-size:1.5rem;font-weight:800;white-space:nowrap;line-height:1.2}
+@media(max-width:600px){.price .pr{grid-template-columns:1fr}.price .pi{flex-direction:row;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px}.price .pi+.pi{border-left:0;border-top:1px solid var(--line)}.price .pi b{font-size:1.3rem}}
+.cta{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:11px 14px;border-radius:14px;background:var(--gold);color:#1b2733;font-weight:800;text-decoration:none;line-height:1.3;box-shadow:0 4px 0 rgba(27,39,51,.18);transition:transform .2s}
+.cta:hover,.cta:focus-visible{transform:translateY(-2px)}
+.cta i{font-style:normal;flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#1b2733;color:var(--gold);animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+@media(prefers-reduced-motion:reduce){.cta i{animation:none}}
+
+footer{padding:10px 0 50px;color:var(--mute);font-size:.92rem}
+@media(max-width:800px){.grid{grid-template-columns:1fr}.posts{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.add{flex-wrap:wrap}.add .btn{width:100%}}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <span class="tag">Демо / пример работы</span>
+  <h1 id="h1">Парсер собирает новости из любых источников и сам публикует их</h1>
+  <div class="price" role="group" aria-label="Стоимость">
+    <div class="ph">Стоимость <span>Цены «от». Точную назову, когда увижу ваше задание</span></div>
+    <div class="pr">
+      <div class="pi"><small>Простой парсер: 1–2 источника, простой отбор</small><b>от 1 000 ₽</b></div>
+      <div class="pi"><small>Сложный парсер: много источников, дубли, несколько площадок</small><b>от 5 000 ₽</b></div>
+    </div>
+  </div>
+  <a class="cta" href="#run"><i aria-hidden="true">↓</i><span>Это живой пример: измените настройки и нажмите «Показать, что получится», увидите результат</span></a>
+  <p class="lede" id="lede">Вы указываете, откуда брать и по каким словам отбирать. Дальше он по расписанию собирает, чистит от дублей, при желании переписывает уникально, рисует обложку и публикует там, где нужно вам.</p>
+</header>
+<main class="wrap">
+  <div class="grid">
+    <section class="card"><h2><i>1</i>Источники</h2>
+      <p class="s">Сколько угодно: сайты, ленты, каналы Telegram. Добавлять, менять и удалять можно в любой момент.</p>
+      <div class="chips" id="src"></div>
+      <div class="add"><input id="srcIn" placeholder="Новый источник" aria-label="Новый источник" maxlength="40"><button class="btn light" id="srcAdd" type="button">Добавить</button></div>
+    </section>
+    <section class="card"><h2><i>2</i>Отбор</h2>
+      <p class="s">Берём только то, что подходит по ключевым словам.</p>
+      <div class="chips" id="kw"></div>
+      <div class="add"><input id="kwIn" placeholder="Новое слово" aria-label="Новое ключевое слово" maxlength="30"><button class="btn light" id="kwAdd" type="button">Добавить</button></div>
+      <label class="opt"><input type="checkbox" id="oDup" checked><span>Убирать одинаковые новости из разных источников</span></label>
+      <label class="opt"><input type="checkbox" id="oDate" checked><span>Ставить дату актуальности</span></label>
+      <label class="opt"><input type="checkbox" id="oAi" checked><span>Переписывать уникальным текстом и рисовать обложку</span></label>
+    </section>
+    <section class="card"><h2><i>3</i>Куда публикуем</h2>
+      <p class="s">В несколько мест сразу. Таблица и Excel тоже есть, но как дополнение.</p>
+      <div class="tg" id="tg"></div>
+    </section>
+    <section class="card"><h2><i>4</i>Когда</h2>
+      <p class="s">По любому расписанию: хоть раз в день, хоть десять.</p>
+      <select id="sch" aria-label="Как часто"><option value="1">1 раз в день</option><option value="2">2 раза в день</option><option value="4">4 раза в день</option><option value="10" selected>10 раз в день</option><option value="24">Каждый час</option></select>
+      <p class="also" id="schNote"></p>
+    </section>
+  </div>
+  <p class="runhint">Нажмите кнопку: результат появится ниже</p>
+  <div class="run"><button class="btn" id="run" type="button">Показать, что получится</button></div>
+  <section class="res" id="res" aria-live="polite">
+    <div class="stats" id="stats"></div>
+    <div class="posts" id="posts"></div>
+  </section>
+</main>
+<footer class="wrap">Демо / пример работы. Новости и источники условные, это пример того, как всё устроено. Ваш парсер настраивается под ваши источники и площадки.</footer>
+<script>
+/* ===== Подстановка под заказ: меняется только этот блок ===== */
+var D = {
+  sources: ['Новостной сайт А', 'Новостной сайт Б', 'Канал Telegram В'],
+  keywords: ['биткоин', 'биржа'],
+  targets: ['Telegram', 'MAX', 'Сайт', 'Google-таблица'],
+  targetsOn: ['Telegram', 'Сайт'],
+  stories: [
+    { g: 1, k: 'биткоин', v: ['Биткоин вернулся к росту после недели снижения', 'Курс биткоина пошёл вверх, снижение остановилось'] },
+    { g: 2, k: 'биржа', v: ['Новая биржа объявила о запуске торгов', 'Запущена ещё одна биржа: торги стартуют на этой неделе'] },
+    { g: 3, k: 'регулирование', v: ['Регулятор обсуждает правила для криптовалют', 'Власти готовят новые правила для рынка криптовалют'] },
+    { g: 4, k: 'биткоин', v: ['Аналитики сравнили активность майнеров', 'Майнинг: что показала свежая статистика сети'] },
+    { g: 5, k: 'кошелёк', v: ['Популярный кошелёк добавил новые монеты', 'В кошельке появилась поддержка новых монет'] }
+  ]
+};
+/* ============================================================ */
+(function(){
+  var $ = function(i){ return document.getElementById(i); };
+  var src = D.sources.slice(), kw = D.keywords.slice(), on = D.targetsOn.slice();
+  function chipList(box, arr, canEdit){
+    box.textContent = '';
+    arr.forEach(function(v,i){
+      var c = document.createElement('span'); c.className = 'chip'; c.appendChild(document.createTextNode(v));
+      if (canEdit) { var e = document.createElement('button'); e.type = 'button'; e.title = 'Изменить'; e.setAttribute('aria-label','Изменить ' + v); e.textContent = '✎';
+        e.addEventListener('click', function(){ var n = window.prompt('Изменить', v); if (n && n.trim()) { arr[i] = n.trim().slice(0,40); chipList(box, arr, canEdit); } }); c.appendChild(e); }
+      var x = document.createElement('button'); x.type = 'button'; x.title = 'Удалить'; x.setAttribute('aria-label','Удалить ' + v); x.textContent = '✕';
+      x.addEventListener('click', function(){ arr.splice(i,1); chipList(box, arr, canEdit); }); c.appendChild(x);
+      box.appendChild(c);
+    });
+  }
+  function bindAdd(inp, btn, arr, box, canEdit){
+    function add(){ var v = inp.value.trim(); if (!v) return; arr.push(v); inp.value = ''; chipList(box, arr, canEdit); }
+    btn.addEventListener('click', add);
+    inp.addEventListener('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); add(); } });
+  }
+  chipList($('src'), src, true); chipList($('kw'), kw, false);
+  bindAdd($('srcIn'), $('srcAdd'), src, $('src'), true); bindAdd($('kwIn'), $('kwAdd'), kw, $('kw'), false);
+  D.targets.forEach(function(t){
+    var l = document.createElement('label'), i = document.createElement('input'); i.type = 'checkbox'; i.checked = on.indexOf(t) >= 0;
+    i.addEventListener('change', function(){ var k = on.indexOf(t); if (i.checked && k < 0) on.push(t); if (!i.checked && k >= 0) on.splice(k,1); });
+    l.appendChild(i); l.appendChild(document.createTextNode(t)); $('tg').appendChild(l);
+  });
+  function note(){ var n = +$('sch').value; $('schNote').textContent = 'Срабатывает ' + (n === 24 ? 'каждый час' : n + ' раз(а) в сутки') + ', без вашего участия.'; }
+  $('sch').addEventListener('change', note); note();
+
+  $('run').addEventListener('click', function(){
+    var raw = [];
+    D.stories.forEach(function(s){ s.v.forEach(function(t,j){ raw.push({ g: s.g, k: s.k, t: t, j: j }); }); });
+    if (!src.length) { raw = []; }
+    var items = raw.map(function(r,i){ r.s = src.length ? src[i % src.length] : ''; return r; });
+    var found = items.length, left = items;
+    if ($('oDup').checked) { var seen = {}; left = left.filter(function(r){ if (seen[r.g]) return false; seen[r.g] = 1; return true; }); }
+    var dups = found - left.length;
+    var words = kw.map(function(w){ return w.toLowerCase(); });
+    var sel = left.filter(function(r){ return !words.length || words.some(function(w){ return (r.t + ' ' + r.k).toLowerCase().indexOf(w) >= 0; }); });
+    var st = $('stats'); st.textContent = '';
+    [['Найдено', found], ['Одинаковых убрано', dups], ['Подошло по словам', sel.length], ['Публикуем в', on.length || 0]].forEach(function(p){
+      var d = document.createElement('div'); d.className = 'stat'; var b = document.createElement('b'); b.textContent = p[1]; var s = document.createElement('span'); s.textContent = p[0]; d.appendChild(b); d.appendChild(s); st.appendChild(d); });
+    var box = $('posts'); box.textContent = '';
+    if (!sel.length) { var em = document.createElement('div'); em.className = 'card empty'; em.textContent = src.length ? 'По этим словам ничего не нашлось. Добавьте другие слова или уберите часть.' : 'Добавьте хотя бы один источник.'; box.appendChild(em); }
+    sel.slice(0,3).forEach(function(r,i){
+      var p = document.createElement('article'); p.className = 'post';
+      if ($('oAi').checked) { var c = document.createElement('div'); c.className = 'cover c' + (i % 3 + 1); c.textContent = r.t; p.appendChild(c); }
+      var b = document.createElement('div'); b.className = 'pb';
+      var t = document.createElement('p'); t.textContent = $('oAi').checked ? 'Коротко: ' + r.t.toLowerCase() + '. Текст написан заново, не копия исходника.' : r.t; b.appendChild(t);
+      var m = document.createElement('div'); m.className = 'meta'; var s1 = document.createElement('span'); s1.textContent = 'Источник: ' + r.s; m.appendChild(s1);
+      if ($('oDate').checked) { var s2 = document.createElement('span'); s2.textContent = 'актуально на 01.01'; m.appendChild(s2); }
+      if ($('oAi').checked) { var s3 = document.createElement('span'); s3.className = 'badge'; s3.textContent = 'уникальный текст'; m.appendChild(s3); }
+      b.appendChild(m);
+      var sn = document.createElement('div'); sn.className = 'sent'; sn.textContent = on.length ? '✓ Опубликовано: ' + on.join(', ') : 'Выберите, куда публикуем'; b.appendChild(sn);
+      p.appendChild(b); box.appendChild(p);
+    });
+    $('res').style.display = 'block'; $('res').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+})();
+</script>
+</body>
+</html>

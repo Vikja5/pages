@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Добрый хвост — премиум (конструктор «Органика»), демо</title>
+<meta name="description" content="Демо / пример работы: премиум-сайт ветеринарной клиники с кино-кадрами, неподвижным фоном, органичными формами, подбором услуги, квизом и записью.">
+<link rel="preload" href="../_fonts/Manrope-Regular.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="../_fonts/Manrope-Bold.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="../_fonts/Manrope-ExtraBold.ttf" as="font" type="font/ttf" crossorigin>
+<script>document.documentElement.className+=' js'</script>
+<style>
+@font-face{font-family:"Manrope";src:url("../_fonts/Manrope-Regular.ttf") format("truetype");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("../_fonts/Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("../_fonts/Manrope-Bold.ttf") format("truetype");font-weight:700;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("../_fonts/Manrope-ExtraBold.ttf") format("truetype");font-weight:800 900;font-style:normal;font-display:block}
+/* запасной шрифт подогнан по ширине: если Manrope не загрузится, текст не «поедет» */
+@font-face{font-family:"Manrope Fallback";src:local("Arial");size-adjust:102%}
+:root{
+  --cream:#F6EEDF; --sand:#EADCC2; --clay:#B4532A; --clay-d:#8F3F1D; --moss:#34502B; --moss-d:#263C20; --bark:#2B2418; --mute:#5B523F; --line:rgba(43,36,24,.22);
+  --font:"Manrope","Manrope Fallback",Arial,sans-serif;
+  --ease:cubic-bezier(.2,.7,.1,1); --r:clamp(30px,5vw,72px);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--sand);color:var(--bark);font-family:var(--font);font-size:17px;line-height:1.6;overflow-x:hidden}
+img{display:block;max-width:100%}
+a{color:inherit}
+button{font-family:inherit}
+:focus-visible{outline:3px solid var(--clay);outline-offset:3px}
+.moss :focus-visible,.scene :focus-visible,.bk :focus-visible{outline-color:#FFD9A8}
+.skip{position:absolute;left:-999px}.skip:focus{left:12px;top:12px;background:#fff;padding:10px 14px;z-index:99;border:2px solid var(--bark)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(18px,4vw,40px)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:12px 28px;border-radius:999px;background:var(--clay);color:#fff;font:700 1rem var(--font);text-decoration:none;border:2px solid var(--clay);cursor:pointer;transition:transform .35s var(--ease),background .25s,box-shadow .35s;white-space:nowrap}
+.btn:hover{background:var(--clay-d);border-color:var(--clay-d);transform:translateY(-3px);box-shadow:0 14px 30px rgba(143,63,29,.3)}
+.btn.ghost{background:transparent;color:inherit;border-color:currentColor}
+.btn.ghost:hover{background:rgba(255,255,255,.14);box-shadow:none}
+.btn.sm{min-height:44px;padding:8px 20px;font-size:.95rem}
+.tel{font-weight:800;text-decoration:none;white-space:nowrap}
+
+/* шапка: стеклянная капсула */
+.top{position:fixed;top:12px;left:12px;right:12px;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:14px;max-width:1160px;margin:0 auto;padding:7px 8px 7px 20px;border-radius:999px;background:rgba(246,238,223,.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid rgba(43,36,24,.12);box-shadow:0 8px 30px rgba(0,0,0,.14)}
+.logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:1.12rem;text-decoration:none;white-space:nowrap}
+.top nav{display:flex;align-items:center;gap:22px}
+.top nav a:not(.btn){text-decoration:none;font-weight:600;font-size:.95rem;color:var(--mute)}
+.top nav a:not(.btn):hover{color:var(--bark);text-decoration:underline;text-underline-offset:6px}
+
+/* сцены: фон-фото неподвижно, листы заезжают сверху */
+.scene{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;z-index:0;display:grid;isolation:isolate;color:#fff}
+.scene>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+.scene::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(30,20,10,.5) 0,rgba(30,20,10,.08) 40%,rgba(30,20,10,.8) 100%)}
+.scene .fg{align-self:end;padding:0 clamp(18px,4vw,56px) clamp(70px,12vh,130px);max-width:1280px;width:100%;margin:0 auto}
+.scene.mid .fg{align-self:center;padding-bottom:0}
+.scene h1,.scene h2.big{margin:0 0 20px;font-weight:800;letter-spacing:-.035em;line-height:.98}
+.scene h1{font-size:clamp(2.7rem,9.5vw,8rem)}
+.scene h1 em{display:block;font-style:normal;color:#FFD9A8}
+.scene h2.big{font-size:clamp(2rem,6.4vw,5rem);max-width:15ch}
+.scene p{max-width:42ch;margin:0 0 26px;font-size:clamp(1.02rem,1.6vw,1.2rem);color:#F4EBDC}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+.hint{position:absolute;right:clamp(18px,4vw,56px);bottom:clamp(40px,8vh,90px);display:flex;flex-direction:column;align-items:center;gap:8px;font-size:.8rem;letter-spacing:.16em;writing-mode:vertical-rl;color:#F4EBDC}
+
+/* листы */
+.sheet{position:relative;z-index:2;background:var(--cream);border-radius:var(--r) var(--r) 0 0;margin-top:calc(var(--r)*-.6);padding:calc(var(--r)*.6 + clamp(48px,7vw,104px)) 0 clamp(54px,7vw,104px)}
+.sheet.sand{background:var(--sand)}
+.sheet.moss{background:var(--moss);color:var(--cream)}
+.eye{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;color:var(--clay-d);margin:0 0 12px}
+.eye svg{flex:none}
+.moss .eye{color:#FFD9A8}
+.h2{font-size:clamp(1.9rem,4.2vw,3.4rem);line-height:1.04;margin:0 0 14px;font-weight:800;letter-spacing:-.03em}
+.sub{margin:0 0 34px;max-width:58ch;color:var(--mute)}
+.moss .sub{color:#E2E8D3}
+.muted{margin:0;color:var(--mute)}
+
+/* природные формы */
+.blob{overflow:hidden;border-radius:58% 42% 55% 45%/50% 58% 42% 50%;animation:morph 18s ease-in-out infinite alternate;background:var(--sand)}
+.blob img{width:100%;height:100%;object-fit:cover}
+@keyframes morph{to{border-radius:42% 58% 45% 55%/56% 44% 56% 44%}}
+.story{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,5vw,80px);align-items:center}
+.story .imgs{position:relative;aspect-ratio:1/1}
+.story .imgs .blob:first-child{position:absolute;left:0;top:0;width:72%;height:76%}
+.story .imgs .blob:last-child{position:absolute;right:0;bottom:0;width:58%;height:58%;border:8px solid var(--cream);animation-delay:-6s}
+.pills{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 0;padding:0;list-style:none}
+.pills li{display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:600;font-size:.95rem}
+.story p{color:var(--mute);max-width:46ch;margin:0 0 14px}
+
+/* подбор */
+.pick{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(22px,4vw,56px);align-items:start}
+.q{border:0;margin:0 0 22px;padding:0}
+.q legend{font-weight:800;padding:0;margin-bottom:10px}
+.opts{display:flex;flex-wrap:wrap;gap:10px}
+.pk,.qo,.fb{min-height:48px;padding:8px 20px;border:2px solid var(--line);border-radius:999px;background:rgba(255,255,255,.7);color:var(--bark);font:600 .98rem var(--font);cursor:pointer;transition:background .25s,border-color .25s,transform .3s var(--ease)}
+.pk:hover,.qo:hover,.fb:hover{border-color:var(--clay);transform:translateY(-2px)}
+.pk[aria-pressed="true"],.fb[aria-pressed="true"]{background:var(--moss);border-color:var(--moss);color:#fff}
+.res{background:#fff;border-radius:40px 40px 40px 12px;padding:clamp(22px,3vw,34px);min-height:200px;box-shadow:0 20px 50px rgba(43,36,24,.1)}
+.res-k{font-size:.8rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--moss)}
+.res h3{margin:4px 0 8px;font-size:1.6rem;line-height:1.15;letter-spacing:-.02em}
+.res p{margin:0 0 8px;color:var(--mute)}
+.res-f{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;margin-top:14px}
+.pr{font-size:1.2rem;font-weight:800;color:var(--clay-d);white-space:nowrap}
+
+/* услуги: раскрытие по наведению */
+.panels{display:flex;gap:14px;height:min(70vh,580px)}
+.panel{position:relative;flex:1;overflow:hidden;border-radius:999px 999px 34px 34px;display:flex;align-items:flex-end;text-decoration:none;color:#fff;transition:flex .8s var(--ease),border-radius .8s var(--ease);isolation:isolate}
+.panel img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;filter:saturate(.8) brightness(.72);transition:filter .8s,transform 1.2s var(--ease)}
+.panel::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,transparent 40%,rgba(30,20,10,.88))}
+.panel .t{padding:0 22px 26px;width:100%}
+.panel h3{margin:0 0 6px;font-size:clamp(1.15rem,1.8vw,1.6rem);line-height:1.1;letter-spacing:-.02em}
+.panel .more{max-height:0;opacity:0;overflow:hidden;transition:max-height .8s var(--ease),opacity .6s .15s;color:#F4EBDC;font-size:.98rem}
+.panel .more b{display:block;color:#FFD9A8;margin-top:6px;font-size:1.15rem}
+.panels:hover .panel,.panels:focus-within .panel{flex:.7}
+.panel:hover,.panel:focus-visible{flex:3!important;border-radius:60px 60px 34px 34px}
+.panel:hover img,.panel:focus-visible img{filter:saturate(1) brightness(.9);transform:scale(1.06)}
+.panel:hover .more,.panel:focus-visible .more{max-height:220px;opacity:1}
+
+/* каталог */
+.flt{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 22px}
+.cat{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.it{display:grid;grid-template-columns:52px minmax(0,1fr) auto auto;gap:6px 18px;align-items:center;padding:14px 22px 14px 14px;background:rgba(255,255,255,.78);border-radius:999px}
+.it .ico{width:52px;height:52px;border-radius:50%;background:var(--sand);color:var(--moss);display:grid;place-items:center}
+.it b{display:block}
+.it span.d{display:block;color:var(--mute);font-size:.95rem;line-height:1.35}
+.it .btn{min-height:44px;padding:6px 18px;font-size:.92rem}
+.note{margin:14px 0 0;color:var(--mute);font-size:.92rem}
+
+/* врачи и гарантии */
+.team{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.team article{background:#fff;padding:28px 26px;border-radius:44px 44px 44px 12px}
+.team article:nth-child(2){border-radius:44px 12px 44px 44px}
+.ico2{width:56px;height:56px;border-radius:50%;background:var(--sand);color:var(--moss);display:grid;place-items:center;margin-bottom:14px}
+.team h3,.g4 h3{margin:0 0 4px;font-size:1.2rem;letter-spacing:-.01em}
+.team p,.g4 p{margin:0;color:var(--mute)}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-top:22px}
+.g4 article{padding:22px 4px 0;border-top:2px solid var(--line)}
+.docs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:34px}
+.doc{display:flex;gap:16px;align-items:center;background:rgba(255,255,255,.6);border:1px dashed var(--line);border-radius:30px;padding:16px 20px}
+.leaf{flex:none;width:54px;height:54px;border-radius:0 70% 0 70%;background:var(--moss)}
+.doc b{display:block;line-height:1.25}
+.tag{display:inline-block;background:var(--sand);border-radius:999px;padding:1px 12px;font-weight:700;font-size:.8rem;margin-top:6px}
+
+/* приём */
+.how{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(24px,5vw,80px);align-items:center}
+.how .blob{aspect-ratio:1/1.05}
+.steps{list-style:none;margin:24px 0 0;padding:0;display:grid;gap:18px;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:56px 1fr;gap:16px;align-items:start}
+.steps li::before{content:counter(s);width:56px;height:56px;border-radius:50% 50% 50% 14px;background:#FFD9A8;color:var(--moss-d);font-weight:800;font-size:1.3rem;display:grid;place-items:center}
+.steps b{display:block;font-size:1.15rem}.steps span{color:#E2E8D3}
+
+/* квиз-чат */
+.qz{display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);gap:clamp(22px,4vw,64px);align-items:center}
+.qz .blob{aspect-ratio:4/5}
+.chatbox{background:#fff;border-radius:44px 44px 44px 12px;overflow:hidden;box-shadow:0 24px 60px rgba(43,36,24,.12);display:flex;flex-direction:column}
+.chat-h{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 24px;background:var(--moss);color:#fff;font-weight:700}
+.chat-h small{font-weight:600;color:#DDE5C9}
+#chat{height:300px;overflow:auto;padding:18px 22px;display:flex;flex-direction:column;gap:10px;background:#FBF7EE}
+.msg{max-width:84%;padding:10px 16px;border-radius:22px;line-height:1.4;font-size:.98rem}
+.msg.bot{background:var(--sand);align-self:flex-start;border-bottom-left-radius:6px}
+.msg.me{background:var(--moss);color:#fff;align-self:flex-end;border-bottom-right-radius:6px}
+#chat-opts{display:flex;flex-wrap:wrap;gap:10px;padding:14px 22px 18px;min-height:82px;align-items:flex-start}
+
+/* отзывы, вопросы */
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,5vw,72px);align-items:start}
+.rev{display:grid;gap:16px}
+.rev blockquote{margin:0;background:#fff;padding:22px 26px;border-radius:36px 36px 36px 10px;font-size:1.05rem}
+.rev blockquote:nth-child(2){border-radius:36px 10px 36px 36px;margin-left:6%}
+.faq details{border-bottom:1px solid var(--line);padding:16px 0}
+.faq summary{cursor:pointer;font-weight:700;font-size:1.08rem;list-style:none;display:flex;justify-content:space-between;gap:16px;align-items:center}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary svg{flex:none;transition:transform .3s var(--ease)}
+.faq details[open] summary svg{transform:rotate(45deg)}
+.faq p{margin:10px 0 0;color:var(--mute)}
+
+/* контакты */
+.cgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:clamp(22px,4vw,64px);align-items:stretch}
+.cgrid dl{margin:0;display:grid;gap:18px}
+.cgrid dt{color:var(--mute);font-size:.88rem}.cgrid dd{margin:0;font-weight:700;font-size:1.2rem}
+.mapb{position:relative;min-height:260px;border-radius:44px 44px 44px 12px;overflow:hidden;background:linear-gradient(rgba(43,36,24,.1) 1px,transparent 1px) 0 0/44px 44px,linear-gradient(90deg,rgba(43,36,24,.1) 1px,transparent 1px) 0 0/44px 44px,var(--cream)}
+.mapb::before{content:"";position:absolute;left:-10%;right:-10%;top:48%;height:30px;background:rgba(255,255,255,.8);transform:rotate(-8deg)}
+.mapb i{position:absolute;left:55%;top:36%;width:26px;height:26px;border-radius:50% 50% 50% 0;background:var(--clay);transform:rotate(-45deg);box-shadow:0 0 0 10px rgba(180,83,42,.2)}
+.mapb span{position:absolute;left:18px;bottom:14px;font-size:.85rem;color:var(--mute)}
+
+/* запись: стеклянная панель на неподвижном фото */
+.bk{position:relative;z-index:2;border-radius:var(--r) var(--r) 0 0;margin-top:calc(var(--r)*-.6);overflow:clip;color:#fff;background:var(--moss-d)}
+.bk-bg{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;z-index:0}
+.bk-bg img{width:100%;height:100%;object-fit:cover;object-position:30% 50%}
+.bk-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(30,20,10,.25),rgba(30,20,10,.75))}
+.bk-fg{position:relative;z-index:1;margin-top:-100vh;margin-top:-100svh;min-height:100vh;min-height:100svh;display:grid;align-items:center;padding:clamp(80px,12vw,130px) clamp(18px,4vw,56px)}
+.glass{width:min(580px,100%);margin-left:auto;padding:clamp(22px,4vw,44px);border-radius:48px 48px 48px 14px;background:rgba(30,20,10,.68);border:1px solid rgba(255,255,255,.35)}
+@supports ((backdrop-filter:blur(10px)) or (-webkit-backdrop-filter:blur(10px))){.glass{background:rgba(30,20,10,.46);-webkit-backdrop-filter:blur(18px) saturate(1.3);backdrop-filter:blur(18px) saturate(1.3)}}
+.glass h2{margin:0 0 8px;font-size:clamp(1.9rem,3.6vw,2.8rem);line-height:1.05;font-weight:800;letter-spacing:-.03em}
+.glass p.s{margin:0 0 20px;color:#F1E8D8}
+.glass form{display:grid;gap:12px}
+.glass label.f{display:grid;gap:5px;font-weight:700;font-size:.93rem}
+.glass input[type=text],.glass input[type=tel],.glass select{font:inherit;min-height:52px;padding:10px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.94);color:var(--bark);width:100%}
+.ck{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start;font-size:.9rem;color:#F1E8D8;font-weight:400}
+.ck input{width:22px;height:22px;margin:1px 0 0;accent-color:var(--clay)}
+.glass #ok{display:none;margin:0;padding:12px 18px;border-radius:24px;background:rgba(255,217,168,.2);border:1px solid #FFD9A8;color:#FFE9CC;font-weight:600}
+
+footer{position:relative;z-index:3;background:var(--moss-d);color:#DCE3CE;padding:28px 0 110px;font-size:.9rem}
+footer p{margin:0 0 8px}
+.sosd{position:fixed;right:16px;bottom:16px;z-index:30;background:var(--clay);color:#fff;padding:10px 20px;border-radius:999px;text-decoration:none;font-weight:800;box-shadow:0 10px 30px rgba(0,0,0,.35);white-space:nowrap}
+.sosd small{display:block;font-weight:600;font-size:.74rem;line-height:1.1}
+.dock{display:none}
+
+/* появление */
+.js .rv{opacity:0;transform:translateY(32px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.js .rv.in{opacity:1;transform:none}
+.js .rv.d1{transition-delay:.12s}.js .rv.d2{transition-delay:.24s}
+
+@media (max-width:900px){
+  .top nav a:not(.btn){display:none}
+  .story,.pick,.how,.qz,.two,.cgrid{grid-template-columns:minmax(0,1fr)}
+  .story .imgs{max-width:460px;margin:0 auto;width:100%}
+  .team,.docs{grid-template-columns:minmax(0,1fr)}
+  .g4{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .panels{flex-direction:column;height:auto}
+  .panel{flex:none!important;height:200px;border-radius:34px!important}
+  .panel .more{max-height:220px;opacity:1}
+  .panel img{filter:saturate(.9) brightness(.75)}
+  .hint{display:none}
+  .glass{margin:0 auto}
+  .qz .blob{max-width:320px;aspect-ratio:1/1}
+  .how .blob{max-width:420px}
+}
+@media (max-width:700px){
+  body{font-size:16.5px}
+  .it{grid-template-columns:48px minmax(0,1fr);border-radius:30px;padding:14px}
+  .it .ico{width:48px;height:48px}
+  .it .pr{grid-column:2}
+  .it .btn{grid-column:2;justify-self:start}
+  .g4{grid-template-columns:minmax(0,1fr)}
+  .rev blockquote:nth-child(2){margin-left:0}
+  .sosd{display:none}
+  .top .logo span{font-size:1.02rem}
+  .scene .fg{padding-bottom:96px}
+  .dock{display:flex;gap:8px;position:fixed;left:0;right:0;bottom:0;z-index:40;padding:10px 12px;background:rgba(246,238,223,.96);border-top:1px solid var(--line)}
+  .dock .btn{flex:1;min-height:48px;padding:6px 10px;font-size:.95rem}
+  .dock .tel{flex:1.25;color:var(--bark)}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{transition:none!important;animation:none!important}
+  .js .rv{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">К содержанию</a>
+<header class="top">
+  <a class="logo" href="#"><svg width="26" height="26" viewBox="0 0 24 24" fill="#B4532A" aria-hidden="true"><circle cx="5" cy="10" r="2.4"/><circle cx="9.5" cy="5.5" r="2.4"/><circle cx="14.5" cy="5.5" r="2.4"/><circle cx="19" cy="10" r="2.4"/><path d="M12 11c-3.300 0-6 2.700-6 5.600 0 1.800 1.400 2.900 3 2.900 1.200 0 1.900-.6 3-.6s1.800.6 3 .6c1.600 0 3-1.100 3-2.900 0-2.900-2.700-5.600-6-5.600z"/></svg><span>Добрый хвост</span></a>
+  <nav aria-label="Разделы"><a href="#istoriya">О нас</a><a href="#podbor">Подбор</a><a href="#uslugi">Услуги</a><a href="#vrachi">Врачи</a><a href="#kontakty">Контакты</a><a class="btn sm" href="#zapis">Записаться</a></nav>
+</header>
+
+<main id="main">
+<!-- 1. кино-кадр: первый экран -->
+<section class="scene" aria-label="Первый экран">
+  <img src="../_photos/_used/vet_12299736_w1600.jpg" alt="Питомец крупным планом, внимательный взгляд" width="1600" height="1067">
+  <div class="fg">
+    <h1>Они всё <em>понимают</em></h1>
+    <p>Ветеринарная клиника, где питомцу не страшно, а хозяину спокойно. Приём по записи, без очередей.</p>
+    <div class="cta"><a class="btn" href="#zapis">Записаться на приём</a><a class="btn ghost" href="#podbor">Подобрать услугу</a></div>
+  </div>
+  <span class="hint" aria-hidden="true">ЛИСТАЙТЕ ВНИЗ</span>
+</section>
+
+<!-- 2. подход и доверие -->
+<section class="sheet" id="istoriya"><div class="wrap story">
+  <div>
+    <p class="eye rv">О клинике</p>
+    <h2 class="h2 rv d1">К каждому питомцу свой подход</h2>
+    <p class="rv d1">Кому-то нужно время, чтобы освоиться. Кому-то нужен спокойный голос и знакомый плед. Мы не торопим: сначала знакомимся, потом лечим.</p>
+    <p class="rv d2">Врачи объясняют каждое назначение простым языком, чтобы вы понимали, что и зачем делаем.</p>
+    <ul class="pills rv d2">
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34502B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Приём по записи</li>
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34502B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Цена до лечения</li>
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34502B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Телефон круглосуточно</li>
+    </ul>
+  </div>
+  <div class="imgs rv d1">
+    <div class="blob"><img src="../_photos/_used/vet_6235648_w1200.jpg" alt="Ветеринар со стетоскопом держит на руках пушистого шпица" loading="lazy" style="object-position:50% 30%"></div>
+    <div class="blob"><img src="../_photos/_used/vet_7470754_w900.jpg" alt="Врач с ассистентом осматривают собаку" loading="lazy"></div>
+  </div>
+</div></section>
+
+<!-- 3. подбор по ситуации -->
+<section class="sheet sand" id="podbor"><div class="wrap">
+  <p class="eye rv">Подбор по ситуации</p>
+  <h2 class="h2 rv d1">Не знаете, с чего начать?</h2>
+  <p class="sub rv d1">Ответьте на три вопроса, и мы покажем подходящую услугу. Это подсказка, окончательное решение принимает врач.</p>
+  <div class="pick rv">
+    <div>
+      <fieldset class="q"><legend>Кто у вас?</legend><div class="opts">
+        <button type="button" class="pk" data-g="pet" data-v="cat" aria-pressed="false">Кошка</button>
+        <button type="button" class="pk" data-g="pet" data-v="dog" aria-pressed="false">Собака</button>
+        <button type="button" class="pk" data-g="pet" data-v="other" aria-pressed="false">Другой питомец</button></div></fieldset>
+      <fieldset class="q"><legend>Что случилось?</legend><div class="opts">
+        <button type="button" class="pk" data-g="what" data-v="vac" aria-pressed="false">Нужна прививка</button>
+        <button type="button" class="pk" data-g="what" data-v="sick" aria-pressed="false">Нездоровится</button>
+        <button type="button" class="pk" data-g="what" data-v="check" aria-pressed="false">Плановый осмотр</button>
+        <button type="button" class="pk" data-g="what" data-v="care" aria-pressed="false">Зубы или шерсть</button></div></fieldset>
+      <fieldset class="q" style="margin-bottom:0"><legend>Когда нужно?</legend><div class="opts">
+        <button type="button" class="pk" data-g="when" data-v="now" aria-pressed="false">Срочно, сегодня</button>
+        <button type="button" class="pk" data-g="when" data-v="week" aria-pressed="false">На этой неделе</button>
+        <button type="button" class="pk" data-g="when" data-v="later" aria-pressed="false">Не горит</button></div></fieldset>
+    </div>
+    <div class="res" id="pick-res" aria-live="polite"><p class="muted">Выберите ответы слева, и здесь появится подходящая услуга.</p></div>
+  </div>
+</div></section>
+
+<!-- 4. кино-кадр: утверждение -->
+<section class="scene mid" aria-label="Кадр">
+  <img src="../_photos/_used/vet_6235011_w1600.jpg" alt="Хозяйка и врач склонились над шпицем на столе" loading="lazy" style="object-position:50% 55%">
+  <div class="fg">
+    <h2 class="big">Мы не торопим. Сначала знакомимся, потом лечим.</h2>
+    <p>Осмотр, прививки, анализы и лечение без спешки и очередей.</p>
+    <div class="cta"><a class="btn" href="#zapis">Записаться</a></div>
+  </div>
+</section>
+
+<!-- 5. услуги: раскрытие по наведению -->
+<section class="sheet" id="uslugi"><div class="wrap">
+  <p class="eye rv">Услуги</p>
+  <h2 class="h2 rv d1">Чем мы занимаемся</h2>
+  <p class="sub rv d1">Наведите курсор на карточку, и она раскроется. Цены ориентировочные.</p>
+</div>
+<div class="wrap rv"><div class="panels">
+  <a class="panel" href="#zapis" data-book data-svc="priem"><img src="../_photos/_used/vet_6235011_w1000.jpg" alt="" loading="lazy" style="object-position:50% 55%"><div class="t"><h3>Приём и осмотр</h3><div class="more">Терапевт осмотрит питомца и объяснит план лечения.<b>от 1 200 ₽</b></div></div></a>
+  <a class="panel" href="#zapis" data-book data-svc="vac"><img src="../_photos/_used/vet_7470754_w1000.jpg" alt="" loading="lazy" style="object-position:40% 50%"><div class="t"><h3>Вакцинация</h3><div class="more">Комплексные прививки и ветпаспорт.<b>от 1 800 ₽</b></div></div></a>
+  <a class="panel" href="#zapis" data-book data-svc="lab"><img src="../_photos/_used/vet_12299736_w1000.jpg" alt="" loading="lazy"><div class="t"><h3>Анализы и УЗИ</h3><div class="more">Результаты в тот же день, расшифровка у врача.<b>от 1 500 ₽</b></div></div></a>
+  <a class="panel" href="#zapis" data-book data-svc="home"><img src="../_photos/_used/vet_34389847_w1000.jpg" alt="" loading="lazy" style="object-position:40% 45%"><div class="t"><h3>Врач на дом</h3><div class="more">Приедем, когда питомцу тяжело ехать.<b>от 2 500 ₽</b></div></div></a>
+</div></div></section>
+
+<!-- 6. каталог с фильтром -->
+<section class="sheet sand" id="katalog"><div class="wrap">
+  <p class="eye rv">Цены</p>
+  <h2 class="h2 rv d1">Каталог услуг</h2>
+  <p class="sub rv d1">Выберите вид питомца, и останутся только подходящие услуги.</p>
+  <div class="flt" role="group" aria-label="Фильтр по виду питомца">
+    <button type="button" class="fb" data-f="all" aria-pressed="true">Все</button>
+    <button type="button" class="fb" data-f="cat" aria-pressed="false">Кошки</button>
+    <button type="button" class="fb" data-f="dog" aria-pressed="false">Собаки</button>
+    <button type="button" class="fb" data-f="other" aria-pressed="false">Другие питомцы</button>
+  </div>
+  <ul class="cat" id="cat"></ul>
+  <p class="note" id="cat-n" aria-live="polite"></p>
+</div></section>
+
+<!-- 7. врачи, документы, гарантии -->
+<section class="sheet" id="vrachi"><div class="wrap">
+  <p class="eye rv">Врачи и доверие</p>
+  <h2 class="h2 rv d1">Кто вас принимает</h2>
+  <p class="sub rv d1">Имена и стаж врачей в демо не указаны. В рабочем сайте здесь фото, специализация и документы каждого.</p>
+  <div class="team">
+    <article class="rv"><div class="ico2"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></div><h3>Терапевт</h3><p>Осмотр, лечение, профилактика и план наблюдения.</p></article>
+    <article class="rv d1"><div class="ico2"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/></svg></div><h3>Хирург</h3><p>Плановые операции и бережное восстановление.</p></article>
+    <article class="rv d2"><div class="ico2"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l2-5 4 10 2-5h6"/></svg></div><h3>Диагност</h3><p>УЗИ, анализы, рентген и расшифровка в тот же день.</p></article>
+  </div>
+  <div class="docs rv">
+    <div class="doc"><span class="leaf" aria-hidden="true"></span><div><b>Лицензия на ветеринарную деятельность</b><span class="tag">Пример документа</span></div></div>
+    <div class="doc"><span class="leaf" aria-hidden="true"></span><div><b>Сертификаты врачей</b><span class="tag">Пример документа</span></div></div>
+    <div class="doc"><span class="leaf" aria-hidden="true"></span><div><b>Реквизиты клиники</b><span class="tag">Пример документа</span></div></div>
+  </div>
+  <div class="g4 rv">
+    <article><h3>Цена до лечения</h3><p>Сумму называем заранее и согласуем, если план меняется.</p></article>
+    <article><h3>План письменно</h3><p>После приёма вы получаете понятные назначения.</p></article>
+    <article><h3>Ответы после приёма</h3><p>Остались вопросы? Спросите у врача по телефону.</p></article>
+    <article><h3>Бережно</h3><p>Не торопим и не удерживаем силой, даём время освоиться.</p></article>
+  </div>
+</div></section>
+
+<!-- 8. как проходит приём -->
+<section class="sheet moss" id="priem"><div class="wrap how">
+  <div class="blob rv"><img src="../_photos/_used/vet_7470754_w1200.jpg" alt="Врач с ассистентом осматривают собаку" loading="lazy" style="object-position:40% 50%"></div>
+  <div>
+    <p class="eye rv">Как проходит приём</p>
+    <h2 class="h2 rv d1">Без очередей и спешки</h2>
+    <p class="sub rv d1" style="margin-bottom:0">Вы всегда знаете, что происходит дальше.</p>
+    <ol class="steps rv d2">
+      <li><div><b>Запись</b><span>Оставляете заявку, мы звоним и подтверждаем время.</span></div></li>
+      <li><div><b>Осмотр</b><span>Врач знакомится с питомцем и спокойно осматривает его.</span></div></li>
+      <li><div><b>План лечения</b><span>Объясняем простыми словами, что нашли и что делать дальше.</span></div></li>
+      <li><div><b>Памятка по уходу</b><span>Рекомендации на дом и срок повторного осмотра.</span></div></li>
+    </ol>
+  </div>
+</div></section>
+
+<!-- 9. квиз-чат -->
+<section class="sheet sand" id="kviz"><div class="wrap">
+  <p class="eye rv">Быстрый помощник</p>
+  <h2 class="h2 rv d1">Четыре вопроса в чате</h2>
+  <p class="sub rv d1">Помощник встроен в сайт и никуда ничего не отправляет. В конце предложит услугу и откроет форму записи.</p>
+  <div class="qz rv">
+    <div class="blob"><img src="../_photos/_used/vet_6235648_w900.jpg" alt="Ветеринар держит на руках шпица" loading="lazy" style="object-position:50% 30%"></div>
+    <div class="chatbox">
+      <div class="chat-h"><span>Помощник клиники</span><small id="chat-step">Вопрос 1 из 4</small></div>
+      <div id="chat" role="log" aria-live="polite" aria-label="Диалог с помощником"></div>
+      <div id="chat-opts"></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- 10. отзывы и вопросы -->
+<section class="sheet" id="otzyvy"><div class="wrap two">
+  <div>
+    <p class="eye rv">Отзывы</p>
+    <h2 class="h2 rv d1">Что говорят хозяева</h2>
+    <p class="sub rv d1">Тексты написаны для демо, реальные отзывы появятся после запуска.</p>
+    <div class="rev">
+      <blockquote class="rv"><span class="tag">Пример отзыва</span><br>Кот боялся приёма, но врач нашла подход, и мы вышли без стресса.</blockquote>
+      <blockquote class="rv d1"><span class="tag">Пример отзыва</span><br>Записались онлайн за минуту, пришли ровно ко времени, очереди не было.</blockquote>
+      <blockquote class="rv d2"><span class="tag">Пример отзыва</span><br>Врач расписала план лечения и ответила на все вопросы по телефону.</blockquote>
+    </div>
+  </div>
+  <div id="voprosy" class="rv d1">
+    <p class="eye">Частые вопросы</p>
+    <h2 class="h2">Отвечаем заранее</h2>
+    <div class="faq" style="margin-top:20px">
+      <details><summary>Нужно ли записываться заранее?<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8F3F1D" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p>Приём идёт по записи, поэтому очередей нет. В срочных случаях звоните, телефон работает круглосуточно.</p></details>
+      <details><summary>Можно ли вызвать врача на дом?<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8F3F1D" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p>Да. Выезд удобен, когда питомцу тяжело ехать или он сильно волнуется.</p></details>
+      <details><summary>Что взять с собой на первый приём?<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8F3F1D" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p>Ветпаспорт, если он есть, и результаты прошлых анализов. Остальное подскажем при записи.</p></details>
+      <details><summary>Сколько стоит приём?<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8F3F1D" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p>От 1 200 ₽. Точную сумму врач назовёт после осмотра, скрытых доплат нет.</p></details>
+    </div>
+  </div>
+</div></section>
+
+<!-- 11. контакты -->
+<section class="sheet sand" id="kontakty"><div class="wrap">
+  <p class="eye rv">Контакты</p>
+  <h2 class="h2 rv d1">Как нас найти</h2>
+  <p class="sub rv d1">Приезжайте по записи или звоните, если что-то срочное.</p>
+  <div class="cgrid rv">
+    <dl>
+      <div><dt>Адрес (условный)</dt><dd>г. Пример, ул. Примерная, 1</dd></div>
+      <div><dt>Часы работы</dt><dd>Ежедневно с 9:00 до 21:00</dd></div>
+      <div><dt>Срочный случай</dt><dd><a class="tel" href="tel:+70000000000">+7 000 000-00-00</a>, круглосуточно</dd></div>
+    </dl>
+    <div class="mapb" role="img" aria-label="Схема расположения, условная"><i></i><span>Карта, в рабочем сайте здесь настоящая</span></div>
+  </div>
+</div></section>
+
+<!-- 12. запись на стеклянной панели -->
+<section class="bk" id="zapis">
+  <div class="bk-bg"><img src="../_photos/_used/vet_5255256_w1600.jpg" alt="" loading="lazy"></div>
+  <div class="bk-fg"><div class="glass">
+    <h2>Запишитесь на приём</h2>
+    <p class="s">Оставьте контакты, и мы позвоним, чтобы подтвердить время.</p>
+    <form id="lead">
+      <label class="f">Питомец<select id="pet"><option value="cat">Кошка</option><option value="dog">Собака</option><option value="other">Другой питомец</option></select></label>
+      <label class="f">Услуга<select id="svc"></select></label>
+      <label class="f">Ваше имя<input id="nm" type="text" autocomplete="name" required></label>
+      <label class="f">Телефон<input id="ph" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7" pattern="\+?[0-9\s\(\)\-]{10,}" required></label>
+      <label class="ck"><input type="checkbox" id="agree" required><span>Согласен на обработку персональных данных. <a href="#polit">Политика конфиденциальности</a> (в демо условная).</span></label>
+      <button class="btn" type="submit">Записаться</button>
+      <p id="ok" role="status">Демо: заявка никуда не отправлена. В рабочем сайте она придёт клинике в Telegram сразу с питомцем и услугой.</p>
+    </form>
+  </div></div>
+</section>
+</main>
+
+<footer id="polit"><div class="wrap">
+  <p>Демо / пример работы. Название, цены, документы и телефон условные; сайт показывает, как может выглядеть ваш.</p>
+  <p>Политика конфиденциальности: в демо условный текст, в рабочем сайте здесь реквизиты клиники и документ. Фото: Alexas Fotos, Tima Miroshnichenko, Mikhail Nilov, Samson Katt, @724211268, Pexels (лицензия Pexels). Люди на фото не являются сотрудниками клиники.</p>
+</div></footer>
+
+<a class="sosd" href="tel:+70000000000"><small>Срочно, круглосуточно</small>+7 000 000-00-00</a>
+<div class="dock"><a class="btn ghost tel" href="tel:+70000000000"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.500 1.500a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>+7 000 000-00-00</a><a class="btn" href="#zapis">Записаться</a></div>
+
+<script>
+(function(){
+var $=function(s){return document.querySelector(s)},$$=function(s){return Array.prototype.slice.call(document.querySelectorAll(s))};
+var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function ic(d){return '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+d+'"/></svg>'}
+var S={
+ priem:{n:'Приём и осмотр',p:'от 1 200 ₽',t:'Осмотр терапевтом и понятный план лечения.',pets:'cat dog other',i:'M6 3v6a4 4 0 0 0 8 0V3M10 13v2a4 4 0 0 0 8 0v-1M18 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4z'},
+ vac:{n:'Вакцинация',p:'от 1 800 ₽',t:'Комплексные прививки и ветпаспорт.',pets:'cat dog',i:'M14 4l6 6M12 6l6 6M6 18l-3 3M8.5 15.5l7-7 3 3-7 7-3-3zM11 13l-2-2'},
+ lab:{n:'Анализы и УЗИ',p:'от 1 500 ₽',t:'Результаты в тот же день, расшифровка у врача.',pets:'cat dog other',i:'M9 3h6M10 3v6l-5 10a1.5 1.5 0 0 0 1.3 2h11.4a1.5 1.5 0 0 0 1.3-2l-5-10V3M8 15h8'},
+ dent:{n:'Стоматология',p:'от 3 500 ₽',t:'Чистка зубов и лечение.',pets:'cat dog',i:'M7 4C4.800 4 3.500 5.700 3.500 8c0 3 1.500 4 1.800 7 .3 2.500 1 5 2.200 5 1.400 0 1.200-4 3-4s1.600 4 3 4c1.200 0 1.900-2.500 2.200-5 .3-3 1.800-4 1.800-7 0-2.300-1.300-4-3.500-4-1.600 0-2.200 1-3.500 1S8.600 4 7 4z'},
+ groom:{n:'Груминг',p:'от 1 500 ₽',t:'Стрижка, купание, уход за когтями и шерстью.',pets:'cat dog',i:'M6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM8.500 7.500L20 18M8.500 16.500L20 6'},
+ surg:{n:'Плановая хирургия',p:'от 6 000 ₽',t:'Операции по плану и бережное восстановление.',pets:'cat dog',i:'M12 3l8 3v6c0 4.500-3.200 7.800-8 9-4.800-1.200-8-4.500-8-9V6zM12 8v6M9 11h6'},
+ exo:{n:'Приём грызунов и птиц',p:'от 1 500 ₽',t:'Осмотр и советы по содержанию небольших питомцев.',pets:'other',i:'M12 21c-4 0-7-2-7-5s3-5 7-5 7 2 7 5-3 5-7 5zM12 11V7M9 4.500a2 2 0 1 0 6 0 2 2 0 1 0-6 0'},
+ home:{n:'Врач на дом',p:'от 2 500 ₽',t:'Приедем, когда питомцу тяжело ехать или он волнуется.',pets:'cat dog other',i:'M3 11l9-8 9 8M5 10v10h14V10M10 20v-5h4v5'},
+ urgent:{n:'Срочный приём',p:'от 2 000 ₽',t:'Помощь в срочных случаях, звоните заранее.',pets:'cat dog other',i:'M13 2L4 14h7l-1 8 9-12h-7z'}
+};
+var TEL='<a class="btn ghost" href="tel:+70000000000" style="color:#2B2418">+7 000 000-00-00</a>';
+function book(pet,svc){var a=$('#pet'),b=$('#svc');if(pet&&a)a.value=pet;if(svc&&b)b.value=svc;var z=$('#zapis');if(z)z.scrollIntoView({behavior:reduce?'auto':'smooth'});setTimeout(function(){var n=$('#nm');if(n)n.focus({preventScroll:true})},reduce?0:700)}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-book]');if(b){e.preventDefault();book(b.getAttribute('data-pet'),b.getAttribute('data-svc'))}});
+var sel=$('#svc');Object.keys(S).forEach(function(k){var o=document.createElement('option');o.value=k;o.textContent=S[k].n+', '+S[k].p;sel.appendChild(o)});
+
+/* подбор по ситуации */
+var st={};
+function pick(){var r=$('#pick-res');
+ if(!(st.pet&&st.what&&st.when)){r.innerHTML='<p class="muted">Ответьте на все три вопроса, и здесь появится подходящая услуга.</p>';return}
+ var k,n,o=st.pet==='other';
+ if(st.when==='now'){k='urgent';n='Позвоните, мы подскажем, как действовать до приезда.'}
+ else if(st.what==='vac'){k=o?'exo':'vac';n='Врач подберёт схему и оформит ветпаспорт.'}
+ else if(st.what==='sick'){k=o?'exo':'priem';n='При необходимости врач сразу назначит анализы или УЗИ.'}
+ else if(st.what==='care'){k=o?'exo':'dent';n='Зубы, шерсть и когти: врач подскажет, что нужно именно вашему питомцу.'}
+ else{k=o?'exo':'priem';n='Осмотр, рекомендации по уходу и прививкам.'}
+ var w={now:'Срочный случай: позвоните или запишитесь на сегодня.',week:'Подберём ближайшее свободное время на этой неделе.',later:'Подберём удобный день, торопиться не нужно.'}[st.when];
+ var s=S[k];
+ r.innerHTML='<span class="res-k">Вам подойдёт</span><h3>'+s.n+'</h3><p>'+s.t+' '+n+'</p><p>'+w+'</p><div class="res-f"><strong class="pr">'+s.p+'</strong><a class="btn" href="#zapis" data-book data-pet="'+st.pet+'" data-svc="'+k+'">Записаться</a>'+(st.when==='now'?TEL:'')+'</div>';
+}
+$$('.pk').forEach(function(b){b.addEventListener('click',function(){var g=b.getAttribute('data-g');st[g]=b.getAttribute('data-v');$$('.pk[data-g="'+g+'"]').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});pick()})});
+
+/* каталог с фильтром */
+function cat(f){var h='',c=0;Object.keys(S).forEach(function(k){var s=S[k];if(f!=='all'&&s.pets.indexOf(f)<0)return;c++;
+ h+='<li class="it"><span class="ico">'+ic(s.i)+'</span><div><b>'+s.n+'</b><span class="d">'+s.t+'</span></div><span class="pr">'+s.p+'</span><a class="btn" href="#zapis" data-book data-pet="'+(f==='all'?'':f)+'" data-svc="'+k+'">Записаться</a></li>'});
+ $('#cat').innerHTML=h;$('#cat-n').textContent='Показано услуг: '+c+'. Точную сумму врач назовёт после осмотра.'}
+$$('.fb').forEach(function(b){b.addEventListener('click',function(){$$('.fb').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});cat(b.getAttribute('data-f'))})});
+cat('all');
+
+/* квиз-чат */
+var QZ=[{q:'Кто у вас живёт?',k:'pet',o:[['cat','Кошка'],['dog','Собака'],['other','Другой питомец']]},
+ {q:'Сколько питомцу лет?',k:'age',o:[['baby','До года'],['adult','От года до 7 лет'],['senior','Старше 7 лет']]},
+ {q:'Что сейчас важнее всего?',k:'need',o:[['vac','Прививка'],['sick','Нездоровится'],['check','Плановая проверка'],['care','Зубы или шерсть']]},
+ {q:'Как вам удобнее?',k:'where',o:[['clinic','Приехать в клинику'],['home','Врач на дом']]}];
+var ans={},qi=0,log=$('#chat'),opts=$('#chat-opts');
+function say(t,u){var d=document.createElement('div');d.className='msg '+(u?'me':'bot');d.textContent=t;log.appendChild(d);log.scrollTop=log.scrollHeight}
+function ask(){var q=QZ[qi];$('#chat-step').textContent='Вопрос '+(qi+1)+' из 4';say(q.q);opts.innerHTML='';
+ q.o.forEach(function(o){var b=document.createElement('button');b.type='button';b.className='qo';b.textContent=o[1];
+  b.addEventListener('click',function(){ans[q.k]=o[0];say(o[1],1);opts.innerHTML='';qi++;setTimeout(qi<QZ.length?ask:done,reduce?0:300)});opts.appendChild(b)})}
+function done(){var k,n,o=ans.pet==='other';
+ if(ans.where==='home'){k='home';n='Врач приедет к вам, питомцу не придётся волноваться в дороге.'}
+ else if(ans.need==='vac'){k=o?'exo':'vac';n=ans.age==='baby'?'Малышам особенно важны первые прививки и ветпаспорт.':'Врач подберёт схему прививок.'}
+ else if(ans.need==='sick'){k=o?'exo':'priem';n='Врач осмотрит и, если нужно, сразу назначит анализы или УЗИ.'}
+ else if(ans.need==='care'){k=o?'exo':'dent';n='Врач посмотрит зубы и шерсть и подскажет уход.'}
+ else{k=ans.age==='senior'?'lab':(o?'exo':'priem');n=ans.age==='senior'?'Питомцам постарше обычно полезны анализы и УЗИ раз в год.':'Осмотр и рекомендации по уходу.'}
+ var s=S[k];$('#chat-step').textContent='Готово';
+ say('Вам подойдёт: '+s.n+', '+s.p+'. '+n);say('Оставьте имя и телефон, и мы подтвердим время. Услуга и питомец уже подставлены в форму.');
+ opts.innerHTML='<a class="btn" href="#zapis" data-book data-pet="'+ans.pet+'" data-svc="'+k+'">Перейти к записи</a><button type="button" class="qo" id="again">Пройти заново</button>';
+ $('#again').addEventListener('click',start)}
+function start(){ans={};qi=0;log.innerHTML='';ask()}
+start();
+
+$('#lead').addEventListener('submit',function(e){e.preventDefault();$('#ok').style.display='block'});
+
+/* появление секций */
+var rv=$$('.rv');
+if('IntersectionObserver' in window){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.08,rootMargin:'0px 0px -4% 0px'});rv.forEach(function(el){io.observe(el)})}
+else rv.forEach(function(el){el.classList.add('in')});
+})();
+</script>
+<style>.allvar{position:fixed;left:14px;bottom:14px;z-index:35;background:rgba(30,20,10,.82);color:#F6EEDF;padding:9px 16px;border-radius:999px;font:700 .85rem var(--font);text-decoration:none;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 8px 24px rgba(0,0,0,.3)}.allvar:hover{background:rgba(30,20,10,.95)}@media (max-width:700px){.allvar{left:12px;bottom:82px;padding:7px 13px;font-size:.78rem}}</style>
+<a class="allvar" id="allvar" href="../k06_vet_vybor/index.html">&larr; Все варианты</a>
+<script>if(self!==top)document.getElementById('allvar').remove()</script>
+</body>
+</html>

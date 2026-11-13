@@ -1,0 +1,297 @@
+<!doctype html>
+<!--
+КОНСТРУКТОР: 03 «Бенто-сетка карточек» (СКЕЛЕТ: только структура, серая палитра, без картинок).
+ГРУППЫ НИШ: 6 Креатив и события (главный: фотограф, свадьбы, туры, барбершоп, студии, агентства); 2б Строительство и ремонт под ключ (стандарт: портфолио объектов).
+ПОСТРОЕНИЕ: вся страница из карточек разного размера в 12-колоночной сетке (плитки 1x1, 2x1, 2x2, широкие), без «секций на всю ширину»; плавающая навигация-капсула по центру сверху; каждый раздел = своя бенто-мозаика; первый экран тоже мозаика.
+СЛОТЫ (что заменяет субагент под заказ):
+ - Тексты: все [Заголовок…], [Текст…], подписи плиток, адрес, телефон, часы (искать «[» и «+7 000»).
+ - Цвета: блок :root (--bg, --tile, --tile2, --ink, --acc; сейчас серые), радиус плиток --r.
+ - Фото: все .ph (серые плитки «фото: …») заменить на <img>/background-image; в портфолио плитки разного размера (классы s-w2, s-h2).
+ - Логотип: .logo (капсула навигации).
+ - Цены: переключатель «Пакет / Разово» (данные в атрибутах data-a и data-b у .amt).
+ - Отзывы (помечены «пример»), вопросы: #faq, контакты: #contacts.
+ИНТЕРАКТИВ: фильтр портфолио по рубрикам, переключатель цен, аккордеон вопросов в плитках, форма с проверкой, подсветка пункта навигации.
+ШРИФТ: Manrope из ../../_fonts/ (запасной Arial, size-adjust).
+-->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Скелет 03 — бенто</title>
+<meta name="description" content="Скелет конструктора 03: бенто-сетка карточек. Тексты-заглушки, серая палитра.">
+<link rel="preload" href="../../_fonts/Manrope-Regular.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="../../_fonts/Manrope-ExtraBold.ttf" as="font" type="font/ttf" crossorigin>
+<style>
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Regular.ttf") format("truetype");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Bold.ttf") format("truetype");font-weight:700;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-ExtraBold.ttf") format("truetype");font-weight:800 900;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope Fallback";src:local("Arial");size-adjust:102%}
+:root{
+  --bg:#E6E6E6; --tile:#F7F7F7; --tile2:#D4D4D4; --dark:#3A3A3A; --ink:#2B2B2B; --mute:#595959; --line:#BDBDBD; --acc:#6E6E6E; --ph:#C2C2C2;
+  --r:28px; --gap:14px;
+  --font:"Manrope","Manrope Fallback",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:90px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;overflow-x:hidden}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.skip{position:absolute;left:-999px}.skip:focus{left:12px;top:12px;background:#fff;padding:10px 14px;z-index:99}
+.wrap{max-width:1200px;margin:0 auto;padding:0 var(--gap)}
+
+/* плавающая капсула */
+.nav{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:50;width:calc(100% - 24px);max-width:760px;background:rgba(247,247,247,.94);border:2px solid var(--ink);border-radius:999px;padding:6px 8px;display:flex;align-items:center;gap:8px}
+.logo{flex:none;width:92px;height:34px;background:var(--ph);border-radius:999px;display:grid;place-items:center;font-size:.7rem;font-weight:700}
+.nav ul{display:flex;gap:2px;list-style:none;margin:0;padding:0;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none}
+.nav ul::-webkit-scrollbar{display:none}
+.nav li a{display:block;white-space:nowrap;text-decoration:none;font-weight:700;font-size:.86rem;padding:8px 12px;border-radius:999px}
+.nav li a:hover,.nav li a.on{background:var(--ink);color:#fff}
+.nav .cta{flex:none;white-space:nowrap;text-decoration:none;font-weight:800;font-size:.86rem;background:var(--ink);color:#fff;padding:9px 16px;border-radius:999px}
+@media(max-width:560px){.nav .cta{display:none}.logo{width:70px}}
+
+main{padding-top:84px}
+.zone{margin:0 0 34px}
+.zone>h2{font-size:clamp(1.6rem,4vw,2.4rem);letter-spacing:-.03em;line-height:1.05;margin:0 0 14px 6px;font-weight:900}
+.zone>h2 small{display:block;font-size:.85rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:6px}
+
+/* бенто-сетка: 12 колонок, строки по 90px */
+.bento{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-rows:minmax(92px,auto);gap:var(--gap)}
+.t{background:var(--tile);border-radius:var(--r);padding:22px;display:flex;flex-direction:column;gap:8px;min-width:0;overflow:hidden;position:relative}
+.t.d{background:var(--dark);color:#fff}.t.d p{color:#d6d6d6}
+.t.g{background:var(--tile2)}
+.t h3{margin:0;font-size:1.15rem;font-weight:800;line-height:1.2}
+.t p{margin:0;color:var(--mute)}
+.t.ph,.ph{background:var(--ph);color:#444;align-items:center;justify-content:center;text-align:center;font-size:.84rem;font-weight:600;padding:12px}
+.t.ph{display:flex}
+.c3{grid-column:span 3}.c4{grid-column:span 4}.c5{grid-column:span 5}.c6{grid-column:span 6}.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:span 12}
+.r2{grid-row:span 2}.r3{grid-row:span 3}.r4{grid-row:span 4}
+.big{font-size:clamp(2rem,5.2vw,4.4rem);line-height:1;letter-spacing:-.04em;font-weight:900;margin:0;overflow-wrap:anywhere}
+.stat{font-size:3rem;font-weight:900;letter-spacing:-.05em;line-height:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 26px;border-radius:999px;border:2px solid var(--ink);background:var(--ink);color:#fff;font:800 1rem var(--font);text-decoration:none;cursor:pointer;align-self:flex-start}
+.t.d .btn{background:#fff;color:var(--ink);border-color:#fff}
+.btn.alt{background:transparent;color:var(--ink)}
+.push{margin-top:auto}
+.chip{display:inline-block;font-size:.74rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;border:2px solid currentColor;border-radius:999px;padding:1px 10px;align-self:flex-start}
+
+/* адаптив сетки */
+@media(max-width:900px){
+  .bento{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .c3,.c4{grid-column:span 3}.c5,.c6,.c7,.c8,.c12{grid-column:span 6}
+  .r3,.r4{grid-row:span 2}
+}
+@media(max-width:560px){
+  :root{--r:22px;--gap:10px}
+  .bento{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .c3,.c4{grid-column:span 1}.c5,.c6,.c7,.c8,.c12{grid-column:span 2}
+  .r2,.r3,.r4{grid-row:auto}
+  .t{padding:16px}
+  .t.ph{min-height:150px}
+}
+
+/* портфолио */
+.filter{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px 6px}
+.filter button{font:800 .88rem var(--font);border:2px solid var(--ink);background:transparent;color:var(--ink);border-radius:999px;padding:9px 18px;cursor:pointer;min-height:44px}
+.filter button[aria-pressed=true]{background:var(--ink);color:#fff}
+.work.hide{display:none}
+.work .cap{margin-top:auto;font-weight:700;font-size:.85rem}
+.work{min-height:150px}
+
+/* цены */
+.switch{display:inline-flex;border:2px solid var(--ink);border-radius:999px;padding:3px;gap:2px;align-self:flex-start}
+.switch button{font:800 .88rem var(--font);border:0;background:transparent;border-radius:999px;padding:9px 18px;cursor:pointer;min-height:42px;color:var(--ink)}
+.switch button[aria-pressed=true]{background:var(--ink);color:#fff}
+.amt{font-size:2.6rem;font-weight:900;letter-spacing:-.04em;line-height:1}
+.t ul{margin:0;padding:0 0 0 18px;color:var(--mute)}
+.t.d ul{color:#d6d6d6}
+
+/* шаги */
+.num{font-size:2.6rem;font-weight:900;letter-spacing:-.05em;line-height:1;color:rgba(0,0,0,.28)}
+
+/* вопросы */
+details{width:100%}
+summary{cursor:pointer;list-style:none;font-weight:800;min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:1.6rem;flex:none}
+details[open] summary::after{content:"−"}
+details p{margin-top:8px}
+
+/* форма */
+form{display:grid;gap:12px;height:100%}
+label{display:grid;gap:5px;font-weight:700;font-size:.92rem}
+input,select,textarea{font:inherit;font-weight:500;padding:12px 14px;border:2px solid var(--ink);border-radius:16px;background:#fff;color:var(--ink);min-height:50px;width:100%}
+textarea{min-height:84px;resize:vertical}
+.agree{display:flex;gap:10px;align-items:flex-start;font-weight:400;font-size:.85rem;color:var(--mute)}
+.agree input{width:24px;height:24px;min-height:24px;flex:none;margin-top:1px;accent-color:var(--ink)}
+.err{color:#7A1F1F;font-weight:700;font-size:.88rem;min-height:1em}
+#ok{display:none;margin:0;padding:12px;border:2px solid var(--ink);border-radius:16px;font-weight:800;background:var(--tile2);color:var(--ink)}
+.contacts a{white-space:nowrap}
+footer{padding:10px 0 40px;color:var(--mute);font-size:.86rem;text-align:center}
+
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#zayavka">К заявке</a>
+
+<nav class="nav" aria-label="Разделы">
+  <div class="logo">[Логотип]</div>
+  <ul>
+    <li><a href="#top">Главная</a></li><li><a href="#uslugi">Услуги</a></li><li><a href="#raboty">Работы</a></li><li><a href="#how">Процесс</a></li><li><a href="#prices">Цены</a></li><li><a href="#reviews">Отзывы</a></li><li><a href="#faq">Вопросы</a></li><li><a href="#contacts">Контакты</a></li>
+  </ul>
+  <a class="cta" href="#zayavka">[Заявка]</a>
+</nav>
+
+<main class="wrap">
+
+<!-- ПЕРВЫЙ ЭКРАН: мозаика -->
+<section class="zone" id="top" aria-label="Главная" data-sec>
+  <div class="bento">
+    <div class="t c8 r3 g"><span class="chip">[Метка: ниша / город]</span><h1 class="big">[Заголовок: оффер, одна фраза]</h1><p>[Подзаголовок: для кого и что получит клиент, 1–2 предложения]</p><div class="push" style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn" href="#zayavka">[Главная кнопка]</a><a class="btn alt" href="#raboty">[Смотреть работы]</a></div></div>
+    <div class="t ph c4 r3">фото: главный кадр, вертикаль</div>
+    <div class="t c4"><div class="stat">[00]</div><p>[Подпись факта 1]</p></div>
+    <div class="t c4 d"><div class="stat">[00]</div><p>[Подпись факта 2]</p></div>
+    <div class="t c4"><div class="stat">[00]</div><p>[Подпись факта 3]</p></div>
+  </div>
+</section>
+
+<!-- УСЛУГИ -->
+<section class="zone" id="uslugi" aria-label="Услуги" data-sec>
+  <h2><small>01</small>[Заголовок: услуги]</h2>
+  <div class="bento">
+    <div class="t c6 r2 d"><h3>[Услуга 1: главная]</h3><p>[Описание: 2 предложения, что входит и для кого]</p><span class="chip push">от [0 000 ₽]</span></div>
+    <div class="t ph c3 r2">фото: услуга 1</div>
+    <div class="t c3"><h3>[Услуга 2]</h3><p>[Описание: 1 предложение]</p><span class="chip push">от [0 000 ₽]</span></div>
+    <div class="t c3 g"><h3>[Услуга 3]</h3><p>[Описание: 1 предложение]</p><span class="chip push">от [0 000 ₽]</span></div>
+    <div class="t c4 g"><h3>[Услуга 4]</h3><p>[Описание: 1 предложение]</p></div>
+    <div class="t c4"><h3>[Услуга 5]</h3><p>[Описание: 1 предложение]</p></div>
+    <div class="t c4 d"><h3>[Не нашли нужное?]</h3><p>[Текст: напишите, подберём]</p><a class="btn push" href="#zayavka">[Кнопка]</a></div>
+  </div>
+</section>
+
+<!-- РАБОТЫ / ПОРТФОЛИО -->
+<section class="zone" id="raboty" aria-label="Работы" data-sec>
+  <h2><small>02</small>[Заголовок: работы / портфолио]</h2>
+  <div class="filter" id="filter" role="group" aria-label="Рубрики">
+    <button type="button" data-f="all" aria-pressed="true">Все</button>
+    <button type="button" data-f="a" aria-pressed="false">[Рубрика А]</button>
+    <button type="button" data-f="b" aria-pressed="false">[Рубрика Б]</button>
+    <button type="button" data-f="c" aria-pressed="false">[Рубрика В]</button>
+  </div>
+  <div class="bento" id="works">
+    <div class="t ph work c6 r3" data-k="a">фото: работа 1, крупная плитка<span class="cap">[Название проекта 1 · рубрика А]</span></div>
+    <div class="t ph work c3 r2" data-k="b">фото: работа 2<span class="cap">[Название 2 · Б]</span></div>
+    <div class="t ph work c3 r2" data-k="c">фото: работа 3<span class="cap">[Название 3 · В]</span></div>
+    <div class="t ph work c6" data-k="a">фото: работа 4, широкая плитка<span class="cap">[Название 4 · А]</span></div>
+    <div class="t ph work c4 r2" data-k="b">фото: работа 5<span class="cap">[Название 5 · Б]</span></div>
+    <div class="t ph work c4 r2" data-k="c">фото: работа 6<span class="cap">[Название 6 · В]</span></div>
+    <div class="t ph work c4 r2" data-k="a">фото: работа 7<span class="cap">[Название 7 · А]</span></div>
+  </div>
+</section>
+
+<!-- КАК ЭТО РАБОТАЕТ -->
+<section class="zone" id="how" aria-label="Как это работает" data-sec>
+  <h2><small>03</small>[Заголовок: как это работает]</h2>
+  <div class="bento">
+    <div class="t c3"><div class="num">1</div><h3>[Шаг 1]</h3><p>[Текст: одно предложение]</p></div>
+    <div class="t c3 g"><div class="num">2</div><h3>[Шаг 2]</h3><p>[Текст: одно предложение]</p></div>
+    <div class="t c3"><div class="num">3</div><h3>[Шаг 3]</h3><p>[Текст: одно предложение]</p></div>
+    <div class="t c3 d"><div class="num" style="color:rgba(255,255,255,.4)">4</div><h3>[Шаг 4: результат]</h3><p>[Текст: что получает клиент]</p></div>
+  </div>
+</section>
+
+<!-- ЦЕНЫ -->
+<section class="zone" id="prices" aria-label="Цены" data-sec>
+  <h2><small>04</small>[Заголовок: пакеты и цены]</h2>
+  <div class="bento">
+    <div class="t c12" style="flex-direction:row;align-items:center;justify-content:space-between;flex-wrap:wrap"><p style="max-width:34em">[Текст: как считается стоимость, что можно изменить]</p><div class="switch" role="group" aria-label="Формат"><button type="button" data-m="a" aria-pressed="true">[Пакет]</button><button type="button" data-m="b" aria-pressed="false">[Разово]</button></div></div>
+    <div class="t c4"><h3>[Пакет 1]</h3><div class="amt" data-a="[0 000 ₽]" data-b="[0 000 ₽]">[0 000 ₽]</div><ul><li>[Что входит 1]</li><li>[Что входит 2]</li><li>[Что входит 3]</li></ul><a class="btn alt push" href="#zayavka">[Кнопка]</a></div>
+    <div class="t c4 d"><span class="chip">[Метка: чаще выбирают]</span><h3>[Пакет 2]</h3><div class="amt" data-a="[0 000 ₽]" data-b="[0 000 ₽]">[0 000 ₽]</div><ul><li>[Что входит 1]</li><li>[Что входит 2]</li><li>[Что входит 3]</li><li>[Что входит 4]</li></ul><a class="btn push" href="#zayavka">[Кнопка]</a></div>
+    <div class="t c4"><h3>[Пакет 3]</h3><div class="amt" data-a="[0 000 ₽]" data-b="[0 000 ₽]">[0 000 ₽]</div><ul><li>[Что входит 1]</li><li>[Что входит 2]</li><li>[Что входит 3]</li></ul><a class="btn alt push" href="#zayavka">[Кнопка]</a></div>
+  </div>
+</section>
+
+<!-- ОТЗЫВЫ -->
+<section class="zone" id="reviews" aria-label="Отзывы" data-sec>
+  <h2><small>05</small>[Заголовок: отзывы]</h2>
+  <div class="bento">
+    <div class="t c6 g"><span class="chip">пример отзыва</span><p style="color:var(--ink);font-size:1.25rem;font-weight:600">[Текст отзыва: 3 предложения о результате]</p><p class="push">[Имя, город]</p></div>
+    <div class="t ph c3">фото: клиент или результат</div>
+    <div class="t c3"><span class="chip">пример отзыва</span><p style="color:var(--ink)">[Текст отзыва: 2 предложения]</p><p class="push">[Имя, город]</p></div>
+    <div class="t c4"><span class="chip">пример отзыва</span><p style="color:var(--ink)">[Текст отзыва: 2 предложения]</p><p class="push">[Имя, город]</p></div>
+    <div class="t c4 d"><span class="chip">пример отзыва</span><p>[Текст отзыва: 2 предложения]</p><p class="push">[Имя, город]</p></div>
+    <div class="t c4"><div class="stat">[0,0]</div><p>[Подпись: средняя оценка, источник — пример]</p></div>
+  </div>
+</section>
+
+<!-- ВОПРОСЫ -->
+<section class="zone" id="faq" aria-label="Вопросы" data-sec>
+  <h2><small>06</small>[Заголовок: частые вопросы]</h2>
+  <div class="bento">
+    <div class="t c6"><details><summary>[Вопрос 1: сроки]</summary><p>[Ответ: 1–2 предложения]</p></details></div>
+    <div class="t c6 g"><details><summary>[Вопрос 2: оплата]</summary><p>[Ответ: 1–2 предложения]</p></details></div>
+    <div class="t c6 g"><details><summary>[Вопрос 3: что нужно от клиента]</summary><p>[Ответ: 1–2 предложения]</p></details></div>
+    <div class="t c6"><details><summary>[Вопрос 4: правки и гарантии]</summary><p>[Ответ: 1–2 предложения]</p></details></div>
+  </div>
+</section>
+
+<!-- ЗАЯВКА + КОНТАКТЫ -->
+<section class="zone" id="zayavka" aria-label="Заявка" data-sec>
+  <h2><small>07</small>[Заголовок: оставить заявку]</h2>
+  <div class="bento">
+    <div class="t c7 r4">
+      <form id="form" novalidate>
+        <label>Имя<input name="name" type="text" autocomplete="name" required placeholder="[Как к вам обращаться]"></label>
+        <label>Телефон<input name="phone" type="tel" autocomplete="tel" required pattern="\+?[0-9\s\(\)\-]{10,}" placeholder="+7 000 000-00-00"></label>
+        <label>[Что нужно / дата]<select name="kind"><option>[Вариант 1]</option><option>[Вариант 2]</option><option>[Вариант 3]</option></select></label>
+        <label>Комментарий<textarea name="msg" placeholder="[Подсказка: что уточнить]"></textarea></label>
+        <label class="agree"><input type="checkbox" name="agree" required><span>Согласен на обработку персональных данных (<a href="#">политика, условная</a>)</span></label>
+        <div class="err" id="err" role="alert"></div>
+        <button class="btn" type="submit">[Кнопка: отправить заявку]</button>
+        <p id="ok" role="status">Демо: заявка никуда не отправляется. В рабочем сайте здесь подключается отправка в Telegram или на почту.</p>
+      </form>
+    </div>
+    <div class="t c5 d" id="contacts"><h3>Контакты</h3><p class="contacts"><a href="tel:+70000000000" style="color:#fff">+7 000 000-00-00</a><br>[мессенджер, соцсети]</p><p>[Город, улица, дом]</p></div>
+    <div class="t c5 g"><h3>Часы работы</h3><p>[Пн–Пт: 00:00–00:00]<br>[Сб–Вс: 00:00–00:00]</p></div>
+    <div class="t ph c5 r2">схема проезда: карта</div>
+  </div>
+</section>
+</main>
+<footer class="wrap">[Название компании] · [реквизиты — условные] · <a href="#">Политика конфиденциальности</a> · Демо-страница, тексты и цены условные</footer>
+
+<script>
+(function(){
+  /* фильтр портфолио */
+  var fb=[].slice.call(document.querySelectorAll("#filter button")),works=[].slice.call(document.querySelectorAll(".work"));
+  fb.forEach(function(b){b.addEventListener("click",function(){
+    fb.forEach(function(x){x.setAttribute("aria-pressed",x===b)});
+    var k=b.getAttribute("data-f");works.forEach(function(w){w.classList.toggle("hide",k!=="all"&&w.getAttribute("data-k")!==k)});
+  })});
+  /* переключатель цен */
+  var sw=[].slice.call(document.querySelectorAll(".switch button")),amts=[].slice.call(document.querySelectorAll(".amt"));
+  sw.forEach(function(b){b.addEventListener("click",function(){
+    sw.forEach(function(x){x.setAttribute("aria-pressed",x===b)});
+    amts.forEach(function(a){a.textContent=a.getAttribute("data-"+b.getAttribute("data-m"))});
+  })});
+  /* форма */
+  var f=document.getElementById("form"),err=document.getElementById("err"),ok=document.getElementById("ok");
+  f.addEventListener("submit",function(e){
+    e.preventDefault();ok.style.display="none";err.textContent="";
+    if(!f.name.value.trim()){err.textContent="Укажите имя.";f.name.focus();return}
+    if(!f.phone.checkValidity()||!f.phone.value.trim()){err.textContent="Проверьте номер телефона.";f.phone.focus();return}
+    if(!f.agree.checked){err.textContent="Нужно согласие на обработку данных.";f.agree.focus();return}
+    ok.style.display="block";
+  });
+  /* подсветка пункта навигации */
+  var secs=[].slice.call(document.querySelectorAll("[data-sec]")),links=[].slice.call(document.querySelectorAll(".nav li a"));
+  var map={top:0,uslugi:1,raboty:2,how:3,prices:4,reviews:5,faq:6,zayavka:7};
+  if("IntersectionObserver" in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){
+      var id=en.target.id,i=map[id];links.forEach(function(a,j){a.classList.toggle("on",(id==="zayavka"?7:i)===j)});
+    }})},{rootMargin:"-30% 0px -60% 0px"});
+    secs.forEach(function(s){io.observe(s)});
+  }
+})();
+</script>
+</body>
+</html>

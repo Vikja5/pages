@@ -1,0 +1,13 @@
+Фото: Pexels (Pexels License, коммерческое использование разрешено, указание автора не обязательно)
+Файл | Автор | Страница на Pexels | Размер | Что на кадре
+hero_01.jpg | furkan-tumer | https://www.pexels.com/photo/7405059/ | 1920x1280, 255 KB | полки пекарни, выпечка
+hero_02.jpg | ani-hadushaj | https://www.pexels.com/photo/32459865/ | 1920x1280, 267 KB | интерьер пекарни, витрины
+rest_01.jpg | Magda Ehlers | https://www.pexels.com/photo/32568165/ | 1920x1440, 553 KB | зал ресторана, дерево и зелень
+rest_02.jpg | Adrien Olichon | https://www.pexels.com/photo/2387675/ | 1920x1280, 514 KB | просторный зал ресторана с гостями
+rest_03.jpg | eden-fc | https://www.pexels.com/photo/34692788/ | 1920x1442, 371 KB | светлый зал ресторана, деревянные столы
+people_01.jpg | gustavo-fring | https://www.pexels.com/photo/7447281/ | 1920x1280, 236 KB | улыбающийся пекарь у витрины
+card_01.jpg | Mikhail Nilov | https://www.pexels.com/photo/6969973/ | 1920x1280, 178 KB | руки с коробкой еды на вынос
+card_02.jpg | valeriya | https://www.pexels.com/photo/27304344/ | 1000x1499, 204 KB | витрина круассанов, вертикаль
+card_03.jpg | roman-odintsov | https://www.pexels.com/photo/5855792/ | 1000x1500, 321 KB | кафе с уголком, вертикаль
+card_04.jpg | karography | https://www.pexels.com/photo/20380436/ | 1000x1782, 366 KB | бистро с террасой, вертикаль
+card_05.jpg | Roman Odintsov | https://www.pexels.com/photo/12725454/ | 1000x1499, 92 KB | курьер с коробкой, вертикаль

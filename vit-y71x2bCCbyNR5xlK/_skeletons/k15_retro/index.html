@@ -1,0 +1,350 @@
+<!doctype html>
+<!--
+КОНСТРУКТОР: 15 «Ретро и винтаж» (СКЕЛЕТ: только структура, серая палитра, без картинок и без рисованной графики).
+ГРУППЫ НИШ: 3 Еда и доставка (стандарт: кафе, кондитерская, ресторан); 6 Креатив и события (барбершоп, события, студии); часть группы 1 (салон) при ретро-подаче.
+ПОСТРОЕНИЕ: вся страница в двойной рамке «афиши»; строго симметричная центральная ось; шапка-плакат с лентой и круглым штампом; орнаментальные разделители из линий; фото-окно с аркой; меню-доска в две колонки с точками-заполнителями и вкладками; шаги как билеты с перфорацией; цены как афиши в двойных рамках; отзывы как открытки; бронь как талон. Рисованных иллюстраций нет: фигуры делаются рамками и скруглением.
+СЛОТЫ (что заменяет субагент под заказ):
+ - Тексты: все [Заголовок…], [Текст…], название в шапке, «Основано [год]», адрес, телефон, часы (искать «[» и «+7 000»).
+ - Цвета: блок :root (--paper, --ink, --frame, --ph; сейчас серые).
+ - Фото: все .ph (серые «фото: …»), арка в первом экране .arch.
+ - Логотип/штамп: .stamp и .ribbon (текст-заглушка).
+ - Меню: объект DATA в скрипте внизу (вкладки и позиции с ценами). Цены-афиши: блок #prices. События: блок #events. Отзывы (помечены «пример»): #reviews. Вопросы: #faq.
+ИНТЕРАКТИВ: вкладки меню, счётчик гостей, выбор даты и времени, проверка формы, раскрывающиеся вопросы.
+ШРИФТ: Manrope из ../../_fonts/ (запасной Arial, size-adjust).
+-->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Скелет 15 — ретро</title>
+<meta name="description" content="Скелет конструктора 15: ретро и винтаж, афишная вёрстка. Тексты-заглушки, серая палитра.">
+<link rel="preload" href="../../_fonts/Manrope-Regular.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="../../_fonts/Manrope-ExtraBold.ttf" as="font" type="font/ttf" crossorigin>
+<style>
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Regular.ttf") format("truetype");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Bold.ttf") format("truetype");font-weight:700;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-ExtraBold.ttf") format("truetype");font-weight:800 900;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope Fallback";src:local("Arial");size-adjust:102%}
+:root{
+  --outer:#D2D2D2; --paper:#F1F1F1; --ink:#2A2A2A; --mute:#595959; --soft:#E0E0E0; --ph:#C6C6C6;
+  --font:"Manrope","Manrope Fallback",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--outer);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.6;overflow-x:hidden;padding:12px}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.skip{position:absolute;left:-999px}.skip:focus{left:12px;top:12px;background:#fff;padding:10px 14px;z-index:99}
+
+/* двойная рамка афиши */
+.poster{max-width:1000px;margin:0 auto;background:var(--paper);border:3px solid var(--ink);padding:10px}
+.inner{border:1px solid var(--ink);padding:0 clamp(16px,4vw,48px);text-align:center}
+@media(max-width:480px){body{padding:6px}.poster{padding:6px}}
+
+/* разделители и заголовки */
+.orn{display:flex;align-items:center;justify-content:center;gap:12px;margin:0 auto;max-width:420px;color:var(--ink)}
+.orn::before,.orn::after{content:"";flex:1;border-top:3px double var(--ink)}
+.orn i{width:12px;height:12px;border:2px solid var(--ink);transform:rotate(45deg);flex:none}
+.sec{padding:52px 0 18px}
+.kick{font-size:.78rem;font-weight:800;letter-spacing:.3em;text-transform:uppercase;color:var(--mute);margin:14px 0 6px}
+h1{font-size:clamp(2.2rem,8.5vw,5rem);line-height:1;letter-spacing:.02em;font-weight:900;text-transform:uppercase;margin:12px 0 14px;overflow-wrap:anywhere}
+h2{font-size:clamp(1.7rem,5vw,2.8rem);line-height:1.05;letter-spacing:.06em;font-weight:900;text-transform:uppercase;margin:0 0 26px;overflow-wrap:anywhere}
+h3{font-size:1.1rem;letter-spacing:.06em;text-transform:uppercase;margin:0 0 6px;font-weight:800}
+.lead{max-width:34em;margin:0 auto 22px;color:var(--mute);font-size:1.1rem}
+.ph{background:var(--ph);color:#444;display:grid;place-items:center;text-align:center;padding:10px;font-size:.84rem;font-weight:600;width:100%;border:1px solid var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 30px;border:3px double var(--ink);background:var(--ink);color:#fff;font:800 .92rem var(--font);letter-spacing:.16em;text-transform:uppercase;text-decoration:none;cursor:pointer}
+.btn:hover{background:var(--paper);color:var(--ink)}
+.btn.alt{background:transparent;color:var(--ink)}
+.btn.alt:hover{background:var(--ink);color:#fff}
+.row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+/* шапка */
+.top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 0;border-bottom:1px solid var(--ink);font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.top a{text-decoration:none;white-space:nowrap}
+.ribbon{display:inline-block;background:var(--ink);color:#fff;padding:10px 56px;margin:26px 0 0;font-weight:900;letter-spacing:.2em;text-transform:uppercase;font-size:clamp(.9rem,3vw,1.2rem);clip-path:polygon(0 0,100% 0,calc(100% - 22px) 50%,100% 100%,0 100%,22px 50%)}
+nav.menu{display:flex;justify-content:center;flex-wrap:wrap;gap:4px 0;padding:16px 0;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);margin-top:22px}
+nav.menu a{text-decoration:none;font-weight:800;font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;padding:6px 14px;white-space:nowrap}
+nav.menu a+a{border-left:1px solid var(--ink)}
+nav.menu a:hover{text-decoration:underline}
+@media(max-width:560px){nav.menu a{padding:6px 9px;font-size:.72rem;letter-spacing:.1em}}
+
+/* первый экран */
+.hero{padding:34px 0 40px;display:grid;justify-items:center}
+.arch{width:min(100%,380px);aspect-ratio:3/4;border-radius:999px 999px 0 0;border:3px double var(--ink);margin-top:22px;background:var(--ph);display:grid;place-items:center;font-size:.84rem;font-weight:600;color:#444;padding:20px;position:relative}
+.stamp{position:absolute;right:-8px;bottom:26px;width:112px;height:112px;border-radius:50%;border:3px double var(--ink);background:var(--paper);display:grid;place-items:center;text-align:center;font-size:.7rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;transform:rotate(-12deg);line-height:1.3;color:var(--ink);padding:8px}
+@media(max-width:480px){.stamp{right:-2px;width:96px;height:96px;font-size:.62rem}}
+
+/* меню-доска */
+.tabs{display:flex;justify-content:center;gap:0;flex-wrap:wrap;margin:0 0 26px}
+.tabs button{font:800 .82rem var(--font);letter-spacing:.16em;text-transform:uppercase;padding:12px 22px;border:2px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;min-height:46px;margin:0 -1px -1px 0}
+.tabs button[aria-selected=true]{background:var(--ink);color:#fff}
+.board{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 56px;text-align:left;border:3px double var(--ink);padding:26px clamp(14px,3vw,34px)}
+.item{padding:10px 0}
+.item .l{display:flex;align-items:baseline;gap:8px}
+.item .l b{font-weight:800;letter-spacing:.04em;text-transform:uppercase;font-size:.96rem}
+.item .l i{flex:1;min-width:16px;border-bottom:2px dotted var(--ink);transform:translateY(-4px)}
+.item .l span{font-weight:800;white-space:nowrap}
+.item p{margin:2px 0 0;font-size:.88rem;color:var(--mute)}
+.note{font-size:.86rem;color:var(--mute);margin:16px 0 0}
+@media(max-width:700px){.board{grid-template-columns:minmax(0,1fr)}}
+
+/* афиша событий */
+.ev{display:grid;gap:14px;max-width:760px;margin:0 auto;text-align:left}
+.ev article{display:grid;grid-template-columns:96px minmax(0,1fr) auto;gap:18px;align-items:center;border:1px solid var(--ink);padding:12px}
+.date{border:3px double var(--ink);text-align:center;padding:8px 4px;line-height:1.1}
+.date b{display:block;font-size:2rem;font-weight:900}
+.date span{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700}
+.ev h3{margin:0 0 2px}.ev p{margin:0;color:var(--mute);font-size:.92rem}
+@media(max-width:560px){.ev article{grid-template-columns:76px minmax(0,1fr)}.ev .btn{grid-column:1/-1;min-height:46px}}
+
+/* билеты-шаги */
+.tix{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;list-style:none;margin:0;padding:0;counter-reset:t}
+.tix li{counter-increment:t;border:2px dashed var(--ink);padding:26px 12px 18px;position:relative;background:var(--paper)}
+.tix li::before,.tix li::after{content:"";position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--outer);border:1px solid var(--ink);transform:translateY(-50%)}
+.tix li::before{left:-11px}.tix li::after{right:-11px}
+.tix .n{display:block;font-size:2.6rem;font-weight:900;line-height:1;margin-bottom:8px}
+.tix .n::before{content:counter(t)}
+.tix p{margin:0;font-size:.92rem;color:var(--mute)}
+@media(max-width:860px){.tix{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.tix{grid-template-columns:minmax(0,1fr)}}
+
+/* цены-афиши */
+.plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}
+.plan{border:3px double var(--ink);padding:26px 16px;display:flex;flex-direction:column;gap:10px;align-items:center;position:relative;min-width:0}
+.plan.pick{background:var(--soft);border-width:6px}
+.plan .tag{position:absolute;top:-14px;background:var(--ink);color:#fff;font-weight:800;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;padding:4px 12px;white-space:nowrap}
+.plan .sum{font-size:2.5rem;font-weight:900;line-height:1}
+.plan ul{list-style:none;margin:0;padding:0;flex:1;width:100%;color:var(--mute);font-size:.94rem}
+.plan li{padding:5px 0;border-top:1px dotted var(--ink)}
+@media(max-width:860px){.plans{grid-template-columns:minmax(0,1fr);gap:26px}}
+
+/* отзывы-открытки */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.pc{border:1px solid var(--ink);padding:18px;text-align:left;position:relative;background:#fafafa;margin:0;display:flex;flex-direction:column;gap:10px}
+.pc .stp{align-self:flex-end;width:54px;height:64px;border:2px dashed var(--ink);display:grid;place-items:center;font-size:.6rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.pc blockquote{margin:0;font-weight:600}
+.pc figcaption{margin-top:auto;border-top:1px solid var(--ink);padding-top:8px;font-size:.86rem;color:var(--mute)}
+.mark{display:inline-block;border:1px solid var(--ink);font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:1px 8px;margin-right:6px;color:var(--ink)}
+@media(max-width:860px){.cards{grid-template-columns:minmax(0,1fr)}}
+
+/* вопросы */
+.faq{max-width:760px;margin:0 auto;text-align:left}
+details{border-top:1px solid var(--ink)}
+details:last-child{border-bottom:1px solid var(--ink)}
+summary{cursor:pointer;list-style:none;min-height:60px;display:flex;align-items:center;justify-content:space-between;gap:14px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;font-size:.95rem}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";flex:none;width:30px;height:30px;border:2px solid var(--ink);border-radius:50%;display:grid;place-items:center;font-size:1.1rem;line-height:1}
+details[open] summary::after{content:"−"}
+details p{margin:0 0 16px;color:var(--mute)}
+
+/* талон-бронь */
+.ticket{max-width:760px;margin:0 auto;border:3px double var(--ink);display:grid;grid-template-columns:minmax(0,1fr) 160px;text-align:left}
+.ticket form{padding:26px;display:grid;gap:14px}
+.stub{border-left:2px dashed var(--ink);padding:20px 12px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:6px;background:var(--soft);font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:.78rem}
+.stub b{font-size:2.4rem;line-height:1;letter-spacing:0}
+label{display:grid;gap:4px;font-weight:800;font-size:.76rem;letter-spacing:.14em;text-transform:uppercase}
+input,select,textarea{font:inherit;font-weight:500;letter-spacing:0;text-transform:none;font-size:1rem;padding:11px 12px;border:2px solid var(--ink);background:#fff;color:var(--ink);min-height:50px;width:100%;border-radius:0}
+textarea{min-height:76px;resize:vertical}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.guests{display:flex;align-items:center;border:2px solid var(--ink);background:#fff;min-height:50px}
+.guests button{width:50px;align-self:stretch;border:0;background:var(--soft);font:800 1.4rem var(--font);cursor:pointer;color:var(--ink)}
+.guests output{flex:1;text-align:center;font-weight:800;font-size:1.1rem;letter-spacing:0}
+.agree{display:flex;gap:12px;align-items:flex-start;font-size:.86rem;font-weight:400;letter-spacing:0;text-transform:none}
+.agree input{width:24px;height:24px;min-height:24px;flex:none;margin-top:2px;accent-color:var(--ink)}
+.err{color:#7A1F1F;font-weight:700;font-size:.9rem;min-height:1em}
+#ok{display:none;margin:0;padding:12px;border:2px solid var(--ink);font-weight:700;background:var(--soft)}
+@media(max-width:640px){.ticket{grid-template-columns:minmax(0,1fr)}.stub{border-left:0;border-top:2px dashed var(--ink);flex-direction:row;justify-content:space-between;order:-1;border-bottom:0}.two{grid-template-columns:minmax(0,1fr)}.ticket form{padding:18px}}
+
+/* контакты */
+.hours{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border:3px double var(--ink);max-width:860px;margin:0 auto}
+.hours>div{padding:22px 14px}
+.hours>div+div{border-left:1px solid var(--ink)}
+.hours .ph{aspect-ratio:16/10;margin-top:10px}
+.hours a{white-space:nowrap}
+@media(max-width:720px){.hours{grid-template-columns:minmax(0,1fr)}.hours>div+div{border-left:0;border-top:1px solid var(--ink)}}
+footer{padding:30px 0 34px;font-size:.82rem;color:var(--mute);border-top:1px solid var(--ink);margin-top:44px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<a class="skip" href="#zayavka">К брони</a>
+<div class="poster"><div class="inner">
+
+<header>
+  <div class="top"><span>[Адрес: город, улица]</span><span>[Часы: 00:00–00:00]</span><a href="tel:+70000000000">+7 000 000-00-00</a></div>
+  <div class="ribbon">[Название заведения]</div>
+  <nav class="menu" aria-label="Разделы"><a href="#top">Главная</a><a href="#menu">Меню</a><a href="#events">Афиша</a><a href="#how">Как мы работаем</a><a href="#prices">Цены</a><a href="#reviews">Отзывы</a><a href="#faq">Вопросы</a><a href="#zayavka">Бронь</a><a href="#contacts">Контакты</a></nav>
+</header>
+
+<main>
+<!-- ПЕРВЫЙ ЭКРАН: афиша -->
+<section class="hero" id="top" aria-label="Главная">
+  <p class="kick">[Надпись над заголовком: основано в 0000]</p>
+  <h1>[Заголовок: оффер, одна фраза]</h1>
+  <p class="lead">[Подзаголовок: для кого и что получит гость, 1–2 предложения]</p>
+  <div class="row"><a class="btn" href="#zayavka">[Главная кнопка: забронировать]</a><a class="btn alt" href="#menu">[Смотреть меню]</a></div>
+  <div class="arch">фото: главный кадр в арке, вертикаль<div class="stamp">[Штамп: основано 0000]</div></div>
+</section>
+
+<div class="orn" aria-hidden="true"><i></i></div>
+
+<!-- МЕНЮ-ДОСКА -->
+<section class="sec" id="menu" aria-label="Меню">
+  <p class="kick">Меню</p>
+  <h2>[Заголовок: меню / услуги]</h2>
+  <div class="tabs" role="tablist" id="tabs" aria-label="Разделы меню"></div>
+  <div class="board" id="board" aria-live="polite"></div>
+  <p class="note">[Примечание: аллергены, вес, цены условные]</p>
+</section>
+
+<div class="orn" aria-hidden="true"><i></i></div>
+
+<!-- АФИША СОБЫТИЙ / АКЦИЙ -->
+<section class="sec" id="events" aria-label="События и акции">
+  <p class="kick">Афиша</p>
+  <h2>[Заголовок: события и акции]</h2>
+  <div class="ev">
+    <article><div class="date"><b>[00]</b><span>[мес]</span></div><div><h3>[Событие 1]</h3><p>[Описание: время, что будет, 1 строка]</p></div><a class="btn alt" href="#zayavka" style="min-height:46px;padding:0 18px">[Кнопка]</a></article>
+    <article><div class="date"><b>[00]</b><span>[мес]</span></div><div><h3>[Событие 2]</h3><p>[Описание: время, что будет, 1 строка]</p></div><a class="btn alt" href="#zayavka" style="min-height:46px;padding:0 18px">[Кнопка]</a></article>
+    <article><div class="date"><b>[00]</b><span>[дни]</span></div><div><h3>[Постоянная акция]</h3><p>[Описание: условия, 1 строка]</p></div><a class="btn alt" href="#zayavka" style="min-height:46px;padding:0 18px">[Кнопка]</a></article>
+  </div>
+</section>
+
+<div class="orn" aria-hidden="true"><i></i></div>
+
+<!-- КАК ЭТО РАБОТАЕТ: билеты -->
+<section class="sec" id="how" aria-label="Как это работает">
+  <p class="kick">Порядок</p>
+  <h2>[Заголовок: как это работает]</h2>
+  <ol class="tix">
+    <li><span class="n"></span><h3>[Шаг 1]</h3><p>[Текст: одно предложение]</p></li>
+    <li><span class="n"></span><h3>[Шаг 2]</h3><p>[Текст: одно предложение]</p></li>
+    <li><span class="n"></span><h3>[Шаг 3]</h3><p>[Текст: одно предложение]</p></li>
+    <li><span class="n"></span><h3>[Шаг 4]</h3><p>[Текст: результат]</p></li>
+  </ol>
+</section>
+
+<div class="orn" aria-hidden="true"><i></i></div>
+
+<!-- ЦЕНЫ -->
+<section class="sec" id="prices" aria-label="Цены">
+  <p class="kick">Цены</p>
+  <h2>[Заголовок: наборы и цены]</h2>
+  <div class="plans">
+    <div class="plan"><h3>[Набор 1]</h3><div class="sum">[0 000 ₽]</div><ul><li>[Что входит 1]</li><li>[Что входит 2]</li><li>[Что входит 3]</li></ul><a class="btn alt" href="#zayavka">[Кнопка]</a></div>
+    <div class="plan pick"><span class="tag">[Метка: чаще выбирают]</span><h3>[Набор 2]</h3><div class="sum">[0 000 ₽]</div><ul><li>[Что входит 1]</li><li>[Что входит 2]</li><li>[Что входит 3]</li><li>[Что входит 4]</li></ul><a class="btn" href="#zayavka">[Кнопка]</a></div>
+    <div class="plan"><h3>[Набор 3]</h3><div class="sum">[0 000 ₽]</div><ul><li>[Что входит 1]</li><li>[Что входит 2]</li><li>[Что входит 3]</li></ul><a class="btn alt" href="#zayavka">[Кнопка]</a></div>
+  </div>
+</section>
+
+<div class="orn" aria-hidden="true"><i></i></div>
+
+<!-- ОТЗЫВЫ: открытки -->
+<section class="sec" id="reviews" aria-label="Отзывы">
+  <p class="kick">Открытки гостей</p>
+  <h2>[Заголовок: отзывы]</h2>
+  <div class="cards">
+    <figure class="pc"><div class="stp">марка</div><blockquote>[Текст отзыва: 2–3 предложения]</blockquote><figcaption><span class="mark">пример</span>[Имя, город]</figcaption></figure>
+    <figure class="pc"><div class="stp">марка</div><blockquote>[Текст отзыва: 2–3 предложения]</blockquote><figcaption><span class="mark">пример</span>[Имя, город]</figcaption></figure>
+    <figure class="pc"><div class="stp">марка</div><blockquote>[Текст отзыва: 2–3 предложения]</blockquote><figcaption><span class="mark">пример</span>[Имя, город]</figcaption></figure>
+  </div>
+</section>
+
+<div class="orn" aria-hidden="true"><i></i></div>
+
+<!-- ВОПРОСЫ -->
+<section class="sec" id="faq" aria-label="Вопросы">
+  <p class="kick">Вопросы</p>
+  <h2>[Заголовок: частые вопросы]</h2>
+  <div class="faq">
+    <details open><summary>[Вопрос 1: бронь и депозит]</summary><p>[Ответ: 1–2 предложения]</p></details>
+    <details><summary>[Вопрос 2: доставка или вынос]</summary><p>[Ответ: 1–2 предложения]</p></details>
+    <details><summary>[Вопрос 3: банкеты и события]</summary><p>[Ответ: 1–2 предложения]</p></details>
+    <details><summary>[Вопрос 4: оплата]</summary><p>[Ответ: 1–2 предложения]</p></details>
+  </div>
+</section>
+
+<div class="orn" aria-hidden="true"><i></i></div>
+
+<!-- БРОНЬ: талон -->
+<section class="sec" id="zayavka" aria-label="Заявка">
+  <p class="kick">Бронь</p>
+  <h2>[Заголовок: оставить заявку / забронировать]</h2>
+  <div class="ticket">
+    <form id="form" novalidate>
+      <div class="two">
+        <label>Дата<input name="date" type="date"></label>
+        <label>Время<select name="time"><option>[00:00]</option><option>[00:30]</option><option>[01:00]</option></select></label>
+      </div>
+      <label>Гостей<div class="guests"><button type="button" id="gm" aria-label="Меньше гостей">−</button><output id="gv" aria-live="polite">2</output><button type="button" id="gp" aria-label="Больше гостей">+</button></div></label>
+      <label>Имя<input name="name" type="text" autocomplete="name" required placeholder="[Как к вам обращаться]"></label>
+      <label>Телефон<input name="phone" type="tel" autocomplete="tel" required pattern="\+?[0-9\s\(\)\-]{10,}" placeholder="+7 000 000-00-00"></label>
+      <label>Пожелания<textarea name="msg" placeholder="[Подсказка: повод, аллергии]"></textarea></label>
+      <label class="agree"><input type="checkbox" name="agree" required><span>Согласен на обработку персональных данных (<a href="#">политика, условная</a>)</span></label>
+      <div class="err" id="err" role="alert"></div>
+      <button class="btn" type="submit">[Кнопка: забронировать]</button>
+      <p id="ok" role="status">Демо: заявка никуда не отправляется. В рабочем сайте здесь подключается отправка в Telegram или на почту.</p>
+    </form>
+    <div class="stub"><span>Талон</span><b id="stubn">2</b><span>[гостя]</span><span>[Талон 000]</span></div>
+  </div>
+</section>
+
+<div class="orn" aria-hidden="true"><i></i></div>
+
+<!-- КОНТАКТЫ -->
+<section class="sec" id="contacts" aria-label="Контакты">
+  <p class="kick">Как нас найти</p>
+  <h2>[Заголовок: контакты]</h2>
+  <div class="hours">
+    <div><h3>Адрес</h3><p>[Город, улица, дом]<br>[Как пройти: ориентир]</p><div class="ph">схема проезда: карта</div></div>
+    <div><h3>Часы работы</h3><p>[Пн–Пт: 00:00–00:00]<br>[Сб–Вс: 00:00–00:00]</p></div>
+    <div><h3>Связь</h3><p><a href="tel:+70000000000">+7 000 000-00-00</a><br>[мессенджер, соцсети]</p><a class="btn alt" href="#zayavka" style="min-height:46px;padding:0 18px">[Кнопка]</a></div>
+  </div>
+</section>
+</main>
+
+<footer>[Название компании] · [реквизиты — условные] · <a href="#">Политика конфиденциальности</a><br>Демо-страница, тексты и цены условные</footer>
+</div></div>
+
+<script>
+/* ДАННЫЕ (заменить под заказ): вкладки меню и позиции [название, описание, цена] */
+var DATA={
+  "[Раздел 1]":[["[Позиция 1.1]","[Описание, 1 строка]",300],["[Позиция 1.2]","[Описание, 1 строка]",350],["[Позиция 1.3]","[Описание, 1 строка]",400],["[Позиция 1.4]","[Описание, 1 строка]",450],["[Позиция 1.5]","[Описание, 1 строка]",500],["[Позиция 1.6]","[Описание, 1 строка]",550]],
+  "[Раздел 2]":[["[Позиция 2.1]","[Описание, 1 строка]",600],["[Позиция 2.2]","[Описание, 1 строка]",650],["[Позиция 2.3]","[Описание, 1 строка]",700],["[Позиция 2.4]","[Описание, 1 строка]",750]],
+  "[Раздел 3]":[["[Позиция 3.1]","[Описание, 1 строка]",200],["[Позиция 3.2]","[Описание, 1 строка]",250],["[Позиция 3.3]","[Описание, 1 строка]",280],["[Позиция 3.4]","[Описание, 1 строка]",320],["[Позиция 3.5]","[Описание, 1 строка]",360]]
+};
+(function(){
+  var cats=Object.keys(DATA),cur=cats[0],tabs=document.getElementById("tabs"),board=document.getElementById("board");
+  function fmt(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g," ")}
+  function render(){
+    tabs.innerHTML="";board.innerHTML="";
+    cats.forEach(function(c){
+      var b=document.createElement("button");b.type="button";b.setAttribute("role","tab");b.setAttribute("aria-selected",c===cur);b.textContent=c;
+      b.onclick=function(){cur=c;render()};tabs.appendChild(b);
+    });
+    DATA[cur].forEach(function(it){
+      var d=document.createElement("div");d.className="item";
+      d.innerHTML='<div class="l"><b></b><i></i><span>'+fmt(it[2])+' ₽</span></div><p></p>';
+      d.querySelector("b").textContent=it[0];d.querySelector("p").textContent=it[1];board.appendChild(d);
+    });
+  }
+  render();
+  /* гости */
+  var g=2,gv=document.getElementById("gv"),sn=document.getElementById("stubn");
+  function setG(n){g=Math.max(1,Math.min(20,n));gv.textContent=g;sn.textContent=g}
+  document.getElementById("gm").onclick=function(){setG(g-1)};
+  document.getElementById("gp").onclick=function(){setG(g+1)};
+  /* форма */
+  var f=document.getElementById("form"),err=document.getElementById("err"),ok=document.getElementById("ok");
+  f.addEventListener("submit",function(e){
+    e.preventDefault();ok.style.display="none";err.textContent="";
+    if(!f.name.value.trim()){err.textContent="Укажите имя.";f.name.focus();return}
+    if(!f.phone.checkValidity()||!f.phone.value.trim()){err.textContent="Проверьте номер телефона.";f.phone.focus();return}
+    if(!f.agree.checked){err.textContent="Нужно согласие на обработку данных.";f.agree.focus();return}
+    ok.style.display="block";
+  });
+})();
+</script>
+</body>
+</html>

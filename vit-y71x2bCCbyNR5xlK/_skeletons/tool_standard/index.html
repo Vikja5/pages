@@ -1,0 +1,455 @@
+<!doctype html>
+<!--
+=====================================================================
+СКЕЛЕТ: ВЕБ-ИНСТРУМЕНТ, УРОВЕНЬ «СТАНДАРТ» (конструктор 12, калькулятор)
+=====================================================================
+ЧТО ЭТО
+  Один файл index.html без картинок, графики, фирменных цветов, теней и логотипов.
+  Нейтральная серая палитра, заглушки текста с подписью, что вставить.
+  Годится для любой ниши: калькулятор стоимости, квиз-подбор, конфигуратор.
+  Адаптивность 375 / 768 / 1280. Шрифт Manrope берётся из ../../_fonts/ (относительный путь).
+  Если файл переносят в другую папку, поправьте путь url(...) в блоке @font-face.
+
+ЧТО ВНУТРИ (уровень стандарт)
+  1. Одна формула: сумма = база(выбор) × множитель × количество + опции (функция calculate()).
+  2. Итог (пересчёт сразу), строки сметы, срок.
+  3. Форма заявки -> sendToTelegram() (заглушка, см. ниже).
+  4. Бесплатные опции: «сохранить расчёт ссылкой» (параметры в адресе после #),
+     кнопки «позвонить» и «написать», блок «как мы считаем»,
+     отзывы-примеры с пометкой «пример».
+  Чего здесь НЕТ (это премиум): цены из файла/базы, админка, история расчётов, кабинет.
+
+СЛОТЫ ДЛЯ ЗАМЕНЫ (всё в одном месте, блок CONFIG в конце файла)
+  CONFIG.brand, CONFIG.phone, CONFIG.messengerUrl  - название, телефон, ссылка «написать»
+  CONFIG.title / lede / unit                       - заголовок, подзаголовок, единица (м², шт., чел.)
+  CONFIG.fields                                    - поля: range (ползунок), choice (плитки), toggle (галочки)
+  CONFIG.price(values)                             - ФОРМУЛА. Меняется только она и список полей.
+  CONFIG.reviews, CONFIG.how                       - отзывы-примеры и текст «как мы считаем»
+  Для КВИЗА: поля = вопросы (choice), formula возвращает не сумму, а баллы, а в итоге показывается
+  результат-подбор (поменяйте подпись CONFIG.totalLabel и текст CONFIG.resultText).
+  Для КОНФИГУРАТОРА: поля = комплектующие, формула складывает цены выбранного.
+  Тексты в квадратных скобках [ВСТАВИТЬ ...] - слоты: заменить на данные заказчика.
+
+КАК ПОДКЛЮЧИТЬ TELEGRAM (заказчику, один раз)
+  1. В Telegram найти @BotFather, команда /newbot, получить токен бота.
+  2. Написать боту любое сообщение; chat_id узнать через @userinfobot (или getUpdates).
+  3. В функции sendToTelegram() вставить токен и chat_id.
+  ВАЖНО: токен в открытом JS виден всем. Для боевого сайта отправку делают через
+  свой маленький сервер или облачную функцию (Netlify Function), а в файле остаётся только
+  адрес этой функции. В скелете токенов НЕТ и быть не должно.
+
+ПРОВЕРИТЬ ПЕРЕД ОТДАЧЕЙ (журнал ошибок сборок)
+  - 375 px: нет прокрутки вбок, телефон и кнопки не переносятся;
+  - шрифт: все символы страницы есть в Manrope; консоль без ошибок;
+  - значки только SVG; служебные пояснения не попали в тексты заказчика;
+  - формулу сверить на 5-7 примерах.
+=====================================================================
+-->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Калькулятор — скелет, стандарт</title>
+<meta name="description" content="Скелет веб-инструмента: расчёт стоимости, итог и заявка.">
+<link rel="preload" href="../../_fonts/Manrope-Regular.ttf" as="font" type="font/ttf" crossorigin>
+<style>
+/* Шрифт: относительный путь к demo\_fonts\. Запасной Arial подогнан по ширине. */
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Regular.ttf") format("truetype");font-weight:400;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Bold.ttf") format("truetype");font-weight:700;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-ExtraBold.ttf") format("truetype");font-weight:800;font-display:block}
+@font-face{font-family:"Manrope Fallback";src:local("Arial");size-adjust:102%;ascent-override:100%;descent-override:25%}
+
+:root{
+  /* Нейтральная серая палитра: акцент заказчика вписать в --accent при точечной доработке */
+  --bg:#F3F4F5; --card:#FFFFFF; --ink:#1F2328; --muted:#5B6470; --line:#D5D9DE; --soft:#E8EAED;
+  --accent:#3A424D; --accent-ink:#FFFFFF; --ok:#2F5D3F; --err:#8A2E2E;
+  --font:"Manrope","Manrope Fallback",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5}
+a{color:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+.skip{position:absolute;left:-999px}.skip:focus{left:12px;top:12px;background:var(--ink);color:#fff;padding:8px 12px;z-index:9}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.ico{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* Шапка */
+header.top{background:var(--card);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:60px}
+.brand{font-weight:800;text-decoration:none;white-space:nowrap}
+.tel{display:inline-flex;gap:8px;align-items:center;text-decoration:none;font-weight:700;white-space:nowrap}
+
+/* Заголовок */
+.hero{padding:32px 0 8px}
+h1{font-size:clamp(1.7rem,5vw,2.8rem);line-height:1.12;margin:0 0 10px;font-weight:800;max-width:20ch}
+.lede{margin:0;color:var(--muted);max-width:56ch}
+.slot{font-size:.82rem;color:var(--muted);border:1px dashed var(--line);padding:2px 8px;display:inline-block;margin-top:8px;border-radius:4px}
+
+/* Калькулятор */
+.calc{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.9fr);gap:20px;align-items:start;padding:20px 0 32px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;min-width:0}
+.panel>h2{margin:0;padding:14px 18px;border-bottom:1px solid var(--line);font-size:1.05rem;font-weight:700}
+fieldset{border:0;border-bottom:1px solid var(--line);margin:0;padding:16px 18px;min-width:0}
+fieldset:last-of-type{border-bottom:0}
+legend{font-weight:700;padding:0;margin-bottom:10px;float:left;width:100%}
+legend+*{clear:both}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.val{font-weight:800;font-size:1.3rem;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;margin:12px 0 2px;accent-color:var(--accent);height:28px}
+.scale{display:flex;justify-content:space-between;color:var(--muted);font-size:.85rem}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.tile{position:relative;display:block;min-width:0}
+.tile input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.tile span{display:block;height:100%;padding:12px;border:2px solid var(--line);background:#fff;border-radius:6px}
+.tile b{display:block}
+.tile small{color:var(--muted);display:block;line-height:1.3;margin-top:2px}
+.tile input:checked+span{border-color:var(--accent);background:var(--soft)}
+.tile input:focus-visible+span{outline:3px solid var(--ink);outline-offset:2px}
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border:2px solid var(--line);background:#fff;cursor:pointer;border-radius:6px}
+.opt input{margin-top:3px;width:20px;height:20px;accent-color:var(--accent);flex:none}
+.opt:has(input:checked){border-color:var(--accent);background:var(--soft)}
+.opt .p{margin-left:auto;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.opt small{color:var(--muted)}
+
+/* Итог */
+.receipt{position:sticky;top:16px}
+.receipt dl{margin:0;padding:6px 18px 0}
+.ln{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-variant-numeric:tabular-nums}
+.ln dt{color:var(--muted)}
+.ln dd{margin:0;font-weight:600;text-align:right}
+.total{padding:16px 18px 18px}
+.total .lbl{color:var(--muted)}
+.total .sum{font-size:clamp(2rem,5vw,2.8rem);font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums;margin:2px 0 6px;overflow-wrap:anywhere}
+.total .note{font-size:.88rem;color:var(--muted);margin:6px 0 14px}
+.btn{display:inline-flex;gap:8px;align-items:center;justify-content:center;background:var(--accent);color:var(--accent-ink);border:2px solid var(--accent);padding:12px 20px;font:700 1rem var(--font);border-radius:6px;cursor:pointer;text-decoration:none;min-height:48px;white-space:nowrap}
+.btn:hover{background:#2B323B}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{background:var(--soft)}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.actions .btn{flex:1 1 auto}
+.msg{font-size:.9rem;color:var(--ok);margin:8px 0 0;min-height:1.2em}
+
+/* Секции */
+section.blk{padding:8px 0 32px}
+section.blk h2{font-size:1.5rem;margin:0 0 14px}
+.how{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:18px;max-width:760px}
+.how p{margin:0 0 8px}.how p:last-child{margin:0}
+.how code{background:var(--soft);padding:2px 6px;border-radius:4px;font-size:.92em}
+.reviews{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.rev{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;margin:0}
+.rev blockquote{margin:0 0 8px}
+.rev figcaption{color:var(--muted);font-size:.9rem}
+.tag{display:inline-block;font-size:.75rem;font-weight:700;border:1px solid var(--line);border-radius:4px;padding:0 6px;margin-left:6px;color:var(--muted);background:var(--soft)}
+
+/* Заявка */
+.apply form{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:20px;display:grid;gap:14px;max-width:640px}
+label.f{display:grid;gap:4px;font-weight:600}
+input[type=text],input[type=tel],textarea{font:inherit;padding:12px;border:2px solid var(--line);border-radius:6px;background:#fff;min-height:48px;width:100%}
+textarea{min-height:90px;resize:vertical}
+#sum-line{margin:0;color:var(--muted)}
+#ok{margin:0;padding:12px;border:2px solid var(--ok);color:var(--ok);font-weight:600;display:none;border-radius:6px}
+#err{margin:0;color:var(--err);font-weight:600;display:none}
+
+footer{border-top:1px solid var(--line);background:var(--card);padding:18px 0 90px;color:var(--muted);font-size:.92rem}
+.mbar{display:none}
+
+@media (max-width:860px){
+  .calc{grid-template-columns:1fr}
+  .receipt{position:static}
+  .mbar{display:flex;position:fixed;left:0;right:0;bottom:0;background:var(--accent);color:#fff;padding:10px 16px;justify-content:space-between;align-items:center;gap:12px;z-index:5}
+  .mbar b{font-size:1.25rem;font-variant-numeric:tabular-nums}
+  .mbar a{background:#fff;color:var(--ink);padding:10px 16px;text-decoration:none;font-weight:700;border-radius:6px;min-height:44px;display:inline-flex;align-items:center;white-space:nowrap}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#calc">К калькулятору</a>
+
+<header class="top"><div class="wrap">
+  <a class="brand" href="#" id="brand">[ВСТАВИТЬ название компании]</a>
+  <a class="tel" href="#" id="tel"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg><span id="telText">[ВСТАВИТЬ телефон]</span></a>
+</div></header>
+
+<main>
+<section class="hero wrap">
+  <h1 id="h1">[ВСТАВИТЬ заголовок: что считаем]</h1>
+  <p class="lede" id="lede">[ВСТАВИТЬ подзаголовок: как работает инструмент и что получит клиент]</p>
+  <span class="slot">Скелет: серая палитра, без картинок и логотипа</span>
+</section>
+
+<section class="wrap calc" id="calc" aria-label="Калькулятор">
+  <!-- Поля строятся из CONFIG.fields (см. скрипт ниже) -->
+  <form class="panel" id="f" onsubmit="return false">
+    <h2>Параметры</h2>
+    <div id="fields"></div>
+  </form>
+
+  <aside class="panel receipt" aria-live="polite">
+    <h2>Предварительный расчёт</h2>
+    <dl id="lines"></dl>
+    <div class="total">
+      <div class="lbl" id="totalLabel">Итого, примерно</div>
+      <div class="sum" id="sum">0</div>
+      <p class="note" id="term"></p>
+      <a class="btn" href="#apply">Получить точный расчёт</a>
+      <!-- Бесплатные опции стандарта -->
+      <div class="actions" style="margin-top:10px">
+        <button class="btn ghost" type="button" id="saveLink"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>Сохранить ссылкой</button>
+        <a class="btn ghost" href="#" id="callBtn"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>Позвонить</a>
+        <a class="btn ghost" href="#" id="writeBtn" target="_blank" rel="noopener"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>Написать</a>
+      </div>
+      <p class="msg" id="saveMsg" role="status"></p>
+    </div>
+  </aside>
+</section>
+
+<!-- Блок «как мы считаем»: текст берётся из CONFIG.how -->
+<section class="wrap blk" id="howBlock">
+  <h2>Как мы считаем</h2>
+  <div class="how" id="how"></div>
+</section>
+
+<!-- Отзывы-примеры: ОБЯЗАТЕЛЬНА пометка «пример», пока нет реальных отзывов заказчика -->
+<section class="wrap blk">
+  <h2>Отзывы</h2>
+  <div class="reviews" id="reviews"></div>
+</section>
+
+<section class="wrap blk apply" id="apply">
+  <h2>Оставить заявку</h2>
+  <form id="lead" novalidate>
+    <p id="sum-line"></p>
+    <label class="f">Ваше имя<input type="text" id="nm" autocomplete="name" required></label>
+    <label class="f">Телефон<input type="tel" id="ph" autocomplete="tel" inputmode="tel" placeholder="+7" required pattern="\+?[0-9\s\(\)\-]{10,}"></label>
+    <label class="f">Комментарий (по желанию)<textarea id="cm"></textarea></label>
+    <button class="btn" type="submit">Отправить заявку</button>
+    <p id="err" role="alert">Проверьте имя и телефон.</p>
+    <p id="ok" role="status"></p>
+  </form>
+</section>
+</main>
+
+<footer><div class="wrap">Скелет-демо. Тексты, цены и контакты условные: заменить данными заказчика. Отзывы помечены «пример».</div></footer>
+
+<div class="mbar" aria-hidden="true"><span>Итого<br><b id="msum">0</b></span><a href="#apply">Заявка</a></div>
+
+<script>
+/* =====================================================================
+   CONFIG - единственное место, которое меняют под нишу
+   ===================================================================== */
+var CONFIG = {
+  brand: '[ВСТАВИТЬ название компании]',
+  phone: '+7 000 000-00-00',            // слот: телефон заказчика
+  messengerUrl: 'https://t.me/your_username', // слот: ссылка «написать» (Telegram/WhatsApp), реальный адрес не писать
+  title: 'Посчитайте стоимость за минуту',
+  lede: 'Выберите параметры, сумма пересчитывается сразу. Точную цену назовёт специалист после уточнения деталей.',
+  totalLabel: 'Итого, примерно',
+  currency: '₽',
+  unit: 'м²',
+  // Поля. type: range | choice | toggle. Для choice: options[{v,label,hint,k}], k = коэффициент/цена в формуле.
+  fields: [
+    {id:'qty',  type:'range',  label:'Количество (площадь, штуки, человек)', min:10, max:200, step:1, value:50, unitLabel:'м²'},
+    {id:'kind', type:'choice', label:'Тип работ (или вопрос квиза)', value:'b',
+      options:[
+        {v:'a', label:'Вариант А', hint:'[ВСТАВИТЬ описание]', k:3000},
+        {v:'b', label:'Вариант Б', hint:'[ВСТАВИТЬ описание]', k:5000},
+        {v:'c', label:'Вариант В', hint:'[ВСТАВИТЬ описание]', k:8000}
+      ]},
+    {id:'lvl',  type:'choice', label:'Уровень', value:'std',
+      options:[
+        {v:'eco', label:'Базовый',  hint:'[ВСТАВИТЬ]', k:0.9},
+        {v:'std', label:'Стандарт', hint:'[ВСТАВИТЬ]', k:1},
+        {v:'top', label:'Расширенный', hint:'[ВСТАВИТЬ]', k:1.25}
+      ]},
+    {id:'opts', type:'toggle', label:'Дополнительно',
+      options:[
+        {v:'o1', label:'Опция 1', hint:'[ВСТАВИТЬ]', perUnit:500},
+        {v:'o2', label:'Опция 2', hint:'[ВСТАВИТЬ]', fixed:15000},
+        {v:'rush', label:'Срочно', hint:'ускоренный срок', pct:10}
+      ]}
+  ],
+  /* ФОРМУЛА. Одна. Вход: values = {qty, kind:'b', lvl:'std', opts:['o1',...]}.
+     Выход: {lines:[[название, значение]], total:число, term:'строка' (можно пустую)}.
+     По умолчанию: количество × цена типа × множитель уровня + опции. */
+  price: function (v, F) {
+    var kind = F.opt('kind', v.kind), lvl = F.opt('lvl', v.lvl);
+    var base = v.qty * kind.k * lvl.k;
+    var lines = [['Количество', v.qty + ' ' + CONFIG.unit], ['Тип', kind.label], ['Уровень', lvl.label], ['Базовая стоимость', F.money(base)]];
+    var total = base, pct = 0;
+    v.opts.forEach(function (id) {
+      var o = F.opt('opts', id);
+      if (o.perUnit) { var s = v.qty * o.perUnit; total += s; lines.push([o.label, F.money(s)]); }
+      else if (o.fixed) { total += o.fixed; lines.push([o.label, F.money(o.fixed)]); }
+      else if (o.pct) { pct += o.pct; }
+    });
+    if (pct) { var add = total * pct / 100; total += add; lines.push(['Срочность +' + pct + '%', F.money(add)]); }
+    var days = Math.max(3, Math.round(v.qty * 0.2 * (pct ? 0.75 : 1)));
+    return {lines: lines, total: total, term: 'Срок: около ' + days + ' дн. [ВСТАВИТЬ свою логику срока или удалить]'};
+  },
+  how: [
+    'Сумма = количество × цена выбранного типа × коэффициент уровня + дополнительные опции.',
+    'Цены и коэффициенты: [ВСТАВИТЬ реальные данные заказчика]. Итог ориентировочный, точную сумму фиксируем в договоре.'
+  ],
+  reviews: [
+    {text:'[ВСТАВИТЬ отзыв клиента: коротко, что получил]', who:'Имя, город'},
+    {text:'[ВСТАВИТЬ отзыв клиента]', who:'Имя, город'},
+    {text:'[ВСТАВИТЬ отзыв клиента]', who:'Имя, город'}
+  ]
+};
+
+/* =====================================================================
+   ОТПРАВКА В TELEGRAM - ЗАГЛУШКА
+   Куда вставить: BOT_TOKEN и CHAT_ID ниже. Реальные значения в этот файл НЕ писать,
+   пока работа идёт в демо. На боевом сайте отправку делают через свой сервер/функцию.
+   ===================================================================== */
+function sendToTelegram(text) {
+  var BOT_TOKEN = '';   // <- сюда токен бота от @BotFather (у заказчика)
+  var CHAT_ID = '';     // <- сюда chat_id чата заказчика
+  if (!BOT_TOKEN || !CHAT_ID) {
+    // Демо-режим: ничего не отправляем
+    return Promise.resolve({demo: true});
+  }
+  return fetch('https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({chat_id: CHAT_ID, text: text})
+  }).then(function (r) { if (!r.ok) throw new Error('telegram ' + r.status); return r.json(); });
+}
+
+/* =====================================================================
+   ДВИЖОК (менять не нужно)
+   ===================================================================== */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var F = {
+    money: function (n) { return Math.round(n).toLocaleString('ru-RU') + ' ' + CONFIG.currency; },
+    opt: function (fid, v) {
+      var f = CONFIG.fields.filter(function (x) { return x.id === fid; })[0];
+      return f.options.filter(function (o) { return o.v === v; })[0] || f.options[0];
+    }
+  };
+  var shown = 0, raf, last = null;
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  // Верстка полей из CONFIG.fields
+  function build() {
+    $('fields').innerHTML = CONFIG.fields.map(function (f) {
+      var h = '<fieldset><legend>' + esc(f.label) + '</legend>';
+      if (f.type === 'range') {
+        h += '<div class="row"><span>' + esc(f.label) + '</span><span class="val"><span id="v_' + f.id + '">' + f.value + '</span> ' + esc(f.unitLabel || '') + '</span></div>' +
+          '<input type="range" id="' + f.id + '" min="' + f.min + '" max="' + f.max + '" step="' + f.step + '" value="' + f.value + '" aria-label="' + esc(f.label) + '">' +
+          '<div class="scale"><span>' + f.min + '</span><span>' + f.max + '</span></div>';
+      } else if (f.type === 'choice') {
+        h += '<div class="tiles">' + f.options.map(function (o) {
+          return '<label class="tile"><input type="radio" name="' + f.id + '" value="' + o.v + '"' + (o.v === f.value ? ' checked' : '') + '><span><b>' + esc(o.label) + '</b><small>' + esc(o.hint || '') + '</small></span></label>';
+        }).join('') + '</div>';
+      } else {
+        h += '<div class="opts">' + f.options.map(function (o) {
+          var p = o.perUnit ? F.money(o.perUnit) + '/' + CONFIG.unit : o.fixed ? F.money(o.fixed) : o.pct ? '+' + o.pct + '%' : '';
+          return '<label class="opt"><input type="checkbox" name="' + f.id + '" value="' + o.v + '"><span>' + esc(o.label) + '<br><small>' + esc(o.hint || '') + '</small></span><span class="p">' + p + '</span></label>';
+        }).join('') + '</div>';
+      }
+      return h + '</fieldset>';
+    }).join('');
+    $('brand').textContent = CONFIG.brand;
+    $('h1').textContent = CONFIG.title;
+    $('lede').textContent = CONFIG.lede;
+    $('totalLabel').textContent = CONFIG.totalLabel;
+    $('telText').textContent = CONFIG.phone;
+    var tel = 'tel:' + CONFIG.phone.replace(/[^+0-9]/g, '');
+    $('tel').href = tel; $('callBtn').href = tel; $('writeBtn').href = CONFIG.messengerUrl;
+    $('how').innerHTML = CONFIG.how.map(function (t) { return '<p>' + esc(t) + '</p>'; }).join('');
+    $('reviews').innerHTML = CONFIG.reviews.map(function (r) {
+      return '<figure class="rev"><blockquote>' + esc(r.text) + '</blockquote><figcaption>' + esc(r.who) + '<span class="tag">пример</span></figcaption></figure>';
+    }).join('');
+  }
+
+  function read() {
+    var v = {};
+    CONFIG.fields.forEach(function (f) {
+      if (f.type === 'range') v[f.id] = +$(f.id).value;
+      else if (f.type === 'choice') v[f.id] = document.querySelector('input[name=' + f.id + ']:checked').value;
+      else v[f.id] = [].map.call(document.querySelectorAll('input[name=' + f.id + ']:checked'), function (x) { return x.value; });
+    });
+    // удобные алиасы для формулы: opts = первый toggle-набор
+    var tg = CONFIG.fields.filter(function (f) { return f.type === 'toggle'; })[0];
+    v.opts = tg ? v[tg.id] : [];
+    return v;
+  }
+
+  function write(v) { // восстановление из ссылки
+    CONFIG.fields.forEach(function (f) {
+      if (v[f.id] === undefined) return;
+      if (f.type === 'range') $(f.id).value = v[f.id];
+      else if (f.type === 'choice') { var r = document.querySelector('input[name=' + f.id + '][value="' + v[f.id] + '"]'); if (r) r.checked = true; }
+      else [].forEach.call(document.querySelectorAll('input[name=' + f.id + ']'), function (c) { c.checked = v[f.id].indexOf(c.value) > -1; });
+    });
+  }
+
+  function count(to) {
+    cancelAnimationFrame(raf);
+    var from = shown, t0 = null, dur = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 300;
+    function step(t) {
+      if (t0 === null) t0 = t;
+      var p = dur ? Math.min((t - t0) / dur, 1) : 1, x = from + (to - from) * (1 - Math.pow(1 - p, 3));
+      $('sum').textContent = F.money(x); $('msum').textContent = F.money(x);
+      if (p < 1) raf = requestAnimationFrame(step); else shown = to;
+    }
+    raf = requestAnimationFrame(step);
+  }
+
+  function calc() {
+    var v = read(), r = CONFIG.price(v, F);
+    CONFIG.fields.forEach(function (f) { if (f.type === 'range') $('v_' + f.id).textContent = v[f.id]; });
+    $('lines').innerHTML = r.lines.map(function (l) { return '<div class="ln"><dt>' + esc(l[0]) + '</dt><dd>' + esc(l[1]) + '</dd></div>'; }).join('');
+    $('term').textContent = r.term || '';
+    count(r.total);
+    last = {v: v, r: r};
+    $('sum-line').textContent = 'Ваш расчёт: ' + r.lines.slice(0, 3).map(function (l) { return l[1]; }).join(', ') + ', итого около ' + F.money(r.total) + '.';
+  }
+
+  // Сохранить ссылкой: параметры кодируются в адрес после #
+  $('saveLink').addEventListener('click', function () {
+    var url = location.href.split('#')[0] + '#calc=' + encodeURIComponent(JSON.stringify(read()));
+    try { history.replaceState(null, '', url); } catch (e) {}
+    var done = function (ok) { $('saveMsg').textContent = ok ? 'Ссылка на расчёт скопирована.' : 'Ссылка в адресной строке: скопируйте её.'; };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(function () { done(true); }, function () { done(false); });
+    else done(false);
+  });
+
+  function restore() {
+    var m = /#calc=(.+)$/.exec(location.hash);
+    if (!m) return;
+    try { write(JSON.parse(decodeURIComponent(m[1]))); } catch (e) {}
+  }
+
+  // Заявка
+  $('lead').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var ok = $('nm').value.trim() && $('ph').checkValidity() && $('ph').value.trim();
+    $('err').style.display = ok ? 'none' : 'block';
+    if (!ok) return;
+    var text = 'Новая заявка\nИмя: ' + $('nm').value + '\nТелефон: ' + $('ph').value + '\nКомментарий: ' + $('cm').value + '\n' +
+      last.r.lines.map(function (l) { return l[0] + ': ' + l[1]; }).join('\n') + '\nИтого: ' + F.money(last.r.total);
+    sendToTelegram(text).then(function (res) {
+      $('ok').textContent = res && res.demo
+        ? 'Демо: заявка никуда не отправлена. В рабочей версии она придёт вам в Telegram вместе с выбранными параметрами.'
+        : 'Спасибо! Заявка отправлена, мы свяжемся с вами.';
+      $('ok').style.display = 'block';
+    }).catch(function () {
+      $('err').textContent = 'Не удалось отправить. Позвоните нам по телефону выше.'; $('err').style.display = 'block';
+    });
+  });
+
+  build(); restore();
+  $('f').addEventListener('input', calc);
+  calc();
+})();
+</script>
+</body>
+</html>

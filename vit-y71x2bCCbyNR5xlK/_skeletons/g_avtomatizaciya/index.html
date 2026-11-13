@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Автоматизация процессов — демо</title>
+<style>
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-display:swap}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Bold.ttf") format("truetype");font-weight:700;font-display:swap}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-ExtraBold.ttf") format("truetype");font-weight:800;font-display:swap}
+:root{--ink:#1f2a33;--mute:#5d6b76;--bg:#f2f4f6;--card:#fff;--line:#d9e0e6;--acc:#3b6a8f;--accbg:#e7eff6;--ok:#2f7d57;--gold:#f2c14e;--font:"Manrope","Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.5}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px}
+header{padding:28px 0 8px}
+.tag{display:inline-block;font-weight:700;font-size:.85rem;color:var(--mute);background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px}
+h1{font-size:clamp(1.7rem,6vw,2.7rem);line-height:1.12;margin:12px 0 10px;font-weight:800}
+.lede{color:var(--mute);margin:0 0 10px;max-width:64ch;font-size:1.05rem}
+.gets{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+.get{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.get b{display:block;color:var(--ok);margin-bottom:2px}
+.get span{color:var(--mute);font-size:.95rem}
+h2.sec{font-size:1.3rem;margin:26px 0 6px}
+.sub{color:var(--mute);margin:0 0 12px}
+.tools{display:flex;flex-wrap:wrap;gap:8px}
+.tl{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 14px;font-weight:700}
+.tl small{display:block;font-weight:400;color:var(--mute);font-size:.8rem}
+.hint{display:inline-block;margin:6px 0 10px;scroll-margin-top:12px;font-weight:700;padding:8px 16px;border-radius:999px;background:var(--gold);color:#1b2733}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.tabs button{min-height:46px;padding:8px 18px;border-radius:999px;border:1px solid var(--line);background:#fff;font:700 1rem var(--font);cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.cases{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.case{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.case h3{margin:0;font-size:1.08rem}
+.pain{margin:0;color:var(--mute);font-size:.95rem}
+.chain{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.st{background:var(--accbg);border:1px solid #c5d8e8;border-radius:10px;padding:6px 10px;font-weight:700;font-size:.9rem}
+.ar{color:var(--acc);font-weight:800}
+.out{color:var(--ok);font-weight:700;margin-top:auto}
+.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.lv{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.lv b{display:block;margin-bottom:4px}.lv span{color:var(--mute);font-size:.95rem}
+.price{margin:14px 0 12px;border:2px solid var(--acc);border-radius:16px;background:#fff;overflow:hidden;box-shadow:0 6px 18px rgba(59,106,143,.16)}
+.price .ph{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;padding:7px 14px;background:var(--acc);color:#fff;font-weight:800;font-size:.95rem}
+.price .ph span{font-weight:600;font-size:.82rem;opacity:.95}
+.price .pr{display:grid;grid-template-columns:1fr 1fr}
+.price .pi{display:flex;flex-direction:column;padding:10px 14px}
+.price .pi+.pi{border-left:1px solid var(--line)}
+.price .pi small{color:var(--mute);font-weight:700;font-size:.84rem;line-height:1.3}
+.price .pi b{color:var(--acc);font-size:1.5rem;font-weight:800;white-space:nowrap;line-height:1.2}
+@media(max-width:600px){.price .pr{grid-template-columns:1fr}.price .pi{flex-direction:row;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px}.price .pi+.pi{border-left:0;border-top:1px solid var(--line)}.price .pi b{font-size:1.3rem}}
+.cta{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:11px 14px;border-radius:14px;background:var(--gold);color:#1b2733;font-weight:800;text-decoration:none;line-height:1.3;box-shadow:0 4px 0 rgba(27,39,51,.18);transition:transform .2s}
+.cta:hover,.cta:focus-visible{transform:translateY(-2px)}
+.cta i{font-style:normal;flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#1b2733;color:var(--gold);animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+@media(prefers-reduced-motion:reduce){.cta i{animation:none}}
+
+footer{padding:20px 0 50px;color:var(--mute);font-size:.92rem}
+@media(max-width:760px){.gets,.cases,.levels{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <span class="tag">Демо / пример работы</span>
+  <h1 id="h1">Всё, что вы делаете руками, будет делать само</h1>
+  <div class="price" role="group" aria-label="Стоимость">
+    <div class="ph">Стоимость <span>Цены «от». Точную назову, когда увижу ваше задание</span></div>
+    <div class="pr">
+      <div class="pi"><small>Простая автоматизация: одна связка сервисов</small><b>от 1 000 ₽</b></div>
+      <div class="pi"><small>Сложная: несколько сценариев, ИИ, таблицы</small><b>от 5 000 ₽</b></div>
+    </div>
+  </div>
+  <a class="cta" href="#tabs"><i aria-hidden="true">↓</i><span>Это живой пример: нажмите на сферу (Продажи, Контент, Учёт, Поддержка), увидите схему автоматизации</span></a>
+  <p class="lede" id="lede">Настраиваем автоматизацию любой сложности: от одной связки между сервисами до целой системы из десятков сценариев с ИИ. Меньше рутины, ни одна заявка не теряется, всё работает без вас.</p>
+  <div class="gets" id="gets"></div>
+</header>
+<main class="wrap">
+  <h2 class="sec">С чем работаем</h2>
+  <p class="sub">Подключаем всё, чем вы уже пользуетесь. Если сервиса нет в списке, как правило, это тоже решаемо.</p>
+  <div class="tools" id="tools"></div>
+
+  <h2 class="sec">Примеры задач</h2>
+  <p class="sub">Это лишь часть. Нажмите на сферу и посмотрите, как это выглядит.</p>
+  <span class="hint">👆 Нажмите на сферу, схема ниже поменяется</span>
+  <div class="tabs" id="tabs" tabindex="-1" role="group" aria-label="Сфера"></div>
+  <div class="cases" id="cases" aria-live="polite"></div>
+
+  <h2 class="sec">Любой уровень</h2>
+  <div class="levels" id="levels"></div>
+
+</main>
+<footer class="wrap">Демо / пример работы. Это образцы того, как выглядят сценарии. Конкретную схему рисуем под вашу задачу.</footer>
+<script>
+/* ===== Подстановка под заказ: меняется только этот блок ===== */
+var G = {
+  gets: [['Меньше рутины', 'Скучные повторяющиеся действия делает сценарий'], ['Ничего не теряется', 'Заявки, письма и платежи попадают куда нужно сразу'], ['Работает без вас', 'По расписанию и по событиям, днём и ночью']],
+  tools: [['Make', 'сценарии'], ['n8n', 'сценарии, свой сервер'], ['CRM-системы', 'клиенты и сделки'], ['Telegram и MAX', 'боты и каналы'], ['Google', 'таблицы, почта, календарь'], ['Планировщики', 'задачи и сроки'], ['Голос и видео', 'расшифровка, нарезка'], ['ИИ', 'ChatGPT, Gemini, Claude'], ['Сайты и формы', 'заявки'], ['Платежи', 'чеки и учёт']],
+  tabs: [
+    { name: 'Продажи', cases: [
+      { t: 'Заявка не теряется', pain: 'Заявки приходят с сайта и из мессенджеров, часть забывается.', chain: ['Форма на сайте', 'CRM', 'Сообщение менеджеру', 'Напоминание через 15 минут'], out: 'Результат: ни одна заявка без ответа' },
+      { t: 'Личное письмо новому клиенту', pain: 'Писать каждому вручную долго, шаблоны безлики.', chain: ['Новый клиент', 'ИИ пишет письмо', 'Отправка', 'Задача на звонок'], out: 'Результат: ответ клиенту за минуту' } ] },
+    { name: 'Контент', cases: [
+      { t: 'Одна статья превращается в посты', pain: 'Для каждой площадки нужен свой текст, на это уходят часы.', chain: ['Статья', 'ИИ делает посты', 'Telegram, MAX, сайт', 'По расписанию'], out: 'Результат: публикации идут сами' },
+      { t: 'Голосовое превращается в заметку', pain: 'Мысли наговариваете, а потом всё нужно переписывать.', chain: ['Голосовое в Telegram', 'Текст', 'ИИ выделяет главное', 'Заметка и задачи'], out: 'Результат: заметка за минуту' } ] },
+    { name: 'Учёт', cases: [
+      { t: 'Оплаты в таблице учёта', pain: 'Платежи и чеки вносятся вручную, бывают ошибки.', chain: ['Оплата', 'Чек', 'Строка в таблице', 'Отчёт в Telegram'], out: 'Результат: учёт всегда актуален' },
+      { t: 'Счета из писем', pain: 'Счета приходят на почту, суммы переносят вручную.', chain: ['Письмо со счётом', 'ИИ находит сумму и дату', 'Таблица', 'Напоминание об оплате'], out: 'Результат: ничего не просрочено' } ] },
+    { name: 'Поддержка', cases: [
+      { t: 'Ответы клиентам без очереди', pain: 'Одни и те же вопросы задают сотни раз.', chain: ['Вопрос в чате', 'ИИ ищет в базе знаний', 'Ответ', 'Сложное человеку'], out: 'Результат: большая часть ответов без вас' },
+      { t: 'Тревожные отзывы сразу вам', pain: 'Негатив замечают поздно.', chain: ['Новый отзыв', 'Оценка тона', 'Негатив вам в Telegram', 'Заготовка ответа'], out: 'Результат: реакция за минуты' } ] }
+  ],
+  levels: [['Простая связка', 'Два-три сервиса, одно действие. Обычно за один день.'], ['Сценарий с ветвлениями', 'Условия, проверки, несколько путей, обработка ошибок.'], ['Система', 'Десятки сценариев, ИИ, отчёты, поддержка после запуска.']]
+};
+/* ============================================================ */
+(function(){
+  var $ = function(i){ return document.getElementById(i); };
+  function el(t, c, x){ var e = document.createElement(t); if (c) e.className = c; if (x) e.textContent = x; return e; }
+  G.gets.forEach(function(g){ var d = el('div','get'); d.appendChild(el('b','',g[0])); d.appendChild(el('span','',g[1])); $('gets').appendChild(d); });
+  G.tools.forEach(function(t){ var d = el('div','tl',t[0]); d.appendChild(el('small','',t[1])); $('tools').appendChild(d); });
+  G.levels.forEach(function(l){ var d = el('div','lv'); d.appendChild(el('b','',l[0])); d.appendChild(el('span','',l[1])); $('levels').appendChild(d); });
+  var btns = [];
+  function show(i){
+    btns.forEach(function(b,k){ b.setAttribute('aria-pressed', k === i); });
+    var box = $('cases'); box.textContent = '';
+    G.tabs[i].cases.forEach(function(c){
+      var d = el('article','case'); d.appendChild(el('h3','',c.t)); d.appendChild(el('p','pain',c.pain));
+      var ch = el('div','chain'); c.chain.forEach(function(s,k){ ch.appendChild(el('span','st',s)); if (k < c.chain.length - 1) ch.appendChild(el('span','ar','→')); });
+      d.appendChild(ch); d.appendChild(el('div','out',c.out)); box.appendChild(d);
+    });
+  }
+  G.tabs.forEach(function(t,i){ var b = el('button','',t.name); b.type = 'button'; b.addEventListener('click', function(){ show(i); }); btns.push(b); $('tabs').appendChild(b); });
+  show(0);
+})();
+</script>
+</body>
+</html>

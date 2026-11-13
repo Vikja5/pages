@@ -1,0 +1,14 @@
+Фото: Pexels (Pexels License, коммерческое использование разрешено, указание автора не обязательно)
+Файл | Автор | Страница на Pexels | Размер | Что на кадре
+hero_01.jpg | artbovich | https://www.pexels.com/photo/7031705/ | 1920x1281, 497 KB | фитнес-клуб, тренажёры, паркет
+hero_02.jpg | mart-production | https://www.pexels.com/photo/7319683/ | 1920x1280, 125 KB | пустая студия танцев, зеркала
+hero_03.jpg | pavel-danilyuk | https://www.pexels.com/photo/6926606/ | 1920x1282, 262 KB | танцоры в зеркальной студии
+hero_04.jpg | jdgromov | https://www.pexels.com/photo/4716814/ | 1920x1280, 249 KB | просторный светлый зал
+hero_05.jpg | mart-production | https://www.pexels.com/photo/8463037/ | 1920x1280, 164 KB | балерина в светлой студии
+people_01.jpg | felix-young | https://www.pexels.com/photo/20060599/ | 1920x1282, 235 KB | девушка с гирей в зале
+people_02.jpg | zandatsu | https://www.pexels.com/photo/31367502/ | 1920x1280, 180 KB | студенты в аудитории
+people_03.jpg | Mikhail Nilov | https://www.pexels.com/photo/9159042/ | 1920x1280, 193 KB | преподаватель помогает студентам
+card_01.jpg | tuti-isnawati | https://www.pexels.com/photo/40551834/ | 1000x1500, 167 KB | девушка в зале, высокий мах, вертикаль
+card_02.jpg | shvetsa | https://www.pexels.com/photo/5262511/ | 1000x1500, 226 KB | две девушки тренируются на площадке, вертикаль
+card_03.jpg | yankrukov | https://www.pexels.com/photo/8199560/ | 1000x1500, 162 KB | студентка с книгой в библиотеке, вертикаль
+card_04.jpg | tima-miroshnichenko | https://www.pexels.com/photo/6550402/ | 1000x1500, 124 KB | студентка пишет конспект, вертикаль

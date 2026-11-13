@@ -1,0 +1,279 @@
+<!doctype html>
+<!--
+СКЕЛЕТ. Конструктор 10: «Одна колонка и одна кнопка» (узкая колонка 560 px, одна повторяющаяся главная кнопка, закреплённая нижняя панель «кнопка + позвонить»; мини-расчёт внутри колонки).
+Подходит для групп ниш: 2 «Дом и ремонт» (базовый уровень: мастер на час, сантехник, электрик, клининг, такси), также мастера-одиночки и услуги с выездом любой группы.
+Вмещает обязательные блоки: ядро (оффер и кнопка, услуги с ценами, как работаем, отзывы, контакты, форма с согласием, подвал, закреплённая кнопка и телефон) + мини-расчёт цены, до/после, гарантия и договор, зона обслуживания и срочный выезд, частые вопросы. Для других групп: «До и после» заменить на «Примеры работ», «Гарантия» на «Условия».
+СЛОТЫ (что субагент заменяет под заказ):
+  ТЕКСТЫ: все строки в [квадратных скобках]; название; телефон, часы, зона.
+  ДАННЫЕ РАСЧЁТА: массив S в скрипте (название работы, цена за единицу, единица, мин, макс, шаг), MINVISIT (минимальный выезд), коэффициент срочности URGENT. Сейчас числа условные нейтральные (100, 200 ...), заменить на прайс заказчика; список «Что делаю и сколько стоит» дублирует S.
+  ЦВЕТА: переменные :root (--ink, --mute, --bg, --card, --line, --acc, --acc-ink, --ok). Сейчас нейтральные серые.
+  ФОТО: две серые рамки «до/после» (.pic), логотипа нет (текст в шапке).
+  ПОВЕДЕНИЕ: форма (демо), строка расчёта #sumline попадает в заявку.
+Шрифт: Manrope из ../../_fonts/ (если файлов нет, запасной Arial с подгонкой).
+-->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Скелет — одна колонка</title>
+<meta name="description" content="Скелет конструктора 10: одна колонка и одна кнопка. Тексты-заглушки.">
+<link rel="preload" href="../../_fonts/Manrope-Regular.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="../../_fonts/Manrope-Bold.ttf" as="font" type="font/ttf" crossorigin>
+<style>
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Regular.ttf") format("truetype");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Bold.ttf") format("truetype");font-weight:700;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-ExtraBold.ttf") format("truetype");font-weight:800 900;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope Fallback";src:local("Arial");size-adjust:102%}
+:root{
+  --ink:#2b2b2b; --mute:#666; --bg:#f2f2f2; --card:#fff; --line:#cfcfcf; --acc:#4a4a4a; --acc-ink:#fff; --ok:#444;
+  --font:"Manrope","Manrope Fallback",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:18px;line-height:1.5;overflow-x:hidden}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.skip{position:absolute;left:-999px}.skip:focus{left:12px;top:12px;background:#fff;padding:10px 14px;z-index:9}
+
+.col{max-width:560px;margin:0 auto;padding:0 20px}
+section{padding:36px 0 8px}
+.top{background:var(--ink);color:#fff}
+.top .col{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-top:14px;padding-bottom:14px}
+.top a{text-decoration:none;font-weight:700}
+.top .tel{white-space:nowrap}
+
+h1{font-size:clamp(2rem,9vw,3rem);line-height:1.04;letter-spacing:-.035em;font-weight:900;margin:34px 0 14px;overflow-wrap:anywhere}
+h2{font-size:1.7rem;line-height:1.1;letter-spacing:-.02em;font-weight:800;margin:0 0 16px}
+.lead{color:var(--mute);margin:0 0 22px;font-size:1.1rem}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:0;list-style:none}
+.badges li{background:#fff;border:2px solid var(--line);border-radius:999px;padding:5px 14px;font-weight:700;font-size:.92rem}
+
+.go{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:64px;padding:0 20px;background:var(--acc);color:var(--acc-ink);border:3px solid var(--acc);border-radius:14px;font:800 1.2rem var(--font);text-decoration:none;cursor:pointer;transition:transform .12s}
+.go:hover{transform:translateY(2px)}
+.go:active{transform:translateY(4px)}
+.sub{text-align:center;color:var(--mute);font-size:.92rem;margin:10px 0 0}
+.sub.l{text-align:left}
+
+.card{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:18px}
+.price{list-style:none;margin:0;padding:0}
+.price li{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.price li:last-child{border-bottom:0}
+.price b{white-space:nowrap}
+.price small{display:block;color:var(--mute)}
+
+.calc label.f{display:grid;gap:6px;font-weight:700;margin-bottom:14px}
+select,input[type=text],input[type=tel]{font:inherit;font-weight:500;padding:12px;border:2px solid var(--line);border-radius:10px;background:#fff;min-height:52px;width:100%;color:var(--ink)}
+.qty{display:flex;align-items:center;gap:10px}
+.qty button{width:52px;height:52px;border:2px solid var(--line);background:#fff;border-radius:10px;font:800 1.5rem var(--font);cursor:pointer;flex:none;color:var(--ink)}
+.qty button:active{background:var(--line)}
+.qty output{flex:1;text-align:center;font-weight:800;font-size:1.5rem}
+.qty .unit{min-width:46px;color:var(--mute);font-weight:600}
+.chk{display:flex;gap:12px;align-items:center;font-weight:700;margin:4px 0 16px;min-height:44px}
+.chk input{width:24px;height:24px;accent-color:var(--ink);flex:none}
+.res{background:var(--ink);color:#fff;border-radius:12px;padding:16px;margin-top:6px}
+.res .l{color:#d0d0d0;font-size:.95rem}
+.res .sum{font-size:2.3rem;font-weight:900;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1.1}
+.res .n{color:#d0d0d0;font-size:.9rem;margin-top:4px}
+
+.steps{list-style:none;margin:0;padding:0;counter-reset:s;display:grid;gap:12px}
+.steps li{counter-increment:s;display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;align-items:start}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--acc);color:#fff;font-weight:900}
+.steps b{display:block}
+.steps span{color:var(--mute)}
+
+.ba{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ba figure{margin:0}
+.ba .pic{aspect-ratio:4/3;border:2px solid var(--line);border-radius:10px;display:grid;place-items:center;color:var(--mute);font-size:.85rem;text-align:center;padding:6px;background:#e4e4e4}
+.ba figcaption{font-weight:800;margin-top:6px}
+
+.rev{margin:0 0 12px}
+.rev blockquote{margin:0 0 6px}
+.rev cite{color:var(--mute);font-style:normal;font-size:.92rem}
+.tag{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--ink);padding:1px 7px;border-radius:6px;margin-right:6px}
+
+details{border-bottom:1px solid var(--line);padding:6px 0}
+summary{cursor:pointer;font-weight:700;min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:12px;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:1.5rem}
+details[open] summary::after{content:"\2013"}
+details p{margin:0 0 10px;color:var(--mute)}
+
+form.lead{display:grid;gap:14px}
+label.f2{display:grid;gap:6px;font-weight:700}
+.agree{display:flex;gap:12px;align-items:flex-start;font-size:.88rem;color:var(--mute)}
+.agree input{width:22px;height:22px;margin-top:2px;flex:none;accent-color:var(--ink)}
+#sumline{margin:0;padding:10px 12px;background:#f7f7f7;border:2px dashed var(--acc);border-radius:10px;font-weight:600;display:none}
+#ok{display:none;margin:0;padding:14px;border:2px solid var(--ok);border-radius:10px;color:var(--ok);font-weight:700;background:#fff}
+.contacts{font-style:normal;display:grid;gap:6px;margin-top:24px}
+.contacts b{color:var(--mute);font-weight:600;display:inline-block;min-width:92px}
+footer{padding:30px 0 110px;color:var(--mute);font-size:.88rem}
+
+.fix{position:fixed;left:0;right:0;bottom:0;z-index:5;background:rgba(242,242,242,.97);border-top:2px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.fix .col{padding:0;display:flex;gap:10px}
+.fix .go{min-height:56px;font-size:1.05rem}
+.fix .call{flex:none;min-width:56px;min-height:56px;padding:0 12px;border:3px solid var(--line);border-radius:14px;display:grid;place-items:center;background:#fff;text-decoration:none;font-weight:800;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#zayavka">К заявке</a>
+<header class="top"><div class="col"><a href="#">[Название]</a><a class="tel" href="tel:+70000000000">+7 000 000-00-00</a></div></header>
+
+<main class="col">
+<!-- первый экран: оффер, плашки-факты, главная кнопка -->
+<section style="padding-top:0">
+  <h1>[Заголовок: оффер, одна фраза]</h1>
+  <p class="lead">[Подзаголовок: что делаю и главная выгода, 1–2 предложения]</p>
+  <ul class="badges"><li>[Факт 1]</li><li>[Факт 2]</li><li>[Факт 3]</li></ul>
+  <a class="go" href="#zayavka">[Главная кнопка]</a>
+  <p class="sub">[Обещание: как быстро перезвоним]</p>
+</section>
+
+<!-- мини-расчёт цены (рабочий; данные в массиве S скрипта) -->
+<section id="raschet">
+  <h2>[Заголовок: посчитайте за минуту]</h2>
+  <div class="card calc">
+    <form id="calc" novalidate>
+      <label class="f">[Что нужно сделать]
+        <select id="svc"></select></label>
+      <div class="f" style="margin-bottom:14px"><span style="font-weight:700;display:block;margin-bottom:6px">[Сколько]</span>
+        <div class="qty"><button type="button" id="minus" aria-label="Меньше">&ndash;</button><output id="qv" aria-live="polite">1</output><button type="button" id="plus" aria-label="Больше">+</button><span class="unit" id="unit">шт</span></div></div>
+      <label class="chk"><input type="checkbox" id="fast"> [Срочно] (+30%)</label>
+    </form>
+    <div class="res" aria-live="polite">
+      <div class="l">Итого, примерно</div>
+      <div class="sum" id="sum">0 ₽</div>
+      <div class="n" id="note"></div>
+    </div>
+    <p style="margin:16px 0 0"><a class="go" href="#zayavka" id="fromcalc">[Главная кнопка]</a></p>
+  </div>
+</section>
+
+<!-- прайс -->
+<section>
+  <h2>[Заголовок: что делаю и сколько стоит]</h2>
+  <div class="card"><ul class="price" id="pricelist"></ul></div>
+  <p class="sub l">[Примечание к ценам: минимальный выезд, что не входит]</p>
+</section>
+
+<!-- как работаю -->
+<section>
+  <h2>[Заголовок: как это будет]</h2>
+  <ol class="steps">
+    <li><div><b>[Шаг 1]</b><span>[Описание шага]</span></div></li>
+    <li><div><b>[Шаг 2]</b><span>[Описание шага]</span></div></li>
+    <li><div><b>[Шаг 3]</b><span>[Описание шага]</span></div></li>
+  </ol>
+</section>
+
+<!-- до и после / примеры работ -->
+<section>
+  <h2>[Заголовок: до и после]</h2>
+  <div class="ba">
+    <figure><div class="pic">фото «до»: что здесь должно быть</div><figcaption>[До]</figcaption></figure>
+    <figure><div class="pic">фото «после»: что здесь должно быть</div><figcaption>[После]</figcaption></figure>
+  </div>
+</section>
+
+<!-- гарантия и договор -->
+<section>
+  <h2>[Заголовок: гарантия и договор]</h2>
+  <div class="card">
+    <p style="margin:0 0 8px"><b>[Условие 1]</b> [пояснение].</p>
+    <p style="margin:0 0 8px"><b>[Условие 2]</b> [пояснение].</p>
+    <p style="margin:0"><b>[Условие 3]</b> [пояснение].</p>
+  </div>
+</section>
+
+<!-- отзывы (в демо с меткой «пример») -->
+<section>
+  <h2>[Заголовок: отзывы]</h2>
+  <div class="card rev"><blockquote><span class="tag">пример</span>[Текст отзыва, 1–2 предложения]</blockquote><cite>[Подпись: имя]</cite></div>
+  <div class="card rev"><blockquote><span class="tag">пример</span>[Текст отзыва, 1–2 предложения]</blockquote><cite>[Подпись: имя]</cite></div>
+</section>
+
+<!-- зона обслуживания и срочный выезд -->
+<section>
+  <h2>[Заголовок: где работаю]</h2>
+  <div class="card"><p style="margin:0 0 6px"><b>[Зона: город, радиус]</b></p><p style="margin:0">[Часы работы, условия срочного выезда]</p></div>
+</section>
+
+<!-- частые вопросы -->
+<section>
+  <h2>[Заголовок: частые вопросы]</h2>
+  <details><summary>[Вопрос 1]</summary><p>[Ответ на вопрос 1]</p></details>
+  <details><summary>[Вопрос 2]</summary><p>[Ответ на вопрос 2]</p></details>
+  <details><summary>[Вопрос 3]</summary><p>[Ответ на вопрос 3]</p></details>
+</section>
+
+<!-- заявка -->
+<section id="zayavka">
+  <h2>[Заголовок: оставить заявку]</h2>
+  <div class="card">
+    <form class="lead" id="lead" novalidate>
+      <p id="sumline"></p>
+      <label class="f2">Как вас зовут<input type="text" id="nm" autocomplete="name" required></label>
+      <label class="f2">Телефон<input type="tel" id="ph" autocomplete="tel" inputmode="tel" placeholder="+7" pattern="\+?[0-9\s\(\)\-]{10,}" required></label>
+      <label class="agree"><input type="checkbox" id="ag" required><span>Согласен на обработку персональных данных ([ссылка на политику]).</span></label>
+      <button class="go" type="submit">[Отправить заявку]</button>
+      <p id="ok" role="status"></p>
+    </form>
+  </div>
+  <address class="contacts">
+    <div><b>Телефон</b>[+7 000 000-00-00]</div>
+    <div><b>Часы</b>[дни и часы]</div>
+    <div><b>Зона</b>[город, район]</div>
+  </address>
+</section>
+</main>
+
+<footer><div class="col">[Название, год] · [Реквизиты] · [Политика конфиденциальности]</div></footer>
+<div class="fix"><div class="col"><a class="go" href="#zayavka">[Главная кнопка]</a><a class="call" href="tel:+70000000000" aria-label="Позвонить">Звонок</a></div></div>
+
+<script>
+(function(){
+  /* СЛОТ: прайс и расчёт. n — название, p — цена за единицу, u — единица, min/max/step — границы количества */
+  var S=[
+    {n:'[Работа 1]',p:100,u:'шт',min:1,max:30},
+    {n:'[Работа 2]',p:200,u:'шт',min:1,max:10},
+    {n:'[Работа 3]',p:300,u:'шт',min:1,max:10},
+    {n:'[Работа 4, за единицу площади]',p:400,u:'м²',min:5,max:200,step:5},
+    {n:'[Работа 5, за единицу площади]',p:500,u:'м²',min:5,max:200,step:5},
+    {n:'[Работа 6, за час]',p:600,u:'ч',min:1,max:12}
+  ];
+  var MINVISIT=1000;   /* минимальный выезд, ₽ */
+  var URGENT=1.3;      /* коэффициент срочности */
+  var $=function(i){return document.getElementById(i)};
+  var fmt=function(n){return Math.round(n).toLocaleString('ru-RU')+' ₽'};
+  var sel=$('svc'),q=S[0].min;
+  S.forEach(function(s,i){
+    var o=document.createElement('option');o.value=i;o.textContent=s.n+', '+s.p+' ₽/'+s.u;sel.appendChild(o);
+    var li=document.createElement('li');li.innerHTML='<span>'+s.n+'</span><b>'+s.p+' ₽/'+s.u+'</b>';$('pricelist').appendChild(li);
+  });
+  function calc(){
+    var s=S[+sel.value],raw=s.p*q,sum=Math.max(raw,MINVISIT),fast=$('fast').checked;
+    if(fast)sum*=URGENT;
+    $('qv').textContent=q;$('unit').textContent=s.u;
+    $('sum').textContent=fmt(sum);
+    $('note').textContent=(raw<MINVISIT?'Применён минимальный выезд '+fmt(MINVISIT)+'. ':'')+(fast?'Срочность +30%. ':'')+'Точную цену назовём после осмотра.';
+    var line=$('sumline');line.style.display='block';
+    line.textContent='Ваш расчёт: '+s.n+', '+q+' '+s.u+(fast?', срочно':'')+', примерно '+fmt(sum)+'.';
+  }
+  function step(d){var s=S[+sel.value],st=s.step||1;q=Math.min(s.max,Math.max(s.min,q+d*st));calc()}
+  sel.addEventListener('change',function(){q=S[+sel.value].min;calc()});
+  $('minus').addEventListener('click',function(){step(-1)});
+  $('plus').addEventListener('click',function(){step(1)});
+  $('fast').addEventListener('change',calc);
+  $('calc').addEventListener('submit',function(e){e.preventDefault()});
+  var lead=$('lead');
+  lead.addEventListener('submit',function(e){
+    e.preventDefault();
+    if(!lead.checkValidity()){lead.reportValidity();return}
+    var ok=$('ok');ok.textContent='Заявка принята (демо: никуда не отправлена). Расчёт приложен.';ok.style.display='block';
+  });
+  calc();
+})();
+</script>
+</body>
+</html>

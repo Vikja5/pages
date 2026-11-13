@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Скрипты для компьютера — демо</title>
+<style>
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-display:swap}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Bold.ttf") format("truetype");font-weight:700;font-display:swap}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-ExtraBold.ttf") format("truetype");font-weight:800;font-display:swap}
+:root{--ink:#1f2a33;--mute:#5d6b76;--bg:#f2f4f6;--card:#fff;--line:#d9e0e6;--acc:#3b6a8f;--accbg:#e7eff6;--gold:#f2c14e;--font:"Manrope","Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.5}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px}
+header{padding:28px 0 8px}
+.tag{display:inline-block;font-weight:700;font-size:.85rem;color:var(--mute);background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px}
+h1{font-size:clamp(1.7rem,6vw,2.6rem);line-height:1.15;margin:12px 0 8px;font-weight:800}
+.lede{color:var(--mute);margin:0 0 8px;max-width:64ch}
+.hint{display:inline-block;margin:8px 0 10px;font-weight:700;padding:8px 16px;border-radius:999px;background:var(--gold);color:#1b2733}
+.pick{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.pick button{min-height:46px;padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:#fff;font:700 .98rem var(--font);cursor:pointer}
+.pick button[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.grid{display:grid;grid-template-columns:1fr 1.5fr;gap:16px;margin:0 0 16px}
+.facts{display:grid;gap:12px;align-content:start}
+.fact{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.fact b{display:block;color:var(--acc);font-size:.82rem;text-transform:uppercase;letter-spacing:.04em}
+.fact p{margin:4px 0 0}
+.code{background:#1f2a33;color:#e8eef3;border-radius:16px;overflow:hidden;align-self:start}
+.code .bar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;background:#2b3944;font-weight:700;font-size:.9rem}
+.copy{min-height:44px;padding:6px 14px;border:0;border-radius:10px;background:var(--gold);color:#1b2733;font:700 .92rem var(--font);cursor:pointer}
+pre{margin:0;padding:14px;overflow-x:auto;-webkit-overflow-scrolling:touch;font:14px/1.6 Consolas,"Courier New",monospace}
+.c{color:#8fb4a0}
+.price{margin:14px 0 12px;border:2px solid var(--acc);border-radius:16px;background:#fff;overflow:hidden;box-shadow:0 6px 18px rgba(59,106,143,.16)}
+.price .ph{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;padding:7px 14px;background:var(--acc);color:#fff;font-weight:800;font-size:.95rem}
+.price .ph span{font-weight:600;font-size:.82rem;opacity:.95}
+.price .pr{display:grid;grid-template-columns:1fr 1fr}
+.price .pi{display:flex;flex-direction:column;padding:10px 14px}
+.price .pi+.pi{border-left:1px solid var(--line)}
+.price .pi small{color:var(--mute);font-weight:700;font-size:.84rem;line-height:1.3}
+.price .pi b{color:var(--acc);font-size:1.5rem;font-weight:800;white-space:nowrap;line-height:1.2}
+@media(max-width:600px){.price .pr{grid-template-columns:1fr}.price .pi{flex-direction:row;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px}.price .pi+.pi{border-left:0;border-top:1px solid var(--line)}.price .pi b{font-size:1.3rem}}
+.cta{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:11px 14px;border-radius:14px;background:var(--gold);color:#1b2733;font-weight:800;text-decoration:none;line-height:1.3;box-shadow:0 4px 0 rgba(27,39,51,.18);transition:transform .2s}
+.cta:hover,.cta:focus-visible{transform:translateY(-2px)}
+.cta i{font-style:normal;flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#1b2733;color:var(--gold);animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+@media(prefers-reduced-motion:reduce){.cta i{animation:none}}
+
+footer{padding:10px 0 50px;color:var(--mute);font-size:.92rem}
+@media(max-width:800px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <span class="tag">Демо / пример работы</span>
+  <h1 id="h1">Скрипты, которые избавляют от рутины на компьютере</h1>
+  <div class="price" role="group" aria-label="Стоимость">
+    <div class="ph">Стоимость <span>Цены «от». Точную назову, когда увижу ваше задание</span></div>
+    <div class="pr">
+      <div class="pi"><small>Скрипт: небольшая программа под задачу</small><b>от 500 ₽</b></div>
+      <div class="pi"><small>Серверы и системы скриптов</small><b>от 2 000 ₽</b></div>
+    </div>
+  </div>
+  <a class="cta" href="#pick"><i aria-hidden="true">↓</i><span>Это живой пример: нажмите на скрипт ниже (чистка, копия, порядок в «Загрузках»…), увидите, что он делает и его код</span></a>
+  <p class="lede" id="lede">Пишем небольшие программы для Windows под вашу задачу: убрать мусор, сохранить важное, разложить файлы по порядку. Запускаются сами по расписанию.</p>
+</header>
+<main class="wrap">
+  <div class="pick" id="pick" tabindex="-1" role="group" aria-label="Примеры скриптов"></div>
+  <div class="grid">
+    <section class="facts" aria-label="О скрипте" id="facts"></section>
+    <section class="code" aria-label="Пример кода">
+      <div class="bar"><span id="fname"></span><button class="copy" id="copy" type="button">Скопировать</button></div>
+      <pre id="code"></pre>
+    </section>
+  </div>
+</main>
+<footer class="wrap">Демо / пример работы. Это образцы оформления. Рабочий скрипт пишется под вашу задачу и проверяется на тестовой папке, ничего не удаляя насовсем без вашего согласия.</footer>
+<script>
+/* ===== Подстановка под заказ: меняется только этот блок ===== */
+var Z = [
+  { name: 'Чистка компьютера', fname: 'очистка.ps1',
+    facts: [['Что делает', 'Находит старые временные файлы и переносит их в архив, освобождая место.'], ['Когда запускается', 'Каждую ночь или по кнопке на рабочем столе.'], ['Что на выходе', 'Журнал: сколько файлов и сколько места освобождено.'], ['Безопасность', 'Ничего не удаляет насовсем. Сначала режим «показать».']],
+    code: ['# Папка и срок (замените на свои)', '$папка = "C:\\Temp"', '$дней  = 30', '$проба = $true   # $true: только показать', '', '# Берём файлы старше нужного срока', '$старые = Get-ChildItem $папка -File |', '  Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-$дней) }', '', '# Переносим в архив или только показываем', 'foreach ($f in $старые) {', '  if ($проба) { "Будет перенесён: $($f.Name)" }', '  else { Move-Item $f.FullName "$папка\\Архив" }', '}'] },
+  { name: 'Резервная копия', fname: 'копия.ps1',
+    facts: [['Что делает', 'Копирует важные папки на другой диск или в облако и хранит последние 7 копий.'], ['Когда запускается', 'Каждый вечер в заданное время.'], ['Что на выходе', 'Папка с датой в названии и сообщение «готово» вам в Telegram.'], ['Безопасность', 'Старые копии удаляются только после успешной новой.']],
+    code: ['# Что копируем и куда', '$откуда = "C:\\Документы"', '$куда   = "D:\\Копии\\" + (Get-Date -Format "yyyy-MM-dd")', '', '# Делаем копию', 'Copy-Item $откуда $куда -Recurse', '', '# Оставляем только 7 последних копий', 'Get-ChildItem "D:\\Копии" -Directory |', '  Sort-Object Name -Descending | Select-Object -Skip 7 |', '  Remove-Item -Recurse'] },
+  { name: 'Порядок в «Загрузках»', fname: 'порядок.ps1',
+    facts: [['Что делает', 'Раскладывает файлы из «Загрузок» по папкам: картинки, документы, архивы, установщики.'], ['Когда запускается', 'Раз в день или при входе в систему.'], ['Что на выходе', 'Аккуратные папки вместо свалки.'], ['Безопасность', 'Файлы только перемещаются, не удаляются.']],
+    code: ['$папка = "$HOME\\Downloads"', '', '# Какое расширение в какую папку', '$правила = @{', '  "Картинки"  = "jpg","png","gif"', '  "Документы" = "pdf","docx","xlsx"', '  "Архивы"    = "zip","rar","7z"', '}', '', 'foreach ($п in $правила.Keys) {', '  New-Item "$папка\\$п" -ItemType Directory -Force | Out-Null', '  Get-ChildItem $папка -File | Where-Object { $правила[$п] -contains $_.Extension.TrimStart(".") } |', '    Move-Item -Destination "$папка\\$п"', '}'] },
+  { name: 'Переименование файлов', fname: 'имена.ps1',
+    facts: [['Что делает', 'Приводит названия сотен файлов к одному виду: дата, номер, понятное имя.'], ['Когда запускается', 'По кнопке, когда нужно навести порядок.'], ['Что на выходе', 'Файлы с единообразными именами и список «было → стало».'], ['Безопасность', 'Список изменений сохраняется, можно вернуть всё обратно.']],
+    code: ['$папка = "C:\\Фото"', '$номер = 1', '', '# Переименовываем по порядку', 'Get-ChildItem $папка -File | Sort-Object LastWriteTime | ForEach-Object {', '  $новое = "{0:000}_{1}" -f $номер, $_.Name', '  "$($_.Name) -> $новое" | Add-Content "$папка\\список.txt"', '  Rename-Item $_.FullName $новое', '  $номер++', '}'] },
+  { name: 'Отчёт о месте на дисках', fname: 'диски.ps1',
+    facts: [['Что делает', 'Проверяет свободное место и предупреждает, пока диск не забился.'], ['Когда запускается', 'Каждое утро.'], ['Что на выходе', 'Короткое сообщение: «Диск C заполнен на 91%».'], ['Безопасность', 'Только читает информацию, ничего не меняет.']],
+    code: ['# Проверяем все диски', 'Get-PSDrive -PSProvider FileSystem | ForEach-Object {', '  $всего = $_.Used + $_.Free', '  if ($всего -gt 0) {', '    $процент = [math]::Round($_.Used / $всего * 100)', '    # Предупреждаем, если почти заполнен', '    if ($процент -gt 85) { "Диск $($_.Name): заполнен на $процент%" }', '  }', '}'] },
+  { name: 'Рабочее место одной кнопкой', fname: 'старт.ps1',
+    facts: [['Что делает', 'Открывает нужные программы, папки и сайты для работы одним нажатием.'], ['Когда запускается', 'Утром, по ярлыку на рабочем столе.'], ['Что на выходе', 'Готовое рабочее место за секунды.'], ['Безопасность', 'Только запускает указанные вами программы.']],
+    code: ['# Программы, папки и сайты для работы', 'Start-Process "excel.exe"', 'Start-Process "explorer.exe" "C:\\Проекты"', 'Start-Process "https://example.com"', '', '# Небольшая пауза между запусками', 'Start-Sleep -Seconds 2'] }
+];
+/* ============================================================ */
+(function(){
+  var $ = function(i){ return document.getElementById(i); };
+  var cur = 0, btns = [];
+  function show(i){
+    cur = i; var z = Z[i];
+    btns.forEach(function(b,k){ b.setAttribute('aria-pressed', k === i); });
+    $('fname').textContent = z.fname;
+    var f = $('facts'); f.textContent = '';
+    z.facts.forEach(function(x){ var d = document.createElement('div'); d.className = 'fact'; var b = document.createElement('b'); b.textContent = x[0]; var p = document.createElement('p'); p.textContent = x[1]; d.appendChild(b); d.appendChild(p); f.appendChild(d); });
+    var pre = $('code'); pre.textContent = '';
+    z.code.forEach(function(line){
+      if (line.replace(/^\s+/,'').charAt(0) === '#') { var s = document.createElement('span'); s.className = 'c'; s.textContent = line; pre.appendChild(s); }
+      else pre.appendChild(document.createTextNode(line));
+      pre.appendChild(document.createTextNode('\n'));
+    });
+  }
+  Z.forEach(function(z,i){ var b = document.createElement('button'); b.type = 'button'; b.textContent = z.name; b.addEventListener('click', function(){ show(i); }); btns.push(b); $('pick').appendChild(b); });
+  $('copy').addEventListener('click', function(){
+    var t = Z[cur].code.join('\n'), b = $('copy');
+    function ok(){ b.textContent = 'Скопировано'; setTimeout(function(){ b.textContent = 'Скопировать'; }, 1600); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, ok); else ok();
+  });
+  show(0);
+})();
+</script>
+</body>
+</html>

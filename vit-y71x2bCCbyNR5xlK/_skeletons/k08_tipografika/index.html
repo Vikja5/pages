@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Скелет 08 — гигантская типографика</title>
+<meta name="description" content="Скелет-заготовка: гигантская типографика. Структура без картинок и фирменных цветов.">
+<link rel="preload" href="../../_fonts/Manrope-ExtraBold.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="../../_fonts/Manrope-Regular.ttf" as="font" type="font/ttf" crossorigin>
+<!--
+СКЕЛЕТ 08: ГИГАНТСКАЯ ТИПОГРАФИКА
+Подходит группам: 6 Креатив и события (премиум: фотограф, студия, агентство), 5 Услуги (запасной для агентств и консалтинга).
+Раскладка: текст и есть дизайн. Огромный заголовок на ширину экрана; фото мало и в «окнах»; список-индекс услуг
+крупными строками (при наведении/нажатии строка раскрывается); бегущая строка; цены строками-таблицей без карточек;
+этапы как огромные номера; одна колонка отзыва на весь экран, листается; вопросы крупными строками;
+форма с полями-«подчёркиваниями»; контакт — гигантская ссылка. Навигация: узкая шапка + меню-оверлей на весь экран.
+Цвет в скелете: светло-серый фон, тёмно-серый текст. Контраст размеров, а не цветов.
+СЛОТЫ (что заменяет субагент под заказ):
+ [ТЕКСТЫ]   все строки в [..]; слово-герой в h1; названия услуг, цены, этапы, отзывы, вопросы
+ [ЦВЕТА]    :root: --bg, --ink, --mute, --line, --accent (одно акцентное пятно: подчёркивание, hover строки)
+ [ФОТО]     блоки .ph («окна» 3:2, 4:5, 16:9): одно в первом экране, по одному в услугах, одно «о мастере»
+ [ЛОГОТИП]  .logo — текстовое имя (набирается тем же шрифтом); при наличии картинки заменить
+ [ШРИФТ]    можно взять один выразительный шрифт для заголовков; Manrope оставлен как запасной
+Интерактив: меню-оверлей, раскрытие строк услуг, листание отзывов, аккордеон вопросов, форма (в демо не отправляется).
+-->
+<style>
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Regular.ttf") format("truetype");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-Bold.ttf") format("truetype");font-weight:700;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("../../_fonts/Manrope-ExtraBold.ttf") format("truetype");font-weight:800 900;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope Fallback";src:local("Arial");size-adjust:102%}
+:root{
+  --bg:#efefef; --ink:#2a2c30; --mute:#6c7079; --line:#c9cbd0; --block:#d9dadd; --accent:#2a2c30; --on-ink:#efefef;
+  --font:"Manrope","Manrope Fallback",Arial,sans-serif; --gut:clamp(16px,4vw,56px);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:18px;line-height:1.5;overflow-x:hidden}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.skip{position:absolute;left:-999px}.skip:focus{left:12px;top:12px;background:var(--ink);color:var(--on-ink);padding:10px 14px;z-index:99}
+.g{padding-inline:var(--gut)}
+section{padding:clamp(56px,9vw,120px) 0}
+.rule{border:0;border-top:2px solid var(--ink);margin:0 var(--gut)}
+.k{font-size:.8rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin:0 0 20px}
+
+/* гигантские размеры */
+.mega{font-size:clamp(2.6rem,12.5vw,15rem);line-height:.88;letter-spacing:-.055em;font-weight:900;margin:0;overflow-wrap:anywhere}
+.big{font-size:clamp(2.2rem,7.5vw,6.5rem);line-height:.95;letter-spacing:-.045em;font-weight:900;margin:0 0 28px;overflow-wrap:anywhere}
+.med{font-size:clamp(1.3rem,2.6vw,2.2rem);line-height:1.15;letter-spacing:-.02em;font-weight:700;margin:0}
+.lead{font-size:clamp(1.05rem,1.8vw,1.4rem);max-width:48ch;color:var(--mute);margin:0}
+
+.btn{display:inline-flex;align-items:center;gap:14px;min-height:60px;padding:0 30px;border:2px solid var(--ink);border-radius:999px;background:var(--ink);color:var(--on-ink);font:800 1.05rem var(--font);text-decoration:none;cursor:pointer;white-space:nowrap}
+.btn:hover{background:transparent;color:var(--ink)}
+.btn.o{background:transparent;color:var(--ink)}.btn.o:hover{background:var(--ink);color:var(--on-ink)}
+.ph{background:var(--block);border:1px dashed #9a9da5;display:grid;place-items:center;text-align:center;padding:12px;color:var(--mute);font-size:.9rem;width:100%}
+.r32{aspect-ratio:3/2}.r45{aspect-ratio:4/5}.r169{aspect-ratio:16/9}
+
+/* шапка и оверлей-меню */
+.top{position:sticky;top:0;z-index:30;background:var(--bg);border-bottom:2px solid var(--ink)}
+.top .g{display:flex;align-items:center;justify-content:space-between;height:60px;gap:16px}
+.logo{font-weight:900;letter-spacing:-.03em;font-size:1.25rem;text-decoration:none;white-space:nowrap}
+.top .tel{margin-left:auto;font-weight:700;text-decoration:none;white-space:nowrap;display:none}
+.menu-b{height:44px;padding:0 18px;border:2px solid var(--ink);border-radius:999px;background:transparent;font:800 .9rem var(--font);cursor:pointer;text-transform:uppercase;letter-spacing:.08em;color:var(--ink)}
+.overlay{position:fixed;inset:0;z-index:40;background:var(--ink);color:var(--on-ink);display:none;flex-direction:column;padding:16px var(--gut) 24px;overflow:auto}
+.overlay.open{display:flex}
+.overlay .x{align-self:flex-end;height:44px;padding:0 18px;border:2px solid var(--on-ink);border-radius:999px;background:transparent;color:var(--on-ink);font:800 .9rem var(--font);cursor:pointer;text-transform:uppercase;letter-spacing:.08em}
+.overlay a{font-size:clamp(2.2rem,9vw,5.5rem);font-weight:900;letter-spacing:-.04em;line-height:1.08;text-decoration:none;border-bottom:1px solid #55585f;padding:6px 0}
+.overlay a:hover{padding-left:16px}
+.overlay a small{font-size:.9rem;letter-spacing:.1em;color:#9a9da5;margin-right:14px;font-weight:700;vertical-align:top}
+
+/* hero */
+.hero{padding:clamp(28px,5vw,64px) 0 0}
+.hero .meta{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--gut);align-items:end;margin-top:clamp(24px,4vw,56px)}
+.hero .meta .ph{min-height:0}
+.hero .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
+.tick{margin-top:clamp(36px,6vw,80px);border-block:2px solid var(--ink);overflow:hidden;white-space:nowrap;padding:12px 0}
+.tick div{display:inline-block;animation:m 30s linear infinite;font-size:clamp(1.4rem,3.4vw,2.6rem);font-weight:900;letter-spacing:-.03em;text-transform:uppercase}
+.tick span{padding:0 .6em}
+@keyframes m{to{transform:translateX(-50%)}}
+
+/* услуги: индекс-строки */
+.idx{list-style:none;margin:0;padding:0;border-top:2px solid var(--ink)}
+.idx li{border-bottom:2px solid var(--ink)}
+.idx button{width:100%;display:grid;grid-template-columns:clamp(46px,7vw,110px) minmax(0,1fr) auto;gap:clamp(8px,2vw,28px);align-items:baseline;text-align:left;background:transparent;border:0;padding:clamp(14px,2.2vw,28px) 0;color:var(--ink);font-family:var(--font);cursor:pointer}
+.idx .n{font-weight:700;color:var(--mute);font-size:1rem}
+.idx .t{font-size:clamp(1.7rem,6vw,5rem);font-weight:900;letter-spacing:-.045em;line-height:1;overflow-wrap:anywhere}
+.idx .p{font-weight:700;white-space:nowrap}
+.idx button:hover .t,.idx button[aria-expanded=true] .t{text-decoration:underline;text-decoration-thickness:.06em;text-underline-offset:.1em}
+.idx .more{display:none;grid-template-columns:clamp(46px,7vw,110px) minmax(0,1fr) minmax(0,1fr);gap:clamp(8px,2vw,28px);padding:0 0 clamp(18px,3vw,36px)}
+.idx .more.open{display:grid}
+.idx .more p{grid-column:2;margin:0;color:var(--mute);max-width:46ch}
+.idx .more .ph{grid-column:3;grid-row:1/3}
+
+/* о себе: две асимметричные колонки */
+.about{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:var(--gut);align-items:start}
+.about .ph{min-height:0}
+.about p{margin:0 0 18px;max-width:52ch}
+
+/* цены: строки-таблица */
+.rows{border-top:2px solid var(--ink)}
+.row{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,5fr) minmax(0,2.4fr);gap:clamp(8px,2vw,28px);align-items:baseline;padding:clamp(18px,2.6vw,34px) 0;border-bottom:2px solid var(--ink)}
+.row .a{font-size:clamp(1.5rem,3.6vw,3rem);font-weight:900;letter-spacing:-.035em;line-height:1}
+.row .b{color:var(--mute)}
+.row .c{font-size:clamp(1.4rem,3vw,2.4rem);font-weight:900;letter-spacing:-.03em;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.row.hit{background:var(--ink);color:var(--on-ink);margin-inline:calc(var(--gut)*-1);padding-inline:var(--gut)}
+.row.hit .b{color:#b6b9c0}
+.note{margin:16px 0 0;color:var(--mute);font-size:.95rem}
+
+/* этапы: огромные номера */
+.st{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--gut);border-top:2px solid var(--ink);padding-top:20px}
+.st .num{font-size:clamp(4rem,12vw,10rem);font-weight:900;letter-spacing:-.07em;line-height:.85;margin:0 0 14px}
+.st h3{font-size:1.25rem;margin:0 0 6px;font-weight:800}
+.st p{margin:0;color:var(--mute)}
+
+/* отзывы: один за раз */
+.q{border-block:2px solid var(--ink)}
+.q blockquote{margin:0;font-size:clamp(1.6rem,5vw,4rem);line-height:1.05;letter-spacing:-.035em;font-weight:800;min-height:4.4em}
+.q .who{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center;justify-content:space-between;margin-top:28px}
+.q .who span{color:var(--mute);font-weight:600}
+.mark{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--ink);padding:1px 8px;border-radius:999px;margin-right:8px;color:var(--ink)}
+.arrows{display:flex;gap:10px;align-items:center}
+.arrows button{width:56px;height:56px;border:2px solid var(--ink);border-radius:50%;background:transparent;color:var(--ink);cursor:pointer;display:grid;place-items:center}
+.arrows button:hover{background:var(--ink);color:var(--on-ink)}
+.arrows output{font-weight:800;min-width:60px;text-align:center;font-variant-numeric:tabular-nums}
+
+/* вопросы */
+details{border-bottom:2px solid var(--ink)}
+details:first-of-type{border-top:2px solid var(--ink)}
+summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:clamp(16px,2.4vw,30px) 0;font-size:clamp(1.3rem,3.4vw,2.6rem);font-weight:900;letter-spacing:-.035em;line-height:1.05}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:1.2em;font-weight:400}
+details[open] summary::after{content:"−"}
+details p{margin:0 0 24px;max-width:60ch;color:var(--mute);font-size:1.1rem}
+
+/* форма и контакт */
+.big-link{display:block;font-size:clamp(1.7rem,7vw,6rem);font-weight:900;letter-spacing:-.05em;line-height:1;text-decoration:none;overflow-wrap:anywhere;border-bottom:3px solid var(--ink);padding-bottom:10px;margin-bottom:clamp(28px,5vw,60px)}
+.big-link:hover{background:var(--ink);color:var(--on-ink)}
+.fgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--gut);align-items:start}
+form{display:grid;gap:22px}
+label.f{display:grid;gap:4px;font-weight:700;font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+input[type=text],input[type=tel],select{font:700 clamp(1.2rem,2.4vw,1.8rem) var(--font);letter-spacing:-.02em;color:var(--ink);background:transparent;border:0;border-bottom:2px solid var(--ink);padding:10px 0;width:100%;min-height:52px;border-radius:0;text-transform:none}
+input::placeholder{color:#a6a9b0}
+input:focus,select:focus{outline:none;border-bottom-width:5px}
+.agree{display:flex;gap:12px;align-items:flex-start;font-size:.9rem;color:var(--mute);text-transform:none;letter-spacing:0;font-weight:400}
+.agree input{width:24px;height:24px;margin-top:2px;flex:none;accent-color:#2a2c30}
+.err{color:#7a2a2a;font-size:.9rem;min-height:1.2em}
+#ok{display:none;margin:0;padding:14px 18px;border:2px solid var(--ink);font-weight:700}
+.info{display:grid;gap:18px;font-style:normal}
+.info div{border-top:2px solid var(--ink);padding-top:10px}
+.info b{display:block;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.info span,.info a{font-size:1.25rem;font-weight:700}
+footer{border-top:2px solid var(--ink);padding:28px 0 110px;font-size:.92rem;color:var(--mute)}
+footer .g{display:flex;flex-wrap:wrap;gap:10px 28px;justify-content:space-between}
+.dock{display:none}
+
+@media (min-width:1100px){.top .tel{display:inline}}
+@media (max-width:900px){
+  .hero .meta,.about,.fgrid{grid-template-columns:minmax(0,1fr)}
+  .st{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:36px}
+  .row{grid-template-columns:minmax(0,1fr) auto}
+  .row .b{grid-column:1/-1;order:3}
+  .idx button{grid-template-columns:46px minmax(0,1fr)}
+  .idx .p{grid-column:2}
+  .idx .more{grid-template-columns:46px minmax(0,1fr)}
+  .idx .more .ph{grid-column:2;grid-row:auto}
+  .dock{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:25;gap:10px;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:var(--bg);border-top:2px solid var(--ink)}
+  .dock .btn{flex:1;justify-content:center;min-height:54px;padding:0 14px}
+}
+@media (max-width:430px){.st{grid-template-columns:minmax(0,1fr)}.btn{padding:0 22px}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.tick div{animation:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#zayavka">К заявке</a>
+
+<header class="top">
+  <div class="g">
+    <a class="logo" href="#top">[ЛОГОТИП / Имя]</a>
+    <a class="tel" href="tel:+70000000000">+7 000 000-00-00</a>
+    <button class="menu-b" id="open" aria-expanded="false" aria-controls="ov">Меню</button>
+  </div>
+</header>
+
+<nav class="overlay" id="ov" aria-label="Разделы" hidden>
+  <button class="x" id="close" type="button">Закрыть</button>
+  <a href="#uslugi"><small>01</small>Услуги</a>
+  <a href="#o-sebe"><small>02</small>О себе</a>
+  <a href="#ceny"><small>03</small>Цены</a>
+  <a href="#kak"><small>04</small>Как работаем</a>
+  <a href="#otzyvy"><small>05</small>Отзывы</a>
+  <a href="#voprosy"><small>06</small>Вопросы</a>
+  <a href="#zayavka"><small>07</small>Связаться</a>
+</nav>
+
+<main id="top">
+<!-- 1. ПЕРВЫЙ ЭКРАН -->
+<section class="hero" style="padding-bottom:0">
+  <div class="g">
+    <p class="k">[Подпись: ниша · город · год]</p>
+    <h1 class="mega">[Слово-герой]<br>[Оффер]</h1>
+    <div class="meta">
+      <div>
+        <p class="lead">[Подзаголовок: для кого и что получит клиент, 1–2 предложения]</p>
+        <div class="cta"><a class="btn" href="#zayavka">[Главная кнопка]</a><a class="btn o" href="#ceny">[Цены]</a></div>
+      </div>
+      <div class="ph r169">фото: один сильный кадр «окном», без текста поверх</div>
+    </div>
+  </div>
+  <div class="tick" aria-hidden="true"><div><span>[Слово 1]</span><span>/</span><span>[Слово 2]</span><span>/</span><span>[Слово 3]</span><span>/</span><span>[Слово 4]</span><span>/</span><span>[Слово 1]</span><span>/</span><span>[Слово 2]</span><span>/</span><span>[Слово 3]</span><span>/</span><span>[Слово 4]</span><span>/</span></div></div>
+</section>
+
+<!-- 2. УСЛУГИ: индекс -->
+<section id="uslugi">
+  <div class="g">
+    <p class="k">01 — Услуги</p>
+    <h2 class="big">[Заголовок: что делаем]</h2>
+    <ul class="idx" id="idx">
+      <li><button type="button" aria-expanded="false"><span class="n">01</span><span class="t">[Услуга 1]</span><span class="p">от [000] ₽</span></button>
+        <div class="more"><p>[Описание услуги: 2–3 предложения, что входит, срок]</p><div class="ph r32">фото: услуга 1</div></div></li>
+      <li><button type="button" aria-expanded="false"><span class="n">02</span><span class="t">[Услуга 2]</span><span class="p">от [000] ₽</span></button>
+        <div class="more"><p>[Описание услуги: 2–3 предложения]</p><div class="ph r32">фото: услуга 2</div></div></li>
+      <li><button type="button" aria-expanded="false"><span class="n">03</span><span class="t">[Услуга 3]</span><span class="p">от [000] ₽</span></button>
+        <div class="more"><p>[Описание услуги: 2–3 предложения]</p><div class="ph r32">фото: услуга 3</div></div></li>
+      <li><button type="button" aria-expanded="false"><span class="n">04</span><span class="t">[Услуга 4]</span><span class="p">от [000] ₽</span></button>
+        <div class="more"><p>[Описание услуги: 2–3 предложения]</p><div class="ph r32">фото: услуга 4</div></div></li>
+    </ul>
+  </div>
+</section>
+
+<!-- 3. О СЕБЕ / О КОМАНДЕ -->
+<section id="o-sebe" style="padding-top:0">
+  <div class="g about">
+    <div class="ph r45">фото: портрет мастера или команды</div>
+    <div>
+      <p class="k">02 — О себе</p>
+      <h2 class="big">[Заголовок: кто вы одной строкой]</h2>
+      <p class="med" style="margin-bottom:22px">[Главная мысль о подходе: 1 предложение крупно]</p>
+      <p>[Абзац о себе: опыт, подход, чем отличаетесь. Без выдуманных цифр, только факты заказчика]</p>
+      <p>[Второй абзац: оборудование, принципы, город работы]</p>
+    </div>
+  </div>
+</section>
+
+<!-- 4. ЦЕНЫ -->
+<section id="ceny" style="padding-top:0">
+  <div class="g">
+    <p class="k">03 — Цены</p>
+    <h2 class="big">[Заголовок: пакеты и стоимость]</h2>
+    <div class="rows">
+      <div class="row"><span class="a">[Пакет 1]</span><span class="b">[Что входит: 1 строка]</span><span class="c">[000] ₽</span></div>
+      <div class="row hit"><span class="a">[Пакет 2]</span><span class="b">[Что входит: 1 строка. Метка: чаще выбирают]</span><span class="c">[000] ₽</span></div>
+      <div class="row"><span class="a">[Пакет 3]</span><span class="b">[Что входит: 1 строка]</span><span class="c">[000] ₽</span></div>
+    </div>
+    <p class="note">[Условия: предоплата, сроки, что оплачивается отдельно. Цены условные]</p>
+  </div>
+</section>
+
+<!-- 5. КАК РАБОТАЕМ -->
+<section id="kak" style="padding-top:0">
+  <div class="g">
+    <p class="k">04 — Как работаем</p>
+    <h2 class="big">[Заголовок: четыре шага]</h2>
+    <div class="st">
+      <div><p class="num">1</p><h3>[Шаг 1]</h3><p>[Описание шага]</p></div>
+      <div><p class="num">2</p><h3>[Шаг 2]</h3><p>[Описание шага]</p></div>
+      <div><p class="num">3</p><h3>[Шаг 3]</h3><p>[Описание шага]</p></div>
+      <div><p class="num">4</p><h3>[Шаг 4]</h3><p>[Описание шага]</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. ОТЗЫВЫ: один на экран -->
+<section id="otzyvy" style="padding-top:0">
+  <div class="g">
+    <p class="k">05 — Отзывы</p>
+    <div class="q" style="padding:clamp(28px,5vw,64px) 0">
+      <blockquote id="qt">[Текст отзыва]</blockquote>
+      <div class="who">
+        <span id="qw"><span class="mark">пример</span>[Имя, проект]</span>
+        <div class="arrows">
+          <button type="button" id="qp" aria-label="Предыдущий отзыв"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+          <output id="qc">1 / 3</output>
+          <button type="button" id="qn" aria-label="Следующий отзыв"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. ВОПРОСЫ -->
+<section id="voprosy" style="padding-top:0">
+  <div class="g">
+    <p class="k">06 — Вопросы</p>
+    <h2 class="big">[Заголовок: частые вопросы]</h2>
+    <details><summary>[Вопрос 1: сроки]</summary><p>[Ответ 1–3 предложения]</p></details>
+    <details><summary>[Вопрос 2: предоплата]</summary><p>[Ответ]</p></details>
+    <details><summary>[Вопрос 3: что нужно от меня]</summary><p>[Ответ]</p></details>
+    <details><summary>[Вопрос 4: правки и возврат]</summary><p>[Ответ]</p></details>
+  </div>
+</section>
+
+<!-- 8. ЗАЯВКА И КОНТАКТЫ -->
+<section id="zayavka" style="padding-top:0">
+  <div class="g">
+    <p class="k">07 — Связаться</p>
+    <a class="big-link" href="tel:+70000000000">+7 000 000-00-00</a>
+    <div class="fgrid">
+      <form id="form" novalidate>
+        <h2 class="med">[Заголовок формы: расскажите о задаче]</h2>
+        <label class="f">Имя<input type="text" name="name" autocomplete="name" required minlength="2" placeholder="[Как к вам обращаться]"></label>
+        <label class="f">Телефон<input type="tel" name="phone" autocomplete="tel" required pattern="\+?[0-9\s\(\)\-]{10,}" placeholder="+7 000 000-00-00"></label>
+        <label class="f">[Вопрос по задаче]<select name="topic"><option>[Вариант 1]</option><option>[Вариант 2]</option><option>[Вариант 3]</option></select></label>
+        <label class="agree"><input type="checkbox" name="agree" required><span>Согласен на обработку персональных данных. [Ссылка на политику: в демо условная]</span></label>
+        <div class="err" id="err" role="alert"></div>
+        <div><button class="btn" type="submit">[Кнопка: отправить]</button></div>
+        <p id="ok" role="status">Демо: заявка не отправляется. В рабочем сайте здесь подтверждение.</p>
+      </form>
+      <address class="info">
+        <div><b>Телефон</b><a href="tel:+70000000000">+7 000 000-00-00</a></div>
+        <div><b>Почта</b><a href="mailto:hello@example.com">[почта@пример.рф]</a></div>
+        <div><b>Адрес</b><span>[Город, улица, дом]</span></div>
+        <div><b>Часы</b><span>[Пн–Вс, 00:00–00:00]</span></div>
+        <div><b>Соцсети</b><span>[Telegram / VK / Instagram]</span></div>
+      </address>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer><div class="g"><span>[Название] · [реквизиты условные]</span><a href="#">Политика конфиденциальности [условная]</a><span>Демо / пример работы</span></div></footer>
+<div class="dock"><a class="btn o" href="tel:+70000000000">Позвонить</a><a class="btn" href="#zayavka">[Главная кнопка]</a></div>
+
+<script>
+(function(){
+  /* меню-оверлей */
+  var ov=document.getElementById('ov'),op=document.getElementById('open');
+  function set(o){ov.hidden=!o;ov.classList.toggle('open',o);op.setAttribute('aria-expanded',o);document.body.style.overflow=o?'hidden':''}
+  op.onclick=function(){set(true)};
+  document.getElementById('close').onclick=function(){set(false)};
+  ov.addEventListener('click',function(e){if(e.target.tagName==='A')set(false)});
+  addEventListener('keydown',function(e){if(e.key==='Escape')set(false)});
+
+  /* услуги: раскрытие строк */
+  document.querySelectorAll('#idx button').forEach(function(b){b.addEventListener('click',function(){
+    var m=b.parentNode.querySelector('.more'),o=!m.classList.contains('open');
+    m.classList.toggle('open',o);b.setAttribute('aria-expanded',o);
+  })});
+
+  /* отзывы: ДАННЫЕ заменить под заказ */
+  var R=[
+    ['[Отзыв 1: 1–2 предложения крупным шрифтом]','[Имя, проект]'],
+    ['[Отзыв 2: 1–2 предложения]','[Имя, проект]'],
+    ['[Отзыв 3: 1–2 предложения]','[Имя, проект]']
+  ],i=0,qt=document.getElementById('qt'),qw=document.getElementById('qw'),qc=document.getElementById('qc');
+  function q(){
+    qt.textContent=R[i][0];
+    qw.textContent='';var m=document.createElement('span');m.className='mark';m.textContent='пример';qw.appendChild(m);qw.appendChild(document.createTextNode(R[i][1]));
+    qc.textContent=(i+1)+' / '+R.length;
+  }
+  document.getElementById('qn').onclick=function(){i=(i+1)%R.length;q()};
+  document.getElementById('qp').onclick=function(){i=(i-1+R.length)%R.length;q()};
+  q();
+
+  /* форма (демо) */
+  var f=document.getElementById('form'),err=document.getElementById('err'),ok=document.getElementById('ok');
+  f.addEventListener('submit',function(e){
+    e.preventDefault();ok.style.display='none';
+    if(!f.checkValidity()){err.textContent='Проверьте имя, телефон (не меньше 10 цифр) и отметьте согласие.';return}
+    err.textContent='';ok.style.display='block';f.reset();
+  });
+})();
+</script>
+</body>
+</html>
