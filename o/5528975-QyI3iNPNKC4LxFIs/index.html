@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Дашборд затрат по АЗС</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f4f6f9;--card:#fff;--ink:#1c2430;--mute:#6b7685;--line:#e3e8ef;--brand:#2b6cb0;--brand2:#9cc3ea;--good:#2f855a;--warn:#d69e2e;--bad:#c53030;--badbg:#fdecec;--warnbg:#fff7e0}
+@media (prefers-color-scheme:dark){:root{--bg:#10151c;--card:#18202a;--ink:#e8edf3;--mute:#93a0b1;--line:#2a3441;--brand:#63a4e8;--brand2:#2f5d8c;--good:#48bb78;--warn:#ecc94b;--bad:#fc8181;--badbg:#3a1f22;--warnbg:#3a321a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1200px;margin:0 auto;padding:20px 16px 48px}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:14px}
+h1{font-size:22px;margin:0}
+.demo{font-size:13px;color:var(--mute)}
+.filters{display:flex;flex-wrap:wrap;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:14px}
+.filters label{display:flex;flex-direction:column;font-size:12px;color:var(--mute);gap:3px;min-width:130px;flex:1}
+select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 8px}
+button{font:inherit;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:7px 14px;cursor:pointer;align-self:flex-end}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.kpi .l{font-size:12px;color:var(--mute)}.kpi .v{font-size:24px;font-weight:700;margin-top:2px}.kpi .s{font-size:12px;color:var(--mute)}
+.kpi.bad{background:var(--badbg);border-color:var(--bad)}.kpi.bad .v{color:var(--bad)}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(12,1fr);margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0}
+.card h2{font-size:15px;margin:0 0 2px}.card p{margin:0 0 10px;font-size:12px;color:var(--mute)}
+.c12{grid-column:span 12}.c8{grid-column:span 8}.c7{grid-column:span 7}.c6{grid-column:span 6}.c5{grid-column:span 5}.c4{grid-column:span 4}
+@media(max-width:860px){.c8,.c7,.c6,.c5,.c4{grid-column:span 12}}
+.chart{position:relative;height:290px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;color:var(--mute);font-weight:600;font-size:12px;border-bottom:1px solid var(--line);padding:6px 6px}
+td{padding:7px 6px;border-bottom:1px solid var(--line)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.red td{background:var(--badbg);color:var(--bad);font-weight:600}
+tr.amb td{background:var(--warnbg)}
+.bar{height:6px;background:var(--line);border-radius:4px;overflow:hidden;min-width:70px}.bar i{display:block;height:100%;background:var(--good)}
+.bar.w i{background:var(--warn)}.bar.b i{background:var(--bad)}
+.fc{display:flex;flex-direction:column;gap:6px;height:100%;justify-content:center}
+.fc .big{font-size:30px;font-weight:800}.fc .big.bad{color:var(--bad)}.fc .big.good{color:var(--good)}
+.scroll{max-height:330px;overflow:auto}
+.note{font-size:12px;color:var(--mute);margin-top:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><h1>Затраты по АЗС: аналитика</h1><div class="demo">Демо на условных данных · 2026 год</div></header>
+
+<div class="filters">
+<label>Месяц с<select id="fFrom"></select></label>
+<label>Месяц по<select id="fTo"></select></label>
+<label>АЗС<select id="fAzs"></select></label>
+<label>Регион<select id="fReg"></select></label>
+<label>Исполнитель<select id="fEx"></select></label>
+<label>Вид работ<select id="fWt"></select></label>
+<button id="reset">Сбросить</button>
+</div>
+
+<div class="kpis" id="kpis"></div>
+
+<div class="grid">
+<div class="card c8"><h2>Факт и смета по месяцам</h2><p>Столбики — за месяц, линия — накопленный перерасход (факт минус смета) с начала периода</p><div class="chart"><canvas id="chMonth"></canvas></div></div>
+<div class="card c4"><div class="fc" id="forecast"></div></div>
+
+<div class="card c6"><h2>Топ-10 АЗС по перерасходу</h2><p>Где факт больше сметы сильнее всего</p><div class="chart"><canvas id="chTop"></canvas></div></div>
+<div class="card c6"><h2>Ранний сигнал: смета почти исчерпана</h2><p>АЗС, использовавшие 80% сметы и больше (красные — уже перерасход)</p><div class="scroll"><table id="tWarn"></table></div></div>
+
+<div class="card c5"><h2>На что уходят деньги</h2><p>Структура затрат по видам работ</p><div class="chart"><canvas id="chWt"></canvas></div></div>
+<div class="card c7"><h2>Исполнители</h2><p>Заявок, сумма, средний чек, средний срок закрытия</p><div class="scroll"><table id="tEx"></table></div></div>
+
+<div class="card c6"><h2>Частые повторные заявки</h2><p>АЗС с наибольшим числом заявок: возможна системная проблема оборудования</p><div class="scroll"><table id="tRep"></table></div></div>
+<div class="card c6"><h2>По регионам</h2><p>Факт и смета по регионам</p><div class="chart"><canvas id="chReg"></canvas></div></div>
+
+<div class="card c12"><h2>Все АЗС</h2><p>Красная строка — факт больше сметы. Сортировка по перерасходу</p><div class="scroll" style="max-height:420px"><table id="tAll"></table></div></div>
+</div>
+<div class="note">Все данные на странице вымышленные: показывают, как будет выглядеть дашборд на ваших заявках. В рабочей таблице он строится из листа «Заявки» и обновляется сам.</div>
+</div>
+
+<script>
+// ---------- условные данные (детерминированно) ----------
+let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646};
+const MN=["Янв","Фев","Мар","Апр","Май","Июн","Июл","Авг","Сен","Окт","Ноя","Дек"];
+const REG=["Север","Юг","Запад","Восток","Центр"];
+const WT=["Замена оборудования","Ремонт ТРК","Обслуживание","Электрика","Кровля и фасад","Благоустройство"];
+const WTW=[.12,.26,.3,.14,.1,.08], WTC=[1.8,1.2,.5,.8,2.2,1.3];
+const EX=["Иванов И.И.","Петров П.С.","Сидорова А.В.","Кузнецов Д.А.","ООО «СервисПлюс»","ИП Морозов"];
+const STR=["Заводская","Лесная","Мира","Советская","Садовая","Новая","Южная","Речная"];
+const azsList=[];
+for(let i=0;i<40;i++)azsList.push({n:1001+i,reg:REG[i%5],addr:"ул. "+STR[i%8]+", "+(3+i*2),bias:.78+rnd()*.5,hot:i%9===3?4:1});
+const pickW=(w)=>{let r=rnd()*w.reduce((a,b)=>a+b),i=0;while(r>w[i]){r-=w[i];i++}return i};
+const rows=[];
+for(let m=0;m<11;m++){const cnt=m<10?26:11;
+ for(let k=0;k<cnt;k++){
+  const a=azsList[pickW(azsList.map(x=>x.hot))];const w=pickW(WTW);
+  const smeta=Math.round((8000+rnd()*14000)*WTC[w]/100)*100;
+  const exi=Math.floor(rnd()*6);const exb=exi===3||exi===5?1.12:.97;
+  const fact=Math.round(smeta*a.bias*exb*(.85+rnd()*.3)/100)*100;
+  const day=1+Math.floor(rnd()*26);const dur=1+Math.floor(rnd()*(exi===4?6:13));
+  rows.push({azs:a.n,addr:a.addr,reg:a.reg,wt:WT[w],ex:EX[exi],m,fact,smeta,dur});
+ }}
+// ---------- состояние / фильтры ----------
+const $=id=>document.getElementById(id);
+const fmt=n=>Math.round(n).toLocaleString("ru-RU")+" ₽";
+const pct=n=>Math.round(n)+"%";
+function fillSel(id,arr,all){const s=$(id);s.innerHTML=arr.map(([v,t])=>`<option value="${v}">${t}</option>`).join("");}
+fillSel("fFrom",MN.slice(0,11).map((t,i)=>[i,t]));fillSel("fTo",MN.slice(0,11).map((t,i)=>[i,t]));
+$("fTo").value=10;
+fillSel("fAzs",[["","Все АЗС"],...azsList.map(a=>[a.n,"АЗС "+a.n+" · "+a.addr])]);
+fillSel("fReg",[["","Все регионы"],...REG.map(r=>[r,r])]);
+fillSel("fEx",[["","Все исполнители"],...EX.map(r=>[r,r])]);
+fillSel("fWt",[["","Все виды работ"],...WT.map(r=>[r,r])]);
+["fFrom","fTo","fAzs","fReg","fEx","fWt"].forEach(i=>$(i).addEventListener("change",render));
+$("reset").onclick=()=>{["fAzs","fReg","fEx","fWt"].forEach(i=>$(i).value="");$("fFrom").value=0;$("fTo").value=10;render()};
+const sum=(a,f)=>a.reduce((s,x)=>s+f(x),0);
+const group=(a,key)=>{const o={};a.forEach(x=>{(o[x[key]]=o[x[key]]||[]).push(x)});return o};
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const charts={};
+function draw(id,cfg){if(charts[id])charts[id].destroy();charts[id]=new Chart($(id),cfg)}
+const opt={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:css("--ink")}}},scales:{x:{ticks:{color:css("--mute")},grid:{display:false}},y:{ticks:{color:css("--mute"),callback:v=>(v/1000)+" т"},grid:{color:css("--line")}}}};
+const barCls=p=>p>100?"b":p>=80?"w":"";
+
+function render(){
+ const from=+$("fFrom").value,to=+$("fTo").value,a=$("fAzs").value,rg=$("fReg").value,ex=$("fEx").value,wt=$("fWt").value;
+ const d=rows.filter(r=>r.m>=from&&r.m<=to&&(!a||r.azs==a)&&(!rg||r.reg===rg)&&(!ex||r.ex===ex)&&(!wt||r.wt===wt));
+ const F=sum(d,r=>r.fact),S=sum(d,r=>r.smeta),over=F-S;
+ const avgDur=d.length?sum(d,r=>r.dur)/d.length:0;
+ $("kpis").innerHTML=[
+  ["Затраты (факт)",fmt(F),"за выбранный период",""],
+  ["Затраты по смете",fmt(S),"за выбранный период",""],
+  [over>0?"Перерасход":"Экономия",fmt(Math.abs(over)),over>0?"факт выше сметы":"факт ниже сметы",over>0?"bad":""],
+  ["Смета использована",S?pct(F/S*100):"—","",S&&F>S?"bad":""],
+  ["Заявок",d.length,"средний чек "+fmt(d.length?F/d.length:0),""],
+  ["Средний срок закрытия",avgDur.toFixed(1)+" дн.","от открытия до закрытия",""]
+ ].map(([l,v,s,c])=>`<div class="kpi ${c}"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join("");
+
+ // по месяцам
+ const ms=[];for(let m=from;m<=to;m++)ms.push(m);
+ const mf=ms.map(m=>sum(d.filter(r=>r.m===m),r=>r.fact)),mS=ms.map(m=>sum(d.filter(r=>r.m===m),r=>r.smeta));
+ let acc=0;const cum=ms.map((m,i)=>acc+=mf[i]-mS[i]);
+ draw("chMonth",{data:{labels:ms.map(m=>MN[m]),datasets:[
+  {type:"bar",label:"Факт",data:mf,backgroundColor:css("--brand"),borderRadius:4,order:2},
+  {type:"bar",label:"Смета",data:mS,backgroundColor:css("--brand2"),borderRadius:4,order:2},
+  {type:"line",label:"Накопленный перерасход",data:cum,borderColor:css("--bad"),backgroundColor:css("--bad"),tension:.25,yAxisID:"y2",order:1}]},
+  options:{...opt,scales:{...opt.scales,y2:{position:"right",ticks:{color:css("--bad"),callback:v=>(v/1000)+" т"},grid:{display:false}}}}});
+
+ // прогноз
+ const full=rows.filter(r=>(!a||r.azs==a)&&(!rg||r.reg===rg)&&(!ex||r.ex===ex)&&(!wt||r.wt===wt));
+ const fy=sum(full,r=>r.fact),sy=sum(full,r=>r.smeta);
+ const fcF=fy/11*12,fcS=sy/11*12,fo=fcF-fcS;
+ $("forecast").innerHTML=`<div class="l" style="color:var(--mute);font-size:12px">Прогноз на конец года (по темпу с января)</div>
+  <div class="big ${fo>0?"bad":"good"}">${fo>0?"+":"−"}${fmt(Math.abs(fo))}</div>
+  <div>${fo>0?"ожидаемый перерасход":"ожидаемая экономия"}</div>
+  <div style="color:var(--mute);font-size:13px">Факт за год ≈ ${fmt(fcF)}<br>Смета за год ≈ ${fmt(fcS)}</div>
+  <div style="color:var(--mute);font-size:12px">Считается по всем месяцам года с учётом фильтров АЗС, региона, исполнителя и вида работ.</div>`;
+
+ // по АЗС
+ const ga=Object.entries(group(d,"azs")).map(([n,r])=>{const f=sum(r,x=>x.fact),s=sum(r,x=>x.smeta);return{n,addr:r[0].addr,reg:r[0].reg,cnt:r.length,f,s,o:f-s,p:s?f/s*100:0}});
+ const top=[...ga].filter(x=>x.o>0).sort((x,y)=>y.o-x.o).slice(0,10);
+ draw("chTop",{type:"bar",data:{labels:top.map(x=>"АЗС "+x.n),datasets:[{label:"Перерасход",data:top.map(x=>x.o),backgroundColor:css("--bad"),borderRadius:4}]},options:{...opt,indexAxis:"y",plugins:{legend:{display:false}},scales:{x:{ticks:{color:css("--mute"),callback:v=>(v/1000)+" т"},grid:{color:css("--line")}},y:{ticks:{color:css("--ink")},grid:{display:false}}}}});
+ const warn=ga.filter(x=>x.p>=80).sort((x,y)=>y.p-x.p);
+ $("tWarn").innerHTML=`<tr><th>АЗС</th><th class="n">Факт / смета</th><th>Использовано</th></tr>`+(warn.length?warn.map(x=>`<tr class="${x.p>100?"red":"amb"}"><td>${x.n}<br><span style="font-weight:400;color:var(--mute);font-size:12px">${x.addr}</span></td><td class="n">${fmt(x.f)}<br>${fmt(x.s)}</td><td><div class="bar ${barCls(x.p)}"><i style="width:${Math.min(x.p,100)}%"></i></div>${pct(x.p)}</td></tr>`).join(""):`<tr><td colspan="3">Таких АЗС нет</td></tr>`);
+
+ // виды работ
+ const gw=Object.entries(group(d,"wt")).map(([k,r])=>[k,sum(r,x=>x.fact)]).sort((x,y)=>y[1]-x[1]);
+ draw("chWt",{type:"doughnut",data:{labels:gw.map(x=>x[0]),datasets:[{data:gw.map(x=>x[1]),backgroundColor:["#2b6cb0","#63a4e8","#38a169","#d69e2e","#dd6b20","#805ad5"],borderColor:css("--card")}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"right",labels:{color:css("--ink")}},tooltip:{callbacks:{label:c=>c.label+": "+fmt(c.parsed)}}}}});
+
+ // исполнители
+ const ge=Object.entries(group(d,"ex")).map(([k,r])=>{const f=sum(r,x=>x.fact),s=sum(r,x=>x.smeta);return{k,c:r.length,f,s,avg:f/r.length,dur:sum(r,x=>x.dur)/r.length,p:s?f/s*100:0}}).sort((x,y)=>y.f-x.f);
+ $("tEx").innerHTML=`<tr><th>Исполнитель</th><th class="n">Заявок</th><th class="n">Сумма</th><th class="n">Ср. чек</th><th class="n">Срок, дн.</th><th class="n">К смете</th></tr>`+ge.map(x=>`<tr class="${x.p>100?"red":""}"><td>${x.k}</td><td class="n">${x.c}</td><td class="n">${fmt(x.f)}</td><td class="n">${fmt(x.avg)}</td><td class="n">${x.dur.toFixed(1)}</td><td class="n">${pct(x.p)}</td></tr>`).join("");
+
+ // повторные
+ const rep=[...ga].sort((x,y)=>y.cnt-x.cnt).slice(0,8);
+ $("tRep").innerHTML=`<tr><th>АЗС</th><th class="n">Заявок</th><th class="n">Затраты</th></tr>`+rep.map(x=>`<tr><td>${x.n} · ${x.addr}</td><td class="n">${x.cnt}</td><td class="n">${fmt(x.f)}</td></tr>`).join("");
+
+ // регионы
+ const gr=Object.entries(group(d,"reg")).map(([k,r])=>[k,sum(r,x=>x.fact),sum(r,x=>x.smeta)]);
+ draw("chReg",{type:"bar",data:{labels:gr.map(x=>x[0]),datasets:[{label:"Факт",data:gr.map(x=>x[1]),backgroundColor:css("--brand"),borderRadius:4},{label:"Смета",data:gr.map(x=>x[2]),backgroundColor:css("--brand2"),borderRadius:4}]},options:opt});
+
+ // все АЗС
+ $("tAll").innerHTML=`<tr><th>АЗС</th><th>Адрес</th><th>Регион</th><th class="n">Заявок</th><th class="n">Факт</th><th class="n">Смета</th><th class="n">Перерасход</th></tr>`+[...ga].sort((x,y)=>y.o-x.o).map(x=>`<tr class="${x.o>0?"red":""}"><td>${x.n}</td><td>${x.addr}</td><td>${x.reg}</td><td class="n">${x.cnt}</td><td class="n">${fmt(x.f)}</td><td class="n">${fmt(x.s)}</td><td class="n">${x.o>0?fmt(x.o):"—"}</td></tr>`).join("");
+}
+render();
+</script>
+</body>
+</html>
