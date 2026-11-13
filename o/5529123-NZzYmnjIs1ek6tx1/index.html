@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Парсер сайта в таблицу — демо</title>
+<style>
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-display:swap}
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-Bold.ttf") format("truetype");font-weight:700;font-display:swap}
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-ExtraBold.ttf") format("truetype");font-weight:800;font-display:swap}
+:root{--ink:#1f2a33;--mute:#5d6b76;--bg:#f2f4f6;--card:#fff;--line:#d9e0e6;--acc:#3b6a8f;--accbg:#e7eff6;--gold:#f2c14e;--ok:#2f7d57;--okbg:#e4f3ea;--font:"Manrope","Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box}
+html{overflow-x:hidden}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.5;overflow-x:hidden}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px}
+header{padding:28px 0 8px}
+.tag{display:inline-block;font-weight:700;font-size:.85rem;color:var(--mute);background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px}
+h1{font-size:clamp(1.6rem,6vw,2.6rem);line-height:1.15;margin:12px 0 8px;font-weight:800;overflow-wrap:anywhere}
+.lede{color:var(--mute);margin:0 0 8px;max-width:64ch}
+.price{margin:14px 0 12px;border:2px solid var(--acc);border-radius:16px;background:#fff;overflow:hidden;box-shadow:0 6px 18px rgba(59,106,143,.16)}
+.price .ph{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;padding:7px 14px;background:var(--acc);color:#fff;font-weight:800;font-size:.95rem}
+.price .ph span{font-weight:600;font-size:.82rem;opacity:.95}
+.price .pr{display:grid;grid-template-columns:1fr 1fr}
+.price .pi{display:flex;flex-direction:column;padding:10px 14px}
+.price .pi+.pi{border-left:1px solid var(--line)}
+.price .pi small{color:var(--mute);font-weight:700;font-size:.84rem;line-height:1.3}
+.price .pi b{color:var(--acc);font-size:1.5rem;font-weight:800;white-space:nowrap;line-height:1.2}
+@media(max-width:600px){.price .pr{grid-template-columns:1fr}.price .pi{flex-direction:row;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px}.price .pi+.pi{border-left:0;border-top:1px solid var(--line)}.price .pi b{font-size:1.3rem}}
+.cta{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:11px 14px;border-radius:14px;background:var(--gold);color:#1b2733;font-weight:800;text-decoration:none;line-height:1.3;box-shadow:0 4px 0 rgba(27,39,51,.18);transition:transform .2s}
+.cta:hover,.cta:focus-visible{transform:translateY(-2px)}
+.cta i{font-style:normal;flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#1b2733;color:var(--gold);animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+@media(prefers-reduced-motion:reduce){.cta i{animation:none}*{scroll-behavior:auto!important}}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;min-width:0}
+.card h2{margin:0 0 4px;font-size:1.1rem;display:flex;align-items:center;gap:10px}
+.card h2 i{font-style:normal;flex:none;display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--acc);color:#fff;font-weight:800;font-size:.9rem}
+.card p.s{margin:0 0 10px;color:var(--mute);font-size:.95rem}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.site{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.site .bar{display:flex;align-items:center;gap:6px;padding:8px 10px;background:#eef2f5;border-bottom:1px solid var(--line)}
+.site .bar b{width:9px;height:9px;border-radius:50%;background:#c9d3db;flex:none}
+.site .bar span{margin-left:6px;font-size:.8rem;color:var(--mute);background:#fff;border:1px solid var(--line);border-radius:999px;padding:2px 10px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px}
+.mini div{border:1px solid var(--line);border-radius:10px;padding:6px;font-size:.74rem;line-height:1.25;color:var(--mute);transition:background .3s,border-color .3s}
+.mini div i{display:block;height:34px;border-radius:6px;background:linear-gradient(135deg,#dbe6ef,#c1d3e2);margin-bottom:5px}
+.mini div b{display:block;color:var(--ink);font-size:.76rem}
+.mini div.hit{background:var(--okbg);border-color:#9fd3b6}
+.mini div.hit i{background:linear-gradient(135deg,#b9e0c9,#8ccaa6)}
+.tg{display:flex;flex-wrap:wrap;gap:8px}
+.tg label{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:6px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;cursor:pointer;font-weight:600}
+.tg input{accent-color:var(--acc);width:18px;height:18px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.opt input{width:22px;height:22px;margin-top:2px;accent-color:var(--acc);flex:none}
+select{width:100%;min-height:48px;border:1px solid var(--line);border-radius:12px;padding:8px 12px;font:inherit;background:#fff;color:inherit}
+.also{margin:8px 0 0;color:var(--mute);font-size:.95rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:10px 18px;border:0;border-radius:12px;background:var(--acc);color:#fff;font:700 1rem var(--font);cursor:pointer}
+.runhint{margin:6px 0 0;text-align:center;font-weight:800;color:var(--acc)}
+.run{display:flex;justify-content:center;margin:6px 0 18px}
+.run .btn{min-width:min(100%,360px);min-height:56px;font-size:1.1rem;background:var(--ok)}
+.run .btn[disabled]{opacity:.6;cursor:progress}
+.res{display:none;margin-bottom:20px}
+.prog{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:14px}
+.prog .trk{height:10px;border-radius:999px;background:#e3eaf0;overflow:hidden;margin:8px 0}
+.prog .trk div{height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--ok));transition:width .25s}
+.log{margin:0;padding:0;list-style:none;font-size:.9rem;color:var(--mute);min-height:1.4em}
+.log li{overflow-wrap:anywhere}
+.log li b{color:var(--ok)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+.stat b{display:block;font-size:1.6rem}.stat span{color:var(--mute);font-size:.85rem}
+.out{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;min-width:0}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.tabs button{min-height:44px;padding:6px 16px;border:1px solid var(--line);border-radius:999px;background:#fff;font:700 .95rem var(--font);color:var(--ink);cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;max-width:100%}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{background:#eef2f5;font-weight:700;color:var(--mute);font-size:.85rem}
+tr.new td{animation:flash 1.2s ease-out}
+@keyframes flash{from{background:var(--okbg)}to{background:transparent}}
+td.num,th.num{text-align:right}
+.in{color:var(--ok);font-weight:700}.out0{color:#a05a1c;font-weight:700}
+.xl th:first-child,.xl td:first-child{background:#eef2f5;color:var(--mute);text-align:center;font-weight:600;width:40px}
+.xl td{border-right:1px solid var(--line)}
+.xl thead tr:first-child th{text-align:center;border-right:1px solid var(--line)}
+.xl thead tr:nth-child(2) th{background:#e0efe7;color:#1f4a36}
+.csv{margin:0;padding:12px;background:#1f2a33;color:#d6e4ef;border-radius:12px;font:.85rem/1.55 Consolas,"Courier New",monospace;overflow-x:auto;white-space:pre}
+.note{margin:10px 0 0;color:var(--mute);font-size:.9rem}
+.empty{padding:16px;color:var(--mute)}
+footer{padding:10px 0 50px;color:var(--mute);font-size:.92rem}
+@media(max-width:800px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <span class="tag">Демо / пример работы · данные условные</span>
+  <h1>Парсер собирает данные с сайта и складывает в таблицу</h1>
+  <a class="cta" href="#run"><i aria-hidden="true">↓</i><span>Это живой пример: выберите поля и нажмите «Показать, что получится», увидите, как данные попадают в таблицу</span></a>
+  <p class="lede">Вы называете сайт и какие данные нужны. Парсер обходит страницы, вытаскивает нужные поля, убирает повторы и отдаёт чистую таблицу: Excel, CSV или Google-таблица. Ниже условный каталог, на нём видно, как это работает.</p>
+</header>
+<main class="wrap">
+  <div class="grid">
+    <section class="card"><h2><i>1</i>Какой сайт</h2>
+      <p class="s">Условный каталог товаров. Зелёным подсветятся карточки, которые парсер возьмёт.</p>
+      <div class="site" aria-hidden="true">
+        <div class="bar"><b></b><b></b><b></b><span>katalog-primer.example / category / chainiki</span></div>
+        <div class="mini" id="mini"></div>
+      </div>
+      <p class="also">Сайт условный, реальные сайты в демо не открываются.</p>
+    </section>
+    <section class="card"><h2><i>2</i>Какие поля нужны</h2>
+      <p class="s">Отметьте, что класть в таблицу. Колонки соберутся сами.</p>
+      <div class="tg" id="fields"></div>
+      <label class="opt"><input type="checkbox" id="oDup" checked><span>Убирать повторы (одна и та же позиция на двух страницах)</span></label>
+      <label class="opt"><input type="checkbox" id="oStock"><span>Брать только то, что есть в наличии</span></label>
+    </section>
+    <section class="card"><h2><i>3</i>Сколько страниц</h2>
+      <p class="s">Парсер сам переходит по страницам каталога.</p>
+      <select id="pages" aria-label="Сколько страниц обойти"><option value="1">1 страница</option><option value="2">2 страницы</option><option value="3" selected>3 страницы (весь пример)</option></select>
+    </section>
+    <section class="card"><h2><i>4</i>Когда обновлять</h2>
+      <p class="s">Один раз или по расписанию, чтобы таблица была свежей.</p>
+      <select id="sch" aria-label="Как часто"><option value="0">Один раз, по запросу</option><option value="1" selected>Раз в день</option><option value="7">Раз в неделю</option><option value="24">Каждый час</option></select>
+      <p class="also" id="schNote"></p>
+    </section>
+  </div>
+  <p class="runhint">Нажмите кнопку: таблица соберётся ниже</p>
+  <div class="run" id="run"><button class="btn" id="go" type="button">Показать, что получится</button></div>
+  <section class="res" id="res" aria-live="polite">
+    <div class="prog"><b id="pt">Обходим каталог…</b><div class="trk"><div id="bar"></div></div><ul class="log" id="log"></ul></div>
+    <div class="stats" id="stats" hidden></div>
+    <div class="out" id="out" hidden>
+      <div class="tabs" role="tablist" aria-label="Вид выгрузки">
+        <button type="button" role="tab" data-v="tbl" aria-selected="true">Таблица</button>
+        <button type="button" role="tab" data-v="xl" aria-selected="false">Как в Excel</button>
+        <button type="button" role="tab" data-v="csv" aria-selected="false">Файл CSV</button>
+      </div>
+      <div id="view"></div>
+      <p class="note" id="vnote"></p>
+    </div>
+  </section>
+</main>
+<footer class="wrap">Демо / пример работы. Каталог, товары, артикулы, цены и ссылки условные, это пример того, как устроена выгрузка. Ваш парсер настраивается под ваш сайт и ваши поля. Работа с сайтами идёт в рамках их правил; обход защиты и ограничений не обещается.</footer>
+<script>
+/* ===== Условные данные примера ===== */
+var D = {
+  fields: [
+    { k: 'name', t: 'Название', on: 1 }, { k: 'art', t: 'Артикул', on: 1 }, { k: 'price', t: 'Цена, ₽', on: 1 },
+    { k: 'stock', t: 'Наличие', on: 1 }, { k: 'url', t: 'Ссылка', on: 0 }
+  ],
+  items: [
+    { p: 1, name: 'Чайник электрический 1,7 л', art: 'A-1001', price: 1890, stock: 1 },
+    { p: 1, name: 'Чайник стеклянный 1,5 л', art: 'A-1002', price: 2350, stock: 1 },
+    { p: 1, name: 'Чайник с контролем температуры', art: 'A-1003', price: 3290, stock: 0 },
+    { p: 1, name: 'Чайник мини 0,8 л', art: 'A-1004', price: 1290, stock: 1 },
+    { p: 1, name: 'Чайник металлический 2 л', art: 'A-1005', price: 2090, stock: 1 },
+    { p: 1, name: 'Чайник дорожный складной', art: 'A-1006', price: 990, stock: 1 },
+    { p: 2, name: 'Чайник металлический 2 л', art: 'A-1005', price: 2090, stock: 1 },
+    { p: 2, name: 'Чайник керамический 1,2 л', art: 'A-1007', price: 2790, stock: 0 },
+    { p: 2, name: 'Чайник заварочный 0,9 л', art: 'A-1008', price: 1190, stock: 1 },
+    { p: 2, name: 'Чайник со свистком 3 л', art: 'A-1009', price: 1590, stock: 1 },
+    { p: 2, name: 'Чайник электрический 2,2 л', art: 'A-1010', price: 2490, stock: 1 },
+    { p: 3, name: 'Чайник стеклянный 1,5 л', art: 'A-1002', price: 2350, stock: 1 },
+    { p: 3, name: 'Чайник-термос 1 л', art: 'A-1011', price: 2190, stock: 0 },
+    { p: 3, name: 'Чайник электрический 1,0 л', art: 'A-1012', price: 1490, stock: 1 },
+    { p: 3, name: 'Чайник походный 1,5 л', art: 'A-1013', price: 1390, stock: 1 }
+  ]
+};
+/* ================================== */
+(function(){
+  var $ = function(i){ return document.getElementById(i); };
+  var timer = null, rows = [], cols = [], view = 'tbl';
+  function fmt(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+  function url(it){ return 'katalog-primer.example/item/' + it.art.toLowerCase(); }
+  function val(it, k){ if (k === 'price') return fmt(it.price); if (k === 'stock') return it.stock ? 'в наличии' : 'нет'; if (k === 'url') return url(it); return it[k]; }
+  function raw(it, k){ if (k === 'price') return String(it.price); if (k === 'stock') return it.stock ? 'в наличии' : 'нет'; if (k === 'url') return url(it); return it[k]; }
+
+  /* мини-сайт слева */
+  var mini = $('mini');
+  D.items.slice(0,6).forEach(function(it){ var d = document.createElement('div'); var i = document.createElement('i'); var b = document.createElement('b'); b.textContent = it.name; var s = document.createElement('span'); s.textContent = it.art + ' · ' + fmt(it.price) + ' ₽'; d.appendChild(i); d.appendChild(b); d.appendChild(s); mini.appendChild(d); });
+  function lightMini(on){ Array.prototype.forEach.call(mini.children, function(d){ d.classList.toggle('hit', on); }); }
+
+  /* поля */
+  D.fields.forEach(function(f){
+    var l = document.createElement('label'), i = document.createElement('input'); i.type = 'checkbox'; i.checked = !!f.on; i.id = 'f_' + f.k;
+    i.addEventListener('change', function(){ f.on = i.checked ? 1 : 0; if (!D.fields.some(function(x){ return x.on; })) { f.on = 1; i.checked = true; } if (rows.length) render(); });
+    l.appendChild(i); l.appendChild(document.createTextNode(f.t)); $('fields').appendChild(l);
+  });
+  function note(){ var n = +$('sch').value; $('schNote').textContent = n === 0 ? 'Соберу один раз и отдам таблицу.' : n === 24 ? 'Таблица обновляется каждый час, без вашего участия.' : n === 7 ? 'Таблица обновляется раз в неделю, без вашего участия.' : 'Таблица обновляется раз в день, без вашего участия.'; }
+  $('sch').addEventListener('change', note); note();
+
+  function mk(tag, txt, cls){ var e = document.createElement(tag); if (txt != null) e.textContent = txt; if (cls) e.className = cls; return e; }
+
+  function render(){
+    cols = D.fields.filter(function(f){ return f.on; });
+    var v = $('view'); v.textContent = '';
+    if (!rows.length) { v.appendChild(mk('div', 'По этим настройкам ничего не нашлось. Уберите фильтр «только в наличии» или добавьте страницы.', 'empty')); $('vnote').textContent = ''; return; }
+    if (view === 'csv') {
+      var lines = [cols.map(function(c){ return c.t; }).join(';')];
+      rows.forEach(function(r){ lines.push(cols.map(function(c){ return raw(r, c.k); }).join(';')); });
+      v.appendChild(mk('pre', lines.join('\n'), 'csv'));
+      $('vnote').textContent = 'Так выглядит файл CSV: значения через точку с запятой, открывается в Excel и Google-таблицах. В демо файл не скачивается.';
+      return;
+    }
+    var sc = mk('div', null, 'scroll'), t = mk('table', null, view === 'xl' ? 'xl' : ''), th = mk('thead');
+    if (view === 'xl') {
+      var l = mk('tr'); l.appendChild(mk('th', '')); cols.forEach(function(c,i){ l.appendChild(mk('th', String.fromCharCode(65 + i))); }); th.appendChild(l);
+    }
+    var h = mk('tr'); if (view === 'xl') h.appendChild(mk('th', '1'));
+    cols.forEach(function(c){ h.appendChild(mk('th', c.t, c.k === 'price' ? 'num' : '')); }); th.appendChild(h); t.appendChild(th);
+    var tb = mk('tbody');
+    rows.forEach(function(r,i){
+      var tr = mk('tr', null, 'new'); if (view === 'xl') tr.appendChild(mk('td', String(i + 2)));
+      cols.forEach(function(c){ var td = mk('td', val(r, c.k), c.k === 'price' ? 'num' : c.k === 'stock' ? (r.stock ? 'in' : 'out0') : ''); tr.appendChild(td); });
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb); sc.appendChild(t); v.appendChild(sc);
+    $('vnote').textContent = view === 'xl' ? 'Так это выглядит в Excel или Google-таблице: готово для фильтров, сортировки и формул.' : 'Строк в таблице: ' + rows.length + '. Данные условные.';
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.tabs button'), function(b){
+    b.addEventListener('click', function(){ view = b.getAttribute('data-v'); Array.prototype.forEach.call(document.querySelectorAll('.tabs button'), function(x){ x.setAttribute('aria-selected', x === b ? 'true' : 'false'); }); render(); });
+  });
+
+  $('go').addEventListener('click', function(){
+    if (timer) return;
+    var btn = $('go'); btn.disabled = true;
+    var np = +$('pages').value, items = D.items.filter(function(i){ return i.p <= np; });
+    var res = $('res'); res.style.display = 'block'; $('stats').hidden = true; $('out').hidden = true;
+    var log = $('log'); log.textContent = ''; $('bar').style.width = '0'; $('pt').textContent = 'Обходим каталог…';
+    res.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    var step = 0, total = np + 2;
+    function tick(){
+      step++;
+      var li = mk('li');
+      if (step <= np) { var n = items.filter(function(i){ return i.p === step; }).length; li.textContent = 'Страница ' + step + ': найдено карточек ' + n; lightMini(step % 2 === 1); }
+      else if (step === np + 1) { li.textContent = 'Вытаскиваю поля, чищу и сверяю повторы…'; lightMini(true); }
+      else { var b = mk('b', 'Готово.'); li.appendChild(b); }
+      log.appendChild(li); $('bar').style.width = Math.round(step / total * 100) + '%';
+      if (step < total) { timer = setTimeout(tick, 550); return; }
+      timer = null; btn.disabled = false; $('pt').textContent = 'Сбор завершён';
+      var found = items.length, left = items;
+      if ($('oDup').checked) { var seen = {}; left = left.filter(function(r){ if (seen[r.art]) return false; seen[r.art] = 1; return true; }); }
+      var dups = found - left.length;
+      if ($('oStock').checked) left = left.filter(function(r){ return r.stock; });
+      rows = left;
+      var st = $('stats'); st.textContent = '';
+      [['Страниц обойдено', np], ['Карточек найдено', found], ['Повторов убрано', dups], ['Строк в таблице', rows.length]].forEach(function(p){ var d = mk('div', null, 'stat'); d.appendChild(mk('b', String(p[1]))); d.appendChild(mk('span', p[0])); st.appendChild(d); });
+      st.hidden = false; $('out').hidden = false; render();
+    }
+    timer = setTimeout(tick, 400);
+  });
+})();
+</script>
+</body>
+</html>
