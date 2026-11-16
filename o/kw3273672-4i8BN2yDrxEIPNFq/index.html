@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Список банкоматов с координатами — демо</title>
+<style>
+@font-face{font-family:"Manrope";src:url("Manrope-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"Manrope";src:url("Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-display:swap}
+@font-face{font-family:"Manrope";src:url("Manrope-Bold.ttf") format("truetype");font-weight:700;font-display:swap}
+@font-face{font-family:"Manrope";src:url("Manrope-ExtraBold.ttf") format("truetype");font-weight:800;font-display:swap}
+:root{--ink:#16222d;--mute:#5d6b76;--bg:#eef2f6;--card:#fff;--line:#d9e0e6;--acc:#2f6f9f;--acc2:#1d4468;--accbg:#e4eef7;--gold:#f2c14e;--ok:#2f7d57;--font:"Manrope","Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:radial-gradient(1200px 400px at 80% -100px,#dbe9f6 0,transparent 70%),var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;overflow-x:hidden}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px 40px}
+header{padding:24px 0 6px}
+.tag{display:inline-block;font-weight:700;font-size:.85rem;color:var(--mute);background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px}
+h1{font-size:clamp(1.5rem,6vw,2.4rem);line-height:1.15;margin:12px 0 8px;font-weight:800}
+.lede{color:var(--mute);margin:0 0 8px;max-width:68ch}
+.cta{display:flex;align-items:center;gap:10px;margin:12px 0;padding:11px 14px;border-radius:14px;background:var(--gold);color:#1b2733;font-weight:800;line-height:1.3;box-shadow:0 4px 0 rgba(27,39,51,.18)}
+.cta i{font-style:normal;flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#1b2733;color:var(--gold)}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:14px 0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:var(--accbg);border-radius:12px;padding:10px 12px}
+.stat b{display:block;font-size:1.7rem;font-weight:800;color:var(--acc2);line-height:1.1}
+.stat span{font-size:.85rem;color:var(--mute)}
+.filters{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end}
+label{display:block;font-weight:700;font-size:.85rem;color:var(--mute);margin-bottom:4px}
+select{width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+button{font:inherit;font-weight:700;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;padding:10px 14px}
+button:hover{border-color:var(--acc)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.tabs button{padding:8px 14px}
+.tabs button[aria-selected=true]{background:var(--acc2);color:#fff;border-color:var(--acc2)}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;max-height:380px;overflow-y:auto}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{padding:7px 10px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--line)}
+th{position:sticky;top:0;background:#f4f7fa;font-weight:700;z-index:1}
+tbody tr{cursor:pointer}
+tbody tr:hover td{background:var(--accbg)}
+tbody tr.sel td{background:#fff1c7}
+.xl th,.xl td{border:1px solid #c9d2da;padding:4px 8px;font-size:.85rem}
+.xl th{background:#e9edf1;text-align:center;color:var(--mute)}
+.xl td.n{background:#e9edf1;text-align:center;color:var(--mute);font-weight:700}
+.xl tr.h td:not(.n){background:#dff0e6;font-weight:700}
+pre{margin:0;padding:12px;background:#14202b;color:#d7e6f3;border-radius:12px;font-size:.8rem;line-height:1.5;overflow:auto;max-height:380px;white-space:pre}
+.mapwrap{display:grid;grid-template-columns:1fr;gap:12px}
+svg{width:100%;height:auto;display:block;background:#f6f9fc;border:1px solid var(--line);border-radius:12px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:.82rem;color:var(--mute);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
+.info{font-size:.9rem;min-height:2.6em;background:var(--accbg);border-radius:10px;padding:8px 12px;margin-top:8px}
+h2{font-size:1.2rem;margin:0 0 10px;font-weight:800}
+.note{font-size:.85rem;color:var(--mute);margin:8px 0 0}
+footer{color:var(--mute);font-size:.85rem;margin-top:16px}
+@media(max-width:560px){.filters{grid-template-columns:1fr}.stat b{font-size:1.35rem}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<span class="tag">демо / пример работы · данные условные</span>
+<h1>Список банкоматов: адреса, координаты, банк</h1>
+<p class="lede">Так выглядит результат: одна таблица, где у каждого банкомата есть банк, город, адрес и точные координаты. Ниже пример на выдуманных данных: можно отфильтровать, посмотреть «как в Excel», в виде CSV и точками на схеме.</p>
+<div class="cta"><i aria-hidden="true">&#8595;</i><span>Это живой пример: выберите банк или город и нажмите на строку таблицы, точка подсветится на схеме.</span></div>
+</header>
+
+<section class="card" aria-label="Счётчики">
+<div class="stats">
+<div class="stat"><b id="cA">0</b><span>банкоматов</span></div>
+<div class="stat"><b id="cB">0</b><span>банков</span></div>
+<div class="stat"><b id="cC">0</b><span>городов</span></div>
+</div>
+</section>
+
+<section class="card" aria-label="Фильтры">
+<div class="filters">
+<div><label for="fb">Банк</label><select id="fb"></select></div>
+<div><label for="fc">Город</label><select id="fc"></select></div>
+<button id="reset" type="button">Сбросить</button>
+</div>
+</section>
+
+<section class="card">
+<h2>Результат</h2>
+<div class="tabs" role="tablist">
+<button role="tab" aria-selected="true" data-v="t" type="button">Таблица</button>
+<button role="tab" aria-selected="false" data-v="x" type="button">Как в Excel</button>
+<button role="tab" aria-selected="false" data-v="c" type="button">Текст CSV</button>
+</div>
+<div id="vt" class="scroll"></div>
+<div id="vx" class="scroll" hidden></div>
+<pre id="vc" hidden></pre>
+<p class="note">Строки примера выдуманные: банки «Банк Пример», адреса «ул. Пример», координаты условные.</p>
+</section>
+
+<section class="card">
+<h2>Схема точек</h2>
+<div class="mapwrap">
+<div>
+<svg id="map" viewBox="0 0 600 360" role="img" aria-label="Условная схема расположения банкоматов"></svg>
+<div class="legend" id="legend"></div>
+<div class="info" id="info">Нажмите на точку или на строку таблицы, здесь появятся подробности.</div>
+</div>
+</div>
+<p class="note">Это условная сетка без внешних карт: в готовой работе координаты можно открыть в любой картографической программе.</p>
+</section>
+
+<footer>Демо / пример работы. Данные условные и не относятся к реальным банкам и адресам. Это образец вида результата, а не готовая база заказчика.</footer>
+</div>
+
+<script>
+(function(){
+var banks=["Банк Пример-1","Банк Пример-2","Банк Пример-3","Банк Пример-4","Банк Пример-5","Банк Пример-6"];
+var cols=["#2f6f9f","#c0562b","#2f7d57","#8a4fb0","#b08a1f","#c23b5a"];
+var cities=[["Город Пример-А",55.10,37.20],["Город Пример-Б",56.30,44.00],["Город Пример-В",54.70,55.90],["Город Пример-Г",57.10,60.60],["Город Пример-Д",53.20,50.10],["Город Пример-Е",58.00,56.20]];
+var hours=["24/7","24/7","08:00-22:00","09:00-20:00","10:00-19:00","круглосуточно"];
+var funcs=["снятие","снятие, внесение","снятие, внесение","снятие"];
+var rows=[],seed=7;
+function rnd(){seed=(seed*9301+49297)%233280;return seed/233280}
+for(var i=0;i<54;i++){
+ var c=cities[i%cities.length],b=banks[Math.floor(rnd()*banks.length)];
+ var lat=c[1]+(rnd()-.5)*0.4,lon=c[2]+(rnd()-.5)*0.6;
+ rows.push({id:i+1,bank:b,city:c[0],addr:"ул. Пример, "+(1+Math.floor(rnd()*120)),lat:lat.toFixed(5),lon:lon.toFixed(5),hours:hours[Math.floor(rnd()*hours.length)],fn:funcs[Math.floor(rnd()*funcs.length)]});
+}
+var sel=null;
+var $=function(id){return document.getElementById(id)};
+function fill(el,list,all){el.innerHTML="";var o=document.createElement("option");o.value="";o.textContent=all;el.appendChild(o);list.forEach(function(v){var p=document.createElement("option");p.value=v;p.textContent=v;el.appendChild(p)})}
+fill($("fb"),banks,"Все банки");fill($("fc"),cities.map(function(c){return c[0]}),"Все города");
+function cur(){var b=$("fb").value,c=$("fc").value;return rows.filter(function(r){return(!b||r.bank===b)&&(!c||r.city===c)})}
+var heads=["Банк","Город","Адрес","Широта","Долгота","Время работы","Снятие / внесение"];
+function vals(r){return[r.bank,r.city,r.addr,r.lat,r.lon,r.hours,r.fn]}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function render(){
+ var d=cur();
+ var sb={},sc={};d.forEach(function(r){sb[r.bank]=1;sc[r.city]=1});
+ $("cA").textContent=d.length;$("cB").textContent=Object.keys(sb).length;$("cC").textContent=Object.keys(sc).length;
+ var t="<table><thead><tr><th>№</th>"+heads.map(function(h){return"<th>"+h+"</th>"}).join("")+"</tr></thead><tbody>";
+ d.forEach(function(r){t+='<tr data-id="'+r.id+'"'+(sel===r.id?' class="sel"':'')+"><td>"+r.id+"</td>"+vals(r).map(function(v){return"<td>"+esc(v)+"</td>"}).join("")+"</tr>"});
+ $("vt").innerHTML=t+"</tbody></table>";
+ var L="ABCDEFGH",x='<table class="xl"><thead><tr><th></th>';
+ for(var k=0;k<8;k++)x+="<th>"+L[k]+"</th>";
+ x+='</tr></thead><tbody><tr class="h"><td class="n">1</td><td>№</td>'+heads.map(function(h){return"<td>"+h+"</td>"}).join("")+"</tr>";
+ d.slice(0,40).forEach(function(r,i){x+='<tr><td class="n">'+(i+2)+"</td><td>"+r.id+"</td>"+vals(r).map(function(v){return"<td>"+esc(v)+"</td>"}).join("")+"</tr>"});
+ $("vx").innerHTML=x+"</tbody></table>";
+ $("vc").textContent="id;банк;город;адрес;широта;долгота;время работы;снятие/внесение\n"+d.map(function(r){return r.id+";"+vals(r).map(function(v){return/[;"]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}).join(";")}).join("\n");
+ drawMap(d);
+}
+function drawMap(d){
+ var s='';
+ for(var i=0;i<=12;i++){s+='<line x1="'+(i*50)+'" y1="0" x2="'+(i*50)+'" y2="360" stroke="#dde5ec" stroke-width="1"/>'}
+ for(var j=0;j<=7;j++){s+='<line x1="0" y1="'+(j*50)+'" x2="600" y2="'+(j*50)+'" stroke="#dde5ec" stroke-width="1"/>'}
+ var minLa=52.8,maxLa=58.4,minLo=36,maxLo=61;
+ d.forEach(function(r){
+  var x=30+(r.lon-minLo)/(maxLo-minLo)*540,y=330-(r.lat-minLa)/(maxLa-minLa)*300;
+  var bi=banks.indexOf(r.bank);
+  s+='<circle class="pt" data-id="'+r.id+'" cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+(sel===r.id?9:5)+'" fill="'+cols[bi]+'" stroke="'+(sel===r.id?'#16222d':'#fff')+'" stroke-width="'+(sel===r.id?3:1.5)+'" style="cursor:pointer"><title>'+esc(r.bank+", "+r.addr)+'</title></circle>';
+ });
+ $("map").innerHTML=s;
+ $("legend").innerHTML=banks.map(function(b,i){return'<span><i style="background:'+cols[i]+'"></i>'+b+'</span>'}).join("");
+}
+function pick(id){
+ sel=id;var r=rows.filter(function(q){return q.id===id})[0];
+ $("info").innerHTML="<b>"+esc(r.bank)+"</b>, "+esc(r.city)+", "+esc(r.addr)+"<br>Координаты: "+r.lat+", "+r.lon+" · "+esc(r.hours)+" · "+esc(r.fn);
+ render();
+}
+document.addEventListener("click",function(e){
+ var tr=e.target.closest&&e.target.closest("#vt tbody tr");if(tr){pick(+tr.getAttribute("data-id"));return}
+ var pt=e.target.closest&&e.target.closest(".pt");if(pt){pick(+pt.getAttribute("data-id"))}
+});
+$("fb").onchange=$("fc").onchange=function(){sel=null;render()};
+$("reset").onclick=function(){$("fb").value="";$("fc").value="";sel=null;$("info").textContent="Нажмите на точку или на строку таблицы, здесь появятся подробности.";render()};
+var tabs=document.querySelectorAll(".tabs button");
+tabs.forEach(function(b){b.onclick=function(){
+ tabs.forEach(function(o){o.setAttribute("aria-selected",o===b?"true":"false")});
+ $("vt").hidden=b.dataset.v!=="t";$("vx").hidden=b.dataset.v!=="x";$("vc").hidden=b.dataset.v!=="c";
+}});
+render();
+})();
+</script>
+</body>
+</html>
