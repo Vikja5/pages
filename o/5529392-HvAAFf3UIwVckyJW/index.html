@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Таблица компаний по ОКВЭД — демо</title>
+<style>
+@font-face{font-family:"Manrope";src:url("Manrope-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"Manrope";src:url("Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-display:swap}
+@font-face{font-family:"Manrope";src:url("Manrope-Bold.ttf") format("truetype");font-weight:700;font-display:swap}
+@font-face{font-family:"Manrope";src:url("Manrope-ExtraBold.ttf") format("truetype");font-weight:800;font-display:swap}
+:root{--ink:#16222d;--mute:#5d6b76;--bg:#eef2f6;--card:#fff;--line:#d9e0e6;--acc:#2f6f9f;--acc2:#1d4468;--accbg:#e4eef7;--gold:#f2c14e;--ok:#2f7d57;--okbg:#e3f3ea;--bad:#b4443c;--badbg:#fbe9e7;--font:"Manrope","Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:radial-gradient(1200px 400px at 80% -100px,#dbe9f6 0,transparent 70%),var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.5;overflow-x:hidden}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+header{padding:26px 0 6px}
+.tag{display:inline-block;font-weight:700;font-size:.85rem;color:var(--mute);background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px}
+h1{font-size:clamp(1.6rem,6vw,2.5rem);line-height:1.15;margin:12px 0 8px;font-weight:800}
+.lede{color:var(--mute);margin:0 0 8px;max-width:66ch}
+.cta{display:flex;align-items:center;gap:10px;margin:12px 0;padding:11px 14px;border-radius:14px;background:var(--gold);color:#1b2733;font-weight:800;line-height:1.3;box-shadow:0 4px 0 rgba(27,39,51,.18)}
+.cta i{font-style:normal;flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#1b2733;color:var(--gold);animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+button{font-family:inherit}
+/* segments */
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
+.seg button{min-height:56px;border:1px solid var(--line);background:#fff;border-radius:14px;font-weight:800;font-size:1rem;color:var(--ink);cursor:pointer;padding:6px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.2;transition:.2s}
+.seg button small{font-weight:600;color:var(--mute);font-size:.76rem}
+.seg button[aria-selected=true]{background:var(--acc);color:#fff;border-color:var(--acc);box-shadow:0 6px 16px rgba(47,111,159,.3)}
+.seg button[aria-selected=true] small{color:#d6e6f3}
+/* pipeline */
+.pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:6px 0 12px;counter-reset:p}
+.pipe button{position:relative;text-align:left;min-height:76px;border:1px solid var(--line);background:#fff;border-radius:14px;padding:10px 12px;cursor:pointer;color:var(--mute);font-weight:700;font-size:.92rem;line-height:1.25;transition:.25s}
+.pipe button b{display:flex;align-items:center;gap:8px;color:var(--ink);font-size:.95rem;margin-bottom:2px}
+.pipe button b i{font-style:normal;flex:none;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--accbg);color:var(--acc);font-size:.85rem;font-weight:800}
+.pipe button.done{border-color:#bfe0cf;background:var(--okbg)}
+.pipe button.done b i{background:var(--ok);color:#fff}
+.pipe button.cur{border-color:var(--acc);box-shadow:0 0 0 3px rgba(47,111,159,.22)}
+.pipe button.cur b i{background:var(--acc);color:#fff}
+/* filters */
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:14px}
+.card h2{margin:0 0 8px;font-size:1.05rem}
+.fl{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:14px;align-items:start}
+.fl label.t{display:block;font-weight:700;font-size:.88rem;color:var(--mute);margin-bottom:4px}
+select{width:100%;min-height:48px;border:1px solid var(--line);border-radius:12px;padding:8px 12px;font:inherit;background:#fff;color:inherit}
+input[type=range]{width:100%;min-height:40px;accent-color:var(--acc)}
+.rv{font-weight:800;color:var(--acc)}
+.opt{display:flex;gap:10px;align-items:center;min-height:44px;cursor:pointer;font-weight:600}
+.opt input{width:22px;height:22px;accent-color:var(--acc)}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin:4px 0 14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:10px 20px;border:0;border-radius:12px;background:var(--acc);color:#fff;font:700 1rem var(--font);cursor:pointer;transition:.2s}
+.btn:hover{background:var(--acc2)}
+.btn.go{background:var(--ok);flex:1 1 220px;font-size:1.08rem;min-height:56px}
+.btn.light{background:#fff;color:var(--acc);border:1px solid var(--acc)}
+.btn:disabled{opacity:.5;cursor:default}
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+.stat b{display:block;font-size:1.7rem;line-height:1.2;font-variant-numeric:tabular-nums}
+.stat span{color:var(--mute);font-size:.85rem;font-weight:600}
+.stat.hl{animation:pop .5s}
+@keyframes pop{0%{transform:scale(.94);background:var(--accbg)}100%{transform:scale(1)}}
+/* view switch */
+.vs{display:inline-flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;margin-bottom:10px}
+.vs button{min-height:44px;padding:6px 16px;border:0;background:#fff;font-weight:700;cursor:pointer;color:var(--mute)}
+.vs button[aria-pressed=true]{background:var(--acc);color:#fff}
+.status{margin:0 0 10px;color:var(--mute);font-weight:600;font-size:.95rem}
+/* table */
+.tw{overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:16px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:.9rem}
+th,td{padding:9px 11px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{background:#f5f8fb;color:var(--mute);font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0}
+tr.dup td{background:var(--badbg);color:var(--bad);text-decoration:line-through;text-decoration-color:rgba(180,68,60,.5)}
+tr.dup td:last-child{text-decoration:none}
+tr.new{animation:rowin .45s both}
+@keyframes rowin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.pill{display:inline-block;border-radius:999px;padding:1px 9px;font-weight:700;font-size:.78rem;background:var(--accbg);color:var(--acc)}
+.pill.ok{background:var(--okbg);color:var(--ok)}
+.pill.bad{background:var(--badbg);color:var(--bad)}
+.dash{color:#9aa7b1}
+.empty{padding:22px;text-align:center;color:var(--mute)}
+/* excel */
+.xl{background:#fff;border:1px solid #bcc7d0;border-radius:10px;overflow:hidden;box-shadow:0 8px 24px rgba(22,34,45,.1)}
+.xtop{display:flex;align-items:center;gap:8px;background:#1f6b45;color:#fff;padding:7px 12px;font-weight:700;font-size:.88rem}
+.xtop i{font-style:normal;display:grid;place-items:center;width:22px;height:22px;background:#fff;color:#1f6b45;border-radius:4px;font-weight:800;font-size:.8rem}
+.fx{display:flex;align-items:center;gap:0;border-bottom:1px solid #bcc7d0;background:#f3f6f4;font-size:.85rem}
+.fx .nm{min-width:54px;padding:6px 10px;border-right:1px solid #bcc7d0;font-weight:700;text-align:center;background:#fff}
+.fx .fv{padding:6px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;color:var(--ink)}
+.xs{overflow-x:auto}
+.xs table{min-width:860px;font-size:.84rem;font-family:"Segoe UI",var(--font)}
+.xs th,.xs td{border:1px solid #d5dce2;padding:5px 9px}
+.xs th{text-transform:none;letter-spacing:0;font-size:.8rem;text-align:center;background:#eef1f3;color:#444;position:static}
+.xs th.rn{width:38px}
+.xs tr.hd td{background:#d9ead9;font-weight:700}
+.xs td.rn{background:#eef1f3;text-align:center;color:#555;font-weight:600}
+.xs td.sel{outline:2px solid #1f6b45;outline-offset:-2px;background:#f0fbf4}
+.xs td{cursor:cell}
+.sheets{display:flex;gap:2px;background:#e9edf0;padding:4px 8px 0;border-top:1px solid #bcc7d0;overflow-x:auto}
+.sheets button{min-height:40px;padding:4px 16px;border:1px solid #bcc7d0;border-bottom:0;border-radius:6px 6px 0 0;background:#d9dfe4;font-weight:600;cursor:pointer;white-space:nowrap;color:#333}
+.sheets button[aria-selected=true]{background:#fff;color:#1f6b45;font-weight:800;box-shadow:inset 0 3px 0 #1f6b45}
+footer{padding:14px 0 50px;color:var(--mute);font-size:.92rem}
+@media(max-width:800px){.fl{grid-template-columns:1fr}.pipe{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){body{font-size:16px}.seg button{font-size:.88rem}.seg button small{font-size:.7rem}.btn{width:100%}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <span class="tag">Демо / пример работы · данные условные</span>
+  <h1>Таблица действующих компаний: от реестра до готового Excel</h1>
+  <p class="lede">Три сегмента: промышленность, медицина, право. Шаги: выборка из реестра по ОКВЭД, поиск сайтов и публичных контактов, очистка дублей, таблица для Excel. Все компании, сайты и адреса ниже выдуманные, это показ того, как выглядит результат.</p>
+  <div class="cta"><i aria-hidden="true">↓</i><span>Это живой пример: выберите сегмент, настройте фильтры и пройдите четыре шага</span></div>
+</header>
+<main class="wrap">
+  <div class="seg" role="tablist" aria-label="Сегмент" id="seg"></div>
+
+  <div class="pipe" id="pipe" role="group" aria-label="Шаги"></div>
+
+  <section class="card" aria-label="Фильтры">
+    <h2>Фильтры выборки</h2>
+    <div class="fl">
+      <div><label class="t" for="fOk">Код ОКВЭД</label><select id="fOk"></select></div>
+      <div><label class="t" for="fRev">Выручка за год от: <span class="rv" id="revV"></span></label><input type="range" id="fRev" min="0" max="500" step="50" value="0"></div>
+      <div><label class="t" for="fCt">Контакт</label><select id="fCt"><option value="">Любой</option><option value="закупки">Отдел закупок</option><option value="ВЭД">ВЭД</option><option value="общий">Общий</option></select></div>
+    </div>
+    <label class="opt"><input type="checkbox" id="fSite"><span>Только компании с найденным официальным сайтом</span></label>
+  </section>
+
+  <div class="btns">
+    <button class="btn go" id="next" type="button">Шаг 1. Выбрать из реестра</button>
+    <button class="btn light" id="all" type="button">Пройти все шаги сразу</button>
+    <button class="btn light" id="reset" type="button">Сначала</button>
+  </div>
+
+  <div class="stats" id="stats" aria-live="polite"></div>
+
+  <div class="vs" role="group" aria-label="Вид"><button type="button" id="vT" aria-pressed="true">Таблица</button><button type="button" id="vX" aria-pressed="false">Как в Excel</button></div>
+  <p class="status" id="status"></p>
+  <div id="out"></div>
+</main>
+<footer class="wrap">Демо / пример работы. Названия компаний, сайты, контакты и показатели условные, домены вида .example не существуют. Это показ того, как выглядит результат, а не работающий сбор.</footer>
+
+<script>
+/* Условные данные. Строка: [индекс ОКВЭД, регион, выручка млн ₽, сайт 1/0, контакт: 0/закупки/ВЭД/общий] */
+var SEG = [
+ { id:'prom', name:'Промышленность', sub:'металл, станки', sheet:'Промышленность',
+   codes:[['25.62','Механическая обработка металлов'],['28.99','Оборудование специального назначения'],['24.10','Производство стали']],
+   rows:[[0,'Свердловская обл.',210,1,'закупки'],[0,'Татарстан',95,1,'общий'],[1,'Московская обл.',430,1,'ВЭД'],[1,'Самарская обл.',60,0,0],[2,'Челябинская обл.',480,1,'закупки'],[2,'Липецкая обл.',350,1,'ВЭД'],[0,'Пермский край',140,1,'закупки'],[1,'Нижегородская обл.',270,0,'общий'],[2,'Кемеровская обл.',120,1,0],[0,'Ленинградская обл.',40,1,'общий'],[1,'Новосибирская обл.',310,1,'закупки'],[2,'Тульская обл.',185,1,'ВЭД']],
+   dups:[2,5,7] },
+ { id:'med', name:'Медицина', sub:'клиники, лаборатории', sheet:'Медицина',
+   codes:[['86.10','Деятельность больниц'],['86.21','Общая врачебная практика'],['21.20','Лекарственные препараты']],
+   rows:[[0,'Москва',380,1,'закупки'],[0,'Санкт-Петербург',260,1,'общий'],[1,'Краснодарский край',75,1,'общий'],[1,'Ростовская обл.',55,0,0],[2,'Московская обл.',490,1,'ВЭД'],[2,'Калужская обл.',330,1,'закупки'],[0,'Башкортостан',150,1,'закупки'],[1,'Омская обл.',30,0,'общий'],[2,'Ярославская обл.',220,1,'ВЭД'],[0,'Красноярский край',115,1,0],[1,'Воронежская обл.',90,1,'общий'],[2,'Санкт-Петербург',410,1,'закупки']],
+   dups:[1,4,9] },
+ { id:'law', name:'Право', sub:'юристы, консалтинг', sheet:'Право',
+   codes:[['69.10','Деятельность в области права'],['69.20','Бухгалтерский учёт и аудит'],['70.22','Консультирование по управлению']],
+   rows:[[0,'Москва',120,1,'общий'],[0,'Санкт-Петербург',85,1,'общий'],[1,'Москва',200,1,'закупки'],[1,'Тюменская обл.',45,0,0],[2,'Москва',310,1,'общий'],[2,'Республика Крым',25,0,'общий'],[0,'Екатеринбург',70,1,'общий'],[1,'Казань',60,1,'закупки'],[2,'Волгоградская обл.',40,1,0],[0,'Иркутская обл.',20,0,'общий'],[1,'Приморский край',55,1,'общий'],[2,'Нижегородская обл.',95,1,'ВЭД']],
+   dups:[0,6,10] }
+];
+var N0 = 0;
+SEG.forEach(function(s){
+  s.list = s.rows.map(function(r,i){
+    N0++;
+    return { n:N0, reg:'П-'+('0000'+N0).slice(-4), name:'ООО Пример-'+N0, ok:s.codes[r[0]][0], okn:s.codes[r[0]][1], region:r[1], rev:r[2], site:r[3]?('primer-'+N0+'.example'):'', ct:r[4], dup:false, base:i };
+  });
+  s.dups.forEach(function(bi){
+    var o = s.list[bi];
+    s.list.push({ n:o.n, reg:o.reg, name:'Пример-'+o.n+', ООО', ok:o.ok, okn:o.okn, region:o.region, rev:o.rev, site:o.site, ct:o.ct, dup:true, base:bi });
+  });
+  // перемешиваем так, чтобы дубль стоял не в самом конце
+  s.list.sort(function(a,b){ return (a.base*2+(a.dup?1:0)) - (b.base*2+(b.dup?1:0)); });
+});
+var STEPS = [
+  ['Реестр по ОКВЭД','Выборка действующих юрлиц по кодам и выручке'],
+  ['Сайты и контакты','Официальный сайт, закупки, ВЭД, общий'],
+  ['Очистка дублей','Одна компания, одна строка'],
+  ['Excel','Готовая таблица в нужном виде']
+];
+var BTN = ['Шаг 1. Выбрать из реестра','Шаг 2. Найти сайты и контакты','Шаг 3. Убрать дубли','Шаг 4. Собрать Excel','Готово. Нажмите «Сначала»'];
+var $ = function(i){ return document.getElementById(i); };
+var st = { seg:0, step:0, view:'T', sel:null };
+
+function el(tag, cls, txt){ var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+function cur(){ return SEG[st.seg]; }
+function rowsF(){
+  var s = cur(), ok = $('fOk').value, rev = +$('fRev').value, ct = $('fCt').value, site = $('fSite').checked;
+  return s.list.filter(function(r){
+    if (ok && r.ok !== ok) return false;
+    if (r.rev < rev) return false;
+    if (st.step >= 2 && site && !r.site) return false;
+    if (st.step >= 2 && ct && r.ct !== ct) return false;
+    return true;
+  });
+}
+function buildSeg(){
+  var b = $('seg'); b.textContent = '';
+  SEG.forEach(function(s,i){
+    var x = el('button'); x.type = 'button'; x.setAttribute('role','tab'); x.setAttribute('aria-selected', i === st.seg);
+    x.appendChild(document.createTextNode(s.name)); x.appendChild(el('small', '', s.sub));
+    x.addEventListener('click', function(){ st.seg = i; st.sel = null; fillOk(); render(); }); b.appendChild(x);
+  });
+}
+function fillOk(){
+  var s = cur(), o = $('fOk'); o.textContent = '';
+  var a = el('option','','Все коды сегмента'); a.value = ''; o.appendChild(a);
+  s.codes.forEach(function(c){ var p = el('option','',c[0] + ' · ' + c[1]); p.value = c[0]; o.appendChild(p); });
+}
+function buildPipe(){
+  var p = $('pipe'); p.textContent = '';
+  STEPS.forEach(function(t,i){
+    var b = el('button'); b.type = 'button';
+    b.className = (st.step > i ? 'done' : '') + (st.step === i ? ' cur' : '');
+    var h = el('b'); h.appendChild(el('i','', st.step > i ? '✓' : String(i+1))); h.appendChild(document.createTextNode(t[0]));
+    b.appendChild(h); b.appendChild(document.createTextNode(t[1]));
+    b.addEventListener('click', function(){ st.step = i + 1; st.view = (st.step === 4) ? 'X' : 'T'; render(); });
+    p.appendChild(b);
+  });
+}
+function stat(box, val, label, hl){ var d = el('div','stat' + (hl ? ' hl' : '')); d.appendChild(el('b','',val)); d.appendChild(el('span','',label)); box.appendChild(d); }
+
+function render(){
+  $('revV').textContent = $('fRev').value + ' млн ₽';
+  buildSeg(); buildPipe();
+  var step = st.step, rows = rowsF();
+  var uniq = rows.filter(function(r){ return !r.dup; });
+  var dups = rows.length - uniq.length;
+  var shown = step >= 4 ? uniq : rows;
+  var base = step >= 3 ? uniq : rows;
+  var box = $('stats'); box.textContent = '';
+  stat(box, step >= 1 ? rows.length : '—', 'найдено в реестре', step === 1);
+  stat(box, step >= 3 ? dups : '—', 'дублей убрано', step === 3);
+  stat(box, step >= 2 ? base.filter(function(r){ return r.site; }).length : '—', 'с сайтом', step === 2);
+  stat(box, step >= 2 ? base.filter(function(r){ return r.ct; }).length : '—', 'с контактом', step === 2);
+  var nb = $('next'); nb.textContent = BTN[step]; nb.disabled = false;
+  $('vT').setAttribute('aria-pressed', st.view === 'T'); $('vX').setAttribute('aria-pressed', st.view === 'X');
+  var msg = ['Шаг 0. Нажмите кнопку «Выбрать из реестра»: после этого появится выборка по ОКВЭД.',
+    'Реестр: ' + rows.length + ' записей по выбранным кодам и выручке. Дальше ищем сайты и публичные контакты.',
+    'Найдены сайты и корпоративные контакты. Заметьте: некоторые компании встречаются дважды.',
+    'Дубли отмечены красным: одна компания записана под разными названиями. Один шаг, и они уйдут.',
+    'Таблица очищена и готова к выгрузке: ' + uniq.length + ' уникальных компаний.'][step];
+  $('status').textContent = msg;
+  var out = $('out'); out.textContent = '';
+  if (step === 0) { var e = el('div','card empty','Таблица пока пуста. Настройте фильтры и нажмите «Шаг 1».'); out.appendChild(e); return; }
+  if (!shown.length) { out.appendChild(el('div','card empty','По этим фильтрам ничего не найдено. Снимите часть условий.')); return; }
+  if (st.view === 'X') excel(out, shown, step); else table(out, shown, step);
+}
+function contactCell(r, step){
+  if (step < 2) return null;
+  return r.ct ? ('отдел: ' + r.ct + ' · info@' + (r.site || 'нет-сайта')) : null;
+}
+function table(out, rows, step){
+  var w = el('div','tw'), t = el('table'), th = el('thead'), tr = el('tr');
+  ['№','Название','ОКВЭД','Регион','Выручка, млн ₽','Сайт','Контакт','Статус'].forEach(function(h){ tr.appendChild(el('th','',h)); });
+  th.appendChild(tr); t.appendChild(th);
+  var tb = el('tbody');
+  rows.forEach(function(r,i){
+    var x = el('tr', (r.dup && step >= 3 ? 'dup' : '') + (' new')); x.style.animationDelay = Math.min(i * 25, 400) + 'ms';
+    x.appendChild(el('td','',r.reg)); x.appendChild(el('td','',r.name)); x.appendChild(el('td','',r.ok)); x.appendChild(el('td','',r.region)); x.appendChild(el('td','',String(r.rev)));
+    var s = el('td'); if (step >= 2) { if (r.site) s.textContent = r.site; else s.appendChild(el('span','dash','не найден')); } else s.appendChild(el('span','dash','—')); x.appendChild(s);
+    var c = el('td'); if (step >= 2) { if (r.ct) c.textContent = r.ct + ' · info@' + (r.site || '—'); else c.appendChild(el('span','dash','нет публичного')); } else c.appendChild(el('span','dash','—')); x.appendChild(c);
+    var u = el('td'); if (r.dup && step >= 3) u.appendChild(el('span','pill bad','дубль')); else if (step >= 3) u.appendChild(el('span','pill ok','уникальная')); else u.appendChild(el('span','pill','действует')); x.appendChild(u);
+    tb.appendChild(x);
+  });
+  t.appendChild(tb); w.appendChild(t); out.appendChild(w);
+}
+function excel(out, rows, step){
+  var s = cur();
+  var xl = el('div','xl');
+  var top = el('div','xtop'); top.appendChild(el('i','','X')); top.appendChild(document.createTextNode('companies_' + s.id + '.xlsx · режим просмотра')); xl.appendChild(top);
+  var fx = el('div','fx'), nm = el('div','nm','A1'), fv = el('div','fv',''); fx.appendChild(nm); fx.appendChild(fv); xl.appendChild(fx);
+  var sc = el('div','xs'), t = el('table');
+  var L = ['A','B','C','D','E','F','G','H'];
+  var h = el('thead'), hr = el('tr'); hr.appendChild(el('th','rn','')); L.forEach(function(l){ hr.appendChild(el('th','',l)); }); h.appendChild(hr); t.appendChild(h);
+  var tb = el('tbody');
+  var head = ['Реестровый №','Название','ОКВЭД','Регион','Выручка, млн ₽','Сайт','Контакт (отдел)','Публичная почта'];
+  var all = [head].concat(rows.map(function(r){ return [r.reg, r.name, r.ok, r.region, r.rev, r.site || '', r.ct || '', (r.ct && r.site) ? 'info@' + r.site : '']; }));
+  all.forEach(function(row,ri){
+    var tr = el('tr', ri === 0 ? 'hd' : ''); tr.appendChild(el('td','rn',String(ri+1)));
+    row.forEach(function(v,ci){
+      var td = el('td','',String(v)); if (typeof v === 'number') td.style.textAlign = 'right';
+      var ref = L[ci] + (ri+1);
+      td.addEventListener('click', function(){
+        var old = tb.querySelector('.sel'); if (old) old.classList.remove('sel'); td.classList.add('sel'); st.sel = ref; nm.textContent = ref; fv.textContent = String(v);
+      });
+      tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+  t.appendChild(tb); sc.appendChild(t); xl.appendChild(sc);
+  var sh = el('div','sheets'); sh.setAttribute('role','tablist');
+  SEG.forEach(function(g,i){ var b = el('button','',g.sheet); b.type = 'button'; b.setAttribute('role','tab'); b.setAttribute('aria-selected', i === st.seg); b.addEventListener('click', function(){ st.seg = i; fillOk(); render(); }); sh.appendChild(b); });
+  xl.appendChild(sh);
+  out.appendChild(xl);
+  var first = tb.querySelector('tr.hd td:nth-child(2)'); if (first) first.click();
+}
+
+$('next').addEventListener('click', function(){
+  if (st.step >= 4) { st.step = 0; st.view = 'T'; } else { st.step++; if (st.step === 4) st.view = 'X'; }
+  render(); if (st.step > 0) $('stats').scrollIntoView({ behavior:'smooth', block:'start' });
+});
+$('all').addEventListener('click', function(){ st.step = 4; st.view = 'X'; render(); $('stats').scrollIntoView({ behavior:'smooth', block:'start' }); });
+$('reset').addEventListener('click', function(){ st.step = 0; st.view = 'T'; render(); });
+$('vT').addEventListener('click', function(){ st.view = 'T'; render(); });
+$('vX').addEventListener('click', function(){ st.view = 'X'; render(); });
+['fOk','fRev','fCt','fSite'].forEach(function(i){ $(i).addEventListener('input', render); $(i).addEventListener('change', render); });
+fillOk(); render();
+</script>
+</body>
+</html>
