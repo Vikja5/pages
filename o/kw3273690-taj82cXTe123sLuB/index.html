@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Единый набор публикаций из 4 источников — демо</title>
+<style>
+@font-face{font-family:"Manrope";src:url("Manrope-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"Manrope";src:url("Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-display:swap}
+@font-face{font-family:"Manrope";src:url("Manrope-Bold.ttf") format("truetype");font-weight:700;font-display:swap}
+@font-face{font-family:"Manrope";src:url("Manrope-ExtraBold.ttf") format("truetype");font-weight:800;font-display:swap}
+:root{--ink:#16222d;--mute:#5d6b76;--bg:#eef2f6;--card:#fff;--line:#d9e0e6;--acc:#2f6f9f;--acc2:#1d4468;--accbg:#e4eef7;--gold:#f2c14e;--ok:#2f7d57;--okbg:#e3f3ea;--code:#101b26;--codeink:#d7e6f2;--font:"Manrope","Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.5;overflow-x:hidden}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px 40px}
+header{padding:26px 0 6px}
+.tag{display:inline-block;font-weight:700;font-size:.85rem;color:var(--mute);background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px}
+h1{font-size:clamp(1.6rem,6vw,2.5rem);line-height:1.15;margin:12px 0 8px;font-weight:800}
+.lede{color:var(--mute);margin:0 0 8px;max-width:66ch}
+.hint{display:inline-block;margin:10px 0 4px;font-weight:700;padding:9px 16px;border-radius:16px;background:var(--gold);color:#1b2733;font-size:.95rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:14px 0}
+.card h2{margin:0 0 6px;font-size:1.1rem}
+.sub{margin:0 0 10px;color:var(--mute);font-size:.95rem}
+.seg{display:flex;gap:6px;background:#e1e8ee;border-radius:14px;padding:5px}
+.seg button{flex:1;min-height:48px;border:0;border-radius:10px;background:transparent;font:700 1rem var(--font);color:var(--mute);cursor:pointer}
+.seg button[aria-pressed=true]{background:#fff;color:var(--acc2);box-shadow:0 1px 4px rgba(22,34,45,.15)}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0 4px}
+.src{border:1px solid var(--line);border-radius:12px;padding:10px;font-size:.88rem;background:#fafcfd}
+.src b{display:block;font-size:.95rem}
+.src span{color:var(--mute)}
+.arrow{text-align:center;color:var(--acc);font-weight:800;margin:6px 0 10px}
+.filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;align-items:end}
+.l{display:block;font-weight:700;font-size:.85rem;color:var(--mute);margin-bottom:4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{min-height:44px;padding:6px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;font:600 .92rem var(--font);color:var(--ink);cursor:pointer}
+.chips button[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:#fff}
+input[type=date]{width:100%;min-height:48px;border:1px solid var(--line);border-radius:12px;padding:8px 10px;font:inherit;background:#fff;color:inherit}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
+.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}
+.stat b{display:block;font-size:1.6rem;font-weight:800;color:var(--acc2);line-height:1.1}
+.stat span{font-size:.85rem;color:var(--mute)}
+.bar{display:flex;height:10px;border-radius:6px;overflow:hidden;margin:6px 0 0;background:#e1e8ee}
+.bar i{display:block;height:100%}
+.tabs{margin:14px 0 10px}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;max-width:100%}
+table{border-collapse:collapse;width:100%;min-width:900px;font-size:.88rem}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--accbg);font-weight:700;white-space:nowrap}
+td.mono{font-family:Consolas,monospace;font-size:.8rem;white-space:nowrap}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-weight:700;font-size:.78rem;color:#fff;white-space:nowrap}
+.pre{background:var(--code);color:var(--codeink);border-radius:12px;padding:14px;margin:0;overflow:auto;max-height:480px;font:.8rem/1.5 Consolas,"Courier New",monospace;white-space:pre;max-width:100%}
+.raw{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.raw>div{min-width:0}
+.raw h3{margin:0 0 6px;font-size:.95rem}
+.raw .pre{max-height:300px}
+.empty{padding:24px;text-align:center;color:var(--mute)}
+.ok{background:var(--okbg);border:1px solid #b9dcc8;color:#1f5c3f;border-radius:12px;padding:10px 14px;font-weight:600;font-size:.92rem;margin-top:10px}
+footer{color:var(--mute);font-size:.88rem;margin-top:18px}
+.hide{display:none!important}
+@media(max-width:720px){
+ body{font-size:16px}
+ .flow,.stats{grid-template-columns:1fr 1fr}
+ .filters{grid-template-columns:1fr 1fr}
+ .filters>div:first-child{grid-column:1/-1}
+ .raw{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <span class="tag">демо / пример работы · данные условные</span>
+ <h1>Четыре источника, один набор данных</h1>
+ <p class="lede">Два телеграм-канала и два сайта собираются в одну таблицу с одинаковыми колонками. Её можно сразу отдавать в ИИ-анализ: без склейки и переименования столбцов.</p>
+ <span class="hint">Это живой пример: переключайте «До» и «После», фильтруйте и меняйте вид</span>
+</header>
+
+<section class="card">
+ <h2>Откуда собирается</h2>
+ <p class="sub">Названия вымышленные, домены учебные (.example). Реальные каналы и сайты не используются.</p>
+ <div class="flow">
+  <div class="src"><b>Канал А</b><span>Telegram: картинка или видео, дата, комментарии</span></div>
+  <div class="src"><b>Канал Б</b><span>Telegram: картинка или видео, дата, комментарии</span></div>
+  <div class="src"><b>Сайт 1</b><span>Картинка, дата публикации</span></div>
+  <div class="src"><b>Сайт 2</b><span>Картинка, дата публикации</span></div>
+ </div>
+ <div class="arrow">↓ единая схема полей ↓</div>
+ <div class="seg" id="mode" role="group" aria-label="Данные до или после">
+  <button type="button" data-m="before" aria-pressed="false">До: 4 формата</button>
+  <button type="button" data-m="after" aria-pressed="true">После: единая таблица</button>
+ </div>
+</section>
+
+<section id="before" class="card hide">
+ <h2>До: сырые данные, у каждого источника свой формат</h2>
+ <p class="sub">Разные названия полей, форматы дат и вложенность. В таком виде в анализ не загрузить без ручной склейки.</p>
+ <div class="raw" id="rawBox"></div>
+</section>
+
+<section id="after">
+ <div class="card">
+  <h2>Фильтры</h2>
+  <div class="filters">
+   <div><span class="l">Источник</span><div class="chips" id="srcChips"></div></div>
+   <div><label class="l" for="d1">Дата с</label><input type="date" id="d1" value="2026-10-01" min="2026-10-01" max="2026-10-31"></div>
+   <div><label class="l" for="d2">Дата по</label><input type="date" id="d2" value="2026-10-31" min="2026-10-01" max="2026-10-31"></div>
+  </div>
+ </div>
+ <div class="stats" id="stats"></div>
+ <div class="card">
+  <h2>Единый набор</h2>
+  <p class="sub">Одни и те же 9 полей для всех источников: id, источник, тип источника, дата, текст, ссылка на медиа, тип медиа, число комментариев, комментарии.</p>
+  <div class="seg tabs" id="view" role="group" aria-label="Вид набора">
+   <button type="button" data-v="table" aria-pressed="true">Таблица</button>
+   <button type="button" data-v="json" aria-pressed="false">JSON</button>
+   <button type="button" data-v="csv" aria-pressed="false">CSV</button>
+  </div>
+  <div id="out"></div>
+  <div class="ok">Все строки в одной схеме: набор сразу читается инструментом анализа, колонки не нужно переименовывать.</div>
+ </div>
+</section>
+<footer>Демо на условных данных: показывает, как выглядит результат. Это не работающий сбор с реальных каналов и сайтов.</footer>
+</div>
+<script>
+var SRC={a:{name:"Канал А",type:"telegram",color:"#2f6f9f"},b:{name:"Канал Б",type:"telegram",color:"#7a4fa3"},s1:{name:"Сайт 1",type:"website",color:"#2f7d57"},s2:{name:"Сайт 2",type:"website",color:"#b8661f"}};
+var RAW=[
+["a","2026-10-02T09:14:00","Новая партия образцов: коротко о том, что изменилось в линейке.","photo","img/a-0001.jpg",["Когда будет в наличии?","Отличный результат","Есть ли тестовый набор?"]],
+["a","2026-10-07T18:40:00","Разбор недели: три главных события в отрасли.","video","vid/a-0002.mp4",["Спасибо за обзор","Жду продолжения"]],
+["a","2026-10-13T11:05:00","Опрос подписчиков: какой формат материалов удобнее.","photo","img/a-0003.jpg",[]],
+["a","2026-10-21T08:30:00","Итоги месяца в одной картинке.","photo","img/a-0004.jpg",["Полезно","Сохранил себе","Можно подробнее по второму пункту?","Согласен"]],
+["b","2026-10-03T12:20:00","Запуск обновления: что нового и когда ждать.","photo","img/b-0001.jpg",["Давно ждали","Как обновиться?"]],
+["b","2026-10-09T20:10:00","Короткий ролик с демонстрацией работы.","video","vid/b-0002.mp4",["Красиво сделано","Какая версия?","Работает на телефоне?"]],
+["b","2026-10-16T07:45:00","Ответы на частые вопросы за неделю.","photo","img/b-0003.jpg",["Спасибо!"]],
+["b","2026-10-27T15:00:00","Анонс встречи с участниками сообщества.","photo","img/b-0004.jpg",[]],
+["s1","2026-10-01T10:00:00","Обзор рынка: основные тенденции осени.","photo","media/s1-0001.jpg",[]],
+["s1","2026-10-08T13:30:00","Как выбрать подходящее решение: пять критериев.","photo","media/s1-0002.jpg",[]],
+["s1","2026-10-15T09:00:00","Интервью с экспертом: вопросы и ответы.","photo","media/s1-0003.jpg",[]],
+["s1","2026-10-29T16:20:00","Новое в разделе новостей компании.","photo","media/s1-0004.jpg",[]],
+["s2","2026-10-05T08:15:00","Сводка событий за неделю.","photo","files/s2-0001.jpg",[]],
+["s2","2026-10-12T14:50:00","Практическое руководство: шаг за шагом.","photo","files/s2-0002.jpg",[]],
+["s2","2026-10-19T10:40:00","Что обсуждают читатели в этом месяце.","photo","files/s2-0003.jpg",[]],
+["s2","2026-10-30T12:00:00","Итоговый материал месяца с примерами.","photo","files/s2-0004.jpg",[]]
+];
+var HOST={a:"https://t.example/channel_a/",b:"https://t.example/channel_b/",s1:"https://site1.example/",s2:"https://site2.example/"};
+var ROWS=RAW.map(function(r,i){var k=r[0];return{
+ id:k+"-"+String(i+1).padStart(3,"0"),source:SRC[k].name,source_type:SRC[k].type,date:r[1].slice(0,10),text:r[2],
+ media_url:HOST[k]+r[4],media_type:r[3]==="photo"?"image":"video",comments_count:r[5].length,comments:r[5],_k:k};});
+var FIELDS=["id","source","source_type","date","text","media_url","media_type","comments_count","comments"];
+var state={src:"all",view:"table"};
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function ru(iso){var p=iso.slice(0,10).split("-");return p[2]+"."+p[1]+"."+p[0]}
+function clean(r){var o={};FIELDS.forEach(function(f){o[f]=r[f]});return o}
+function filtered(){var a=$("d1").value||"0000",b=$("d2").value||"9999";
+ return ROWS.filter(function(r){return(state.src==="all"||r._k===state.src)&&r.date>=a&&r.date<=b})}
+function csvCell(v){v=String(v);return /[",;\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+function renderChips(){var h='<button type="button" data-s="all" aria-pressed="'+(state.src==="all")+'">Все</button>';
+ Object.keys(SRC).forEach(function(k){h+='<button type="button" data-s="'+k+'" aria-pressed="'+(state.src===k)+'">'+SRC[k].name+'</button>'});
+ $("srcChips").innerHTML=h}
+function render(){
+ renderChips();var rows=filtered();
+ var cm=rows.reduce(function(s,r){return s+r.comments_count},0),vid=rows.filter(function(r){return r.media_type==="video"}).length;
+ var bar="";Object.keys(SRC).forEach(function(k){var n=rows.filter(function(r){return r._k===k}).length;if(n)bar+='<i style="width:'+(100*n/rows.length)+'%;background:'+SRC[k].color+'" title="'+SRC[k].name+': '+n+'"></i>'});
+ $("stats").innerHTML='<div class="stat"><b>'+rows.length+'</b><span>публикаций из '+ROWS.length+'<div class="bar">'+bar+'</div></span></div>'+
+  '<div class="stat"><b>'+cm+'</b><span>комментариев</span></div>'+
+  '<div class="stat"><b>'+vid+'</b><span>видео</span></div>'+
+  '<div class="stat"><b>'+FIELDS.length+'</b><span>полей в схеме, одинаково для всех</span></div>';
+ var out=$("out");
+ if(!rows.length){out.innerHTML='<div class="empty">Нет публикаций за выбранные источник и даты.</div>';return}
+ if(state.view==="table"){
+  var h='<div class="tw"><table><thead><tr>'+FIELDS.map(function(f){return"<th>"+f+"</th>"}).join("")+"</tr></thead><tbody>";
+  rows.forEach(function(r){h+="<tr><td class='mono'>"+r.id+"</td><td><span class='pill' style='background:"+SRC[r._k].color+"'>"+r.source+"</span></td><td>"+r.source_type+"</td><td class='mono'>"+r.date+"</td><td>"+esc(r.text)+"</td><td class='mono'>"+esc(r.media_url.replace("https://",""))+"</td><td>"+r.media_type+"</td><td>"+r.comments_count+"</td><td>"+(r.comments.length?esc(r.comments.join(" | ")):"—")+"</td></tr>"});
+  out.innerHTML=h+"</tbody></table></div>";
+ }else if(state.view==="json"){
+  out.innerHTML='<pre class="pre">'+esc(JSON.stringify(rows.map(clean),null,2))+"</pre>";
+ }else{
+  var lines=[FIELDS.join(",")];
+  rows.forEach(function(r){lines.push(FIELDS.map(function(f){var v=r[f];if(f==="comments")v=v.join(" | ");return csvCell(v)}).join(","))});
+  out.innerHTML='<pre class="pre">'+esc(lines.join("\n"))+"</pre>";
+ }
+}
+function raw(){
+ var pick=function(k){return RAW.filter(function(r){return r[0]===k}).slice(0,2)};
+ var a=pick("a").map(function(r,i){var o={message_id:100+i,date:r[1].replace("T"," "),text:r[2]};o[r[3]]=r[4];o.replies=r[5].length;return o});
+ var b=pick("b").map(function(r,i){return{post:{uid:"b"+(7+i),ts:Math.round(Date.parse(r[1]+"Z")/1000),caption:r[2]},attachments:[{kind:r[3]==="photo"?"IMG":"VID",path:r[4]}],replies:r[5].map(function(c){return{body:c}})}});
+ var s1='<article>\n'+pick("s1").map(function(r){return' <h2>'+r[2]+'</h2>\n <time>'+ru(r[1])+'</time>\n <img src="'+r[4]+'">'}).join("\n</article>\n<article>\n")+'\n</article>';
+ var s2='<items>\n'+pick("s2").map(function(r){return' <item>\n  <title>'+r[2]+'</title>\n  <pubDate>'+new Date(r[1]+"Z").toUTCString()+'</pubDate>\n  <enclosure url="'+r[4]+'"/>\n </item>'}).join("\n")+'\n</items>';
+ var bx=[["Канал А: JSON, плоский",JSON.stringify(a,null,1)],["Канал Б: JSON, вложенный, другие ключи",JSON.stringify(b,null,1)],["Сайт 1: HTML-разметка",s1],["Сайт 2: XML-лента",s2]];
+ $("rawBox").innerHTML=bx.map(function(x){return"<div><h3>"+x[0]+'</h3><pre class="pre">'+esc(x[1])+"</pre></div>"}).join("");
+}
+document.addEventListener("click",function(e){
+ var t=e.target.closest("button");if(!t)return;
+ if(t.dataset.m){["before","after"].forEach(function(m){$(m).classList.toggle("hide",m!==t.dataset.m)});
+  document.querySelectorAll("#mode button").forEach(function(b){b.setAttribute("aria-pressed",b===t)})}
+ if(t.dataset.s){state.src=t.dataset.s;render()}
+ if(t.dataset.v){state.view=t.dataset.v;document.querySelectorAll("#view button").forEach(function(b){b.setAttribute("aria-pressed",b===t)});render()}
+});
+$("d1").addEventListener("change",render);$("d2").addEventListener("change",render);
+raw();render();
+</script>
+</body>
+</html>
