@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Верстка PDF-каталога — демо</title>
+<style>
+@font-face{font-family:"Manrope";src:url("Manrope-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"Manrope";src:url("Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-display:swap}
+@font-face{font-family:"Manrope";src:url("Manrope-Bold.ttf") format("truetype");font-weight:700;font-display:swap}
+@font-face{font-family:"Manrope";src:url("Manrope-ExtraBold.ttf") format("truetype");font-weight:800;font-display:swap}
+:root{--ink:#16222d;--mute:#5d6b76;--bg:#eef2f6;--card:#fff;--line:#d9e0e6;--acc:#2f6f9f;--acc2:#1d4468;--accbg:#e4eef7;--gold:#f2c14e;--font:"Manrope","Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:radial-gradient(1200px 400px at 80% -100px,#dbe9f6 0,transparent 70%),var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.5;overflow-x:hidden}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px 40px}
+header{padding:26px 0 6px}
+.tag{display:inline-block;font-weight:700;font-size:.85rem;color:var(--mute);background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px}
+h1{font-size:clamp(1.6rem,6vw,2.5rem);line-height:1.15;margin:12px 0 8px;font-weight:800}
+.lede{color:var(--mute);margin:0 0 8px;max-width:66ch}
+.cta{display:flex;align-items:center;gap:10px;margin:12px 0;padding:11px 14px;border-radius:14px;background:var(--gold);color:#1b2733;font-weight:800;line-height:1.3;box-shadow:0 4px 0 rgba(27,39,51,.18)}
+.cta i{font-style:normal;flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#1b2733;color:var(--gold)}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+button{font-family:inherit}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
+.seg button{min-height:52px;border:1px solid var(--line);background:#fff;border-radius:14px;font-weight:800;font-size:1rem;color:var(--ink);cursor:pointer;padding:6px 8px;line-height:1.2}
+.seg button[aria-selected=true]{background:var(--acc);color:#fff;border-color:var(--acc);box-shadow:0 6px 16px rgba(47,111,159,.3)}
+.stage{margin:0 auto;position:relative;overflow:hidden;border-radius:6px;box-shadow:0 10px 34px rgba(22,34,45,.22);background:#fff}
+.sheet{position:absolute;left:0;top:0;width:794px;height:1122px;transform-origin:0 0;display:none;overflow:hidden;background:#fff;color:#16222d}
+.sheet.on{display:block}
+.note{font-size:.85rem;color:var(--mute);text-align:center;margin:10px 0 0}
+.get{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:26px 0 12px}
+.get div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}
+.get b{display:block;font-weight:800;margin-bottom:4px}
+.get span{color:var(--mute);font-size:.92rem;line-height:1.35;display:block}
+.dl{display:inline-block;margin:6px 0;font-weight:800;color:var(--acc2)}
+h2{font-size:1.25rem;margin:26px 0 4px}
+.foot{font-size:.82rem;color:var(--mute);margin-top:18px}
+@media(max-width:700px){.get{grid-template-columns:1fr 1fr}}
+@media(max-width:420px){.get{grid-template-columns:1fr}.seg button{font-size:.9rem}}
+
+/* ===== страницы каталога (A4, 794x1122) ===== */
+.sheet *{box-sizing:border-box}
+.sheet a{color:inherit;text-decoration:none}
+.sheet svg{display:block}
+.cover{background:linear-gradient(160deg,#1d4468 0%,#2f6f9f 62%,#4f93c4 100%);color:#fff}
+.cover .ph{position:absolute;left:0;right:0;bottom:0;height:560px}
+.cover .top{position:absolute;left:64px;top:60px;right:64px;display:flex;justify-content:space-between;font-weight:700;font-size:14px;letter-spacing:.16em;text-transform:uppercase;opacity:.9}
+.cover h3{position:absolute;left:64px;top:190px;margin:0;font-size:78px;line-height:1.02;font-weight:800;letter-spacing:-.02em}
+.cover .sub{position:absolute;left:64px;top:418px;width:520px;font-size:22px;line-height:1.4;font-weight:400;opacity:.95}
+.cover .yr{position:absolute;left:64px;top:376px;font-size:15px;font-weight:800;letter-spacing:.18em;color:#f2c14e}
+.cover .ft{position:absolute;left:64px;right:64px;bottom:48px;display:flex;justify-content:space-between;font-size:14px;font-weight:600;color:#fff}
+.cover .ft span{background:rgba(22,34,45,.55);padding:8px 14px;border-radius:8px}
+.pj{padding:0}
+.pj .band{height:70px;background:#1d4468;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 56px;font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.pj .band em{font-style:normal;color:#f2c14e}
+.pj .body{padding:36px 56px 0}
+.pj .k{font-size:13px;font-weight:800;letter-spacing:.16em;color:#2f6f9f;text-transform:uppercase}
+.pj h4{margin:6px 0 10px;font-size:44px;line-height:1.08;font-weight:800;letter-spacing:-.01em}
+.pj .lead{margin:0;font-size:17px;line-height:1.55;color:#3d4b57;width:560px}
+.pj .grid{display:grid;grid-template-columns:372px 1fr;gap:30px;margin-top:28px}
+.plan{border:1px solid #d9e0e6;border-radius:12px;background:#f6f9fc;padding:16px}
+.plan small{display:block;font-size:12px;color:#5d6b76;margin-top:8px;font-weight:600}
+.spec{margin:0;padding:0;list-style:none}
+.spec li{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #d9e0e6;font-size:15px}
+.spec li:first-child{border-top:2px solid #16222d}
+.spec b{font-weight:800;text-align:right}
+.spec span{color:#5d6b76}
+.photos{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin:26px 56px 0;height:200px}
+.photos div{border-radius:10px;overflow:hidden;position:relative}
+.photos svg{width:100%;height:100%}
+.pj .fn{position:absolute;left:56px;right:56px;bottom:26px;display:flex;justify-content:space-between;font-size:12px;color:#5d6b76;border-top:1px solid #d9e0e6;padding-top:10px;font-weight:600}
+.pj .fn a{color:#2f6f9f;font-weight:700}
+.end{background:#f6f9fc}
+.end .hd{height:300px;background:linear-gradient(160deg,#1d4468,#2f6f9f);color:#fff;padding:64px}
+.end .hd small{font-size:14px;font-weight:800;letter-spacing:.18em;color:#f2c14e;text-transform:uppercase}
+.end .hd h4{margin:12px 0 0;font-size:56px;line-height:1.05;font-weight:800}
+.cc{margin:-60px 64px 0;background:#fff;border:1px solid #d9e0e6;border-radius:16px;padding:36px 40px;box-shadow:0 12px 30px rgba(22,34,45,.12);position:relative}
+.cc .row{display:grid;grid-template-columns:150px 1fr;padding:16px 0;border-bottom:1px solid #d9e0e6;align-items:center}
+.cc .row:last-child{border:0}
+.cc .row span{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#5d6b76}
+.cc .row a{font-size:26px;font-weight:800;color:#1d4468;text-decoration:underline;text-decoration-color:#f2c14e;text-underline-offset:5px;text-decoration-thickness:3px}
+.end .lg{margin:34px 64px 0;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.end .lg div{font-size:15px;line-height:1.5;color:#3d4b57}
+.end .lg b{display:block;color:#16222d;font-size:16px;margin-bottom:4px}
+.end .fn{position:absolute;left:64px;right:64px;bottom:30px;font-size:12px;color:#5d6b76;font-weight:600;border-top:1px solid #d9e0e6;padding-top:10px}
+
+/* печать: все страницы подряд, по одной на лист A4 */
+@page{size:A4;margin:0}
+@media print{
+ html,body{background:#fff!important}
+ body{overflow:visible}
+ header,.seg,.cta,.get,.note,.dl,h2,.foot,.nopr{display:none!important}
+ .wrap{max-width:none;padding:0;margin:0}
+ .stage{width:auto!important;height:auto!important;box-shadow:none;border-radius:0;overflow:visible}
+ .sheet{position:relative!important;display:block!important;transform:none!important;page-break-after:always;break-after:page}
+ .sheet:last-child{page-break-after:auto;break-after:auto}
+ *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <span class="tag">демо / пример работы · данные условные</span>
+ <h1>Верстка PDF-каталога недвижимости</h1>
+ <p class="lede">Ниже три страницы вымышленного каталога в формате A4: обложка, страница проекта и финальная с контактами. Это образец вёрстки и типографики на условных данных, а не каталог заказчика.</p>
+ <div class="cta"><i>&#8595;</i><span>Это живой пример: переключайте страницы кнопками «Обложка», «Проект», «Контакты».</span></div>
+</header>
+
+<div class="seg" role="tablist" aria-label="Страницы каталога">
+ <button role="tab" aria-selected="true" data-p="0">Обложка</button>
+ <button role="tab" aria-selected="false" data-p="1">Проект</button>
+ <button role="tab" aria-selected="false" data-p="2">Контакты</button>
+</div>
+
+<div class="stage" id="stage">
+
+<!-- 1. ОБЛОЖКА -->
+<section class="sheet cover on" aria-label="Обложка">
+ <div class="top"><span>Застройщик Пример</span><span>Каталог проектов</span></div>
+ <div class="yr">ДЕМО · ДАННЫЕ УСЛОВНЫЕ</div>
+ <h3>ЖК<br>Пример</h3>
+ <div class="sub">Каталог квартир и планировок. Спокойный квартал у парка, 3 корпуса.</div>
+ <svg class="ph" viewBox="0 0 794 560" preserveAspectRatio="none" aria-hidden="true">
+  <defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".16"/><stop offset="1" stop-color="#ffffff" stop-opacity=".02"/></linearGradient></defs>
+  <circle cx="620" cy="130" r="64" fill="#f2c14e" opacity=".9"/>
+  <g fill="#173a58"><rect x="40" y="250" width="150" height="310"/><rect x="215" y="170" width="170" height="390"/><rect x="410" y="300" width="130" height="260"/><rect x="565" y="215" width="190" height="345"/></g>
+  <g fill="url(#g1)"><rect x="40" y="250" width="150" height="310"/><rect x="215" y="170" width="170" height="390"/><rect x="410" y="300" width="130" height="260"/><rect x="565" y="215" width="190" height="345"/></g>
+  <g fill="#f2c14e" opacity=".85"><rect x="60" y="280" width="20" height="26"/><rect x="100" y="280" width="20" height="26"/><rect x="140" y="330" width="20" height="26"/><rect x="60" y="380" width="20" height="26"/><rect x="235" y="210" width="22" height="28"/><rect x="285" y="260" width="22" height="28"/><rect x="335" y="210" width="22" height="28"/><rect x="235" y="320" width="22" height="28"/><rect x="335" y="370" width="22" height="28"/><rect x="430" y="340" width="20" height="26"/><rect x="480" y="400" width="20" height="26"/><rect x="590" y="260" width="22" height="28"/><rect x="650" y="310" width="22" height="28"/><rect x="710" y="260" width="22" height="28"/><rect x="590" y="400" width="22" height="28"/></g>
+  <rect x="0" y="520" width="794" height="40" fill="#10304a"/>
+ </svg>
+ <div class="ft"><span>2027 · сдача условная</span><span>primer.example</span></div>
+</section>
+
+<!-- 2. ПРОЕКТ -->
+<section class="sheet pj" aria-label="Страница проекта">
+ <div class="band"><span>ЖК Пример · Корпус 1</span><em>Страница 2</em></div>
+ <div class="body">
+  <div class="k">Двухкомнатная · тип В</div>
+  <h4>Квартира с отдельной кухней-гостиной</h4>
+  <p class="lead">Светлая планировка с двумя спальнями и просторной кухней. Окна во двор, раздельный санузел, гардеробная в коридоре. Тексты и размеры условные.</p>
+  <div class="grid">
+   <div class="plan">
+    <svg viewBox="0 0 340 250" width="100%" role="img" aria-label="Схема планировки">
+     <rect x="4" y="4" width="332" height="242" fill="#fff" stroke="#16222d" stroke-width="4"/>
+     <path d="M4 110H150M150 4V110M150 110V246M230 110H336M230 110V246M150 170H230" stroke="#16222d" stroke-width="3" fill="none"/>
+     <rect x="162" y="124" width="56" height="5" fill="#f6f9fc"/><rect x="150" y="62" width="5" height="26" fill="#f6f9fc"/>
+     <g fill="#e4eef7"><rect x="8" y="8" width="138" height="98"/><rect x="154" y="8" width="178" height="98"/><rect x="8" y="114" width="138" height="128"/><rect x="234" y="114" width="98" height="128"/></g>
+     <g fill="#f2c14e" opacity=".5"><rect x="154" y="114" width="72" height="52"/><rect x="154" y="174" width="72" height="68"/></g>
+     <g font-family="Manrope,sans-serif" font-size="12" font-weight="700" fill="#16222d" text-anchor="middle"><text x="77" y="62">Спальня 1</text><text x="243" y="62">Кухня-гостиная</text><text x="77" y="182">Спальня 2</text><text x="283" y="182">Лоджия</text><text x="190" y="144">Коридор</text><text x="190" y="212">С/у</text></g>
+     <g stroke="#2f6f9f" stroke-width="3"><path d="M40 4H110M190 4H300M4 150V210M336 140V220"/></g>
+    </svg>
+    <small>Схема-заглушка, масштаб условный</small>
+   </div>
+   <ul class="spec">
+    <li><span>Площадь общая</span><b>64,8 м²</b></li>
+    <li><span>Кухня-гостиная</span><b>24,3 м²</b></li>
+    <li><span>Спальни</span><b>14,1 и 11,6 м²</b></li>
+    <li><span>Этаж</span><b>5–12</b></li>
+    <li><span>Потолки</span><b>2,8 м</b></li>
+    <li><span>Отделка</span><b>предчистовая</b></li>
+    <li><span>Срок сдачи</span><b>4 кв. 2027</b></li>
+   </ul>
+  </div>
+ </div>
+ <div class="photos">
+  <div><svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice"><rect width="400" height="200" fill="#2f6f9f"/><rect y="120" width="400" height="80" fill="#1d4468"/><rect x="40" y="50" width="120" height="100" fill="#e4eef7"/><rect x="190" y="70" width="160" height="80" fill="#f2c14e" opacity=".85"/><text x="14" y="188" font-family="Manrope,sans-serif" font-size="12" font-weight="700" fill="#fff">Фото: гостиная (заглушка)</text></svg></div>
+  <div><svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice"><rect width="200" height="200" fill="#4f93c4"/><circle cx="100" cy="80" r="40" fill="#f2c14e" opacity=".9"/><rect y="140" width="200" height="60" fill="#1d4468"/></svg></div>
+  <div><svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice"><rect width="200" height="200" fill="#1d4468"/><rect x="30" y="40" width="60" height="120" fill="#2f6f9f"/><rect x="110" y="70" width="60" height="90" fill="#f2c14e" opacity=".85"/></svg></div>
+ </div>
+ <div class="fn"><span>Данные условные · не является офертой</span><a href="https://primer.example/zhk-primer">primer.example/zhk-primer</a></div>
+</section>
+
+<!-- 3. ФИНАЛ -->
+<section class="sheet end" aria-label="Контакты">
+ <div class="hd"><small>Застройщик Пример</small><h4>Приходите<br>посмотреть</h4></div>
+ <div class="cc">
+  <div class="row"><span>Телефон</span><a href="tel:+70000000000">+7 000 000-00-00</a></div>
+  <div class="row"><span>Почта</span><a href="mailto:info@primer.example">info@primer.example</a></div>
+  <div class="row"><span>Сайт</span><a href="https://primer.example">primer.example</a></div>
+  <div class="row"><span>Офис продаж</span><a href="https://primer.example/contacts">ул. Условная, 1 (на карте)</a></div>
+ </div>
+ <div class="lg">
+  <div><b>Режим работы</b>Ежедневно с 9:00 до 20:00. Показ квартир по записи.</div>
+  <div><b>Как добраться</b>Остановка «Парк Пример», 3 минуты пешком. Парковка для гостей.</div>
+ </div>
+ <div class="fn">Демо / пример вёрстки. Все названия, телефоны и данные условные, совпадения случайны.</div>
+</section>
+</div>
+<p class="note">Размер листа A4 (210 × 297 мм). Телефон, почта и ссылки на страницах кликабельны и в PDF.</p>
+
+<h2>Что получите</h2>
+<div class="get">
+ <div><b>PDF-каталог</b><span>Единый стиль, ровные отступы, чистая типографика, кликабельные телефон, почта и ссылка.</span></div>
+ <div><b>Редактируемый исходник</b><span>Файл, где можно менять тексты и картинки самим, без заново собранного макета.</span></div>
+ <div><b>Два раунда правок</b><span>Вносим замечания по макету, затем финальная сверка перед выдачей.</span></div>
+ <div><b>Без переделки дизайна</b><span>Берём вашу концепцию, обложку и референсы, дизайн с нуля не рисуем.</span></div>
+</div>
+<a class="dl" id="pdfl" href="primer_katalog.pdf">Открыть пример PDF этого каталога (3 страницы)</a>
+<p class="foot">Демо / пример работы. Каталог, жилой комплекс, застройщик, телефон, почта и адрес вымышлены и не относятся к заказчику. Изображения нарисованы заглушками.</p>
+</div>
+
+<script>
+(function(){
+ var st=document.getElementById('stage'),sh=[].slice.call(st.querySelectorAll('.sheet')),tabs=[].slice.call(document.querySelectorAll('.seg button'));
+ function fit(){
+  var w=Math.min(794,st.parentNode.clientWidth),s=w/794;
+  st.style.width=w+'px';st.style.height=(1122*s)+'px';
+  sh.forEach(function(e){e.style.transform='scale('+s+')'});
+ }
+ function show(i){
+  sh.forEach(function(e,k){e.classList.toggle('on',k===i)});
+  tabs.forEach(function(b,k){b.setAttribute('aria-selected',k===i)});
+ }
+ tabs.forEach(function(b){b.addEventListener('click',function(){show(+b.dataset.p)})});
+ window.addEventListener('resize',fit);fit();
+})();
+</script>
+</body>
+</html>
