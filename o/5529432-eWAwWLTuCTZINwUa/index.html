@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Дашборд из Excel — демо</title>
+<link rel="preload" href="Manrope-Regular.ttf" as="font" type="font/ttf" crossorigin>
+<style>
+@font-face{font-family:"Manrope";src:url("Manrope-Regular.ttf") format("truetype");font-weight:400;font-display:block}
+@font-face{font-family:"Manrope";src:url("Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-display:block}
+@font-face{font-family:"Manrope";src:url("Manrope-Bold.ttf") format("truetype");font-weight:700;font-display:block}
+@font-face{font-family:"Manrope";src:url("Manrope-ExtraBold.ttf") format("truetype");font-weight:800;font-display:block}
+:root{--bg:#f3f5f9;--card:#fff;--ink:#1c2230;--mut:#6b7385;--line:#e3e7ee;--a:#2f6fdb;--b:#f0872a;--c:#27ae60;--d:#9b59b6;--e:#95a5a6;--acc:#2f6fdb}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Manrope",Arial,sans-serif;font-size:15px;line-height:1.4}
+.wrap{max-width:1500px;margin:0 auto;padding:16px}
+.demo{display:inline-block;background:#fff4d6;border:1px solid #ecd48a;color:#6a5310;border-radius:999px;padding:4px 12px;font-size:12.5px;font-weight:600;margin-bottom:10px}
+h1{font-size:26px;font-weight:800;margin:0 0 4px;letter-spacing:-.01em}
+.sub{color:var(--mut);margin:0 0 16px}
+.card{background:var(--card);border-radius:12px;box-shadow:0 1px 3px rgba(20,30,60,.08);padding:16px;min-width:0}
+.upload{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px;margin-bottom:16px}
+.drop{border:2px dashed #b9c5dc;border-radius:12px;padding:20px;text-align:center;background:#f8faff;transition:.15s}
+.drop.over{border-color:var(--a);background:#eaf1ff}
+.drop h2{margin:0 0 4px;font-size:17px;font-weight:800}
+.drop p{margin:0 0 12px;color:var(--mut);font-size:13.5px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+button,.btn{font:inherit;font-weight:700;font-size:14px;border:0;border-radius:8px;padding:10px 16px;cursor:pointer;background:var(--a);color:#fff}
+button.sec{background:#e8eefb;color:#1d4ea8}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #9bbcff;outline-offset:2px}
+.status{font-size:13.5px;margin-top:10px;min-height:20px}
+.status.ok{color:#17803f}.status.err{color:#b3261e}
+.note{font-size:13px;color:var(--mut)}
+.note b{color:var(--ink)}
+.cols{margin:0;padding-left:18px;font-size:13px;color:var(--mut)}
+.filters{display:flex;gap:14px 20px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg label,.fg .lb{font-size:12px;color:var(--mut);font-weight:600}
+select{font:inherit;font-size:14px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);min-width:110px}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+.seg button{background:#fff;color:var(--ink);border-radius:0;padding:8px 14px;font-weight:600;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--a);color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;margin-bottom:16px}
+.kpi .t{font-size:12.5px;color:var(--mut)}
+.kpi .v{font-size:24px;font-weight:800;margin:6px 0 4px;letter-spacing:-.01em;overflow-wrap:anywhere}
+.kpi .s{font-size:11.5px;color:#8a92a3}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.ch h3{margin:0 0 6px;font-size:15px;font-weight:800}
+.ch .plot{width:100%;height:240px}
+.ch svg{display:block;width:100%;height:100%;overflow:visible}
+.leg{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;font-size:12px;color:var(--mut);margin-top:4px}
+.leg i{display:inline-block;width:22px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.empty{padding:40px 0;text-align:center;color:var(--mut)}
+.sheetbox{margin-top:16px;display:none}
+.sheetbox.show{display:block}
+.sheethead{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.sheethead h3{margin:0;font-size:15px}
+.sheet{overflow:auto;max-height:300px;border:1px solid #c9d1de;border-radius:6px}
+table{border-collapse:collapse;font-size:13px;width:100%;min-width:640px;background:#fff}
+th,td{border:1px solid #d5dbe6;padding:4px 10px;white-space:nowrap}
+thead th{background:#eef1f6;color:#555e70;font-weight:600;text-align:center;position:sticky;top:0}
+tbody th{background:#eef1f6;color:#555e70;font-weight:600;width:42px;position:sticky;left:0}
+tr.hdr td{background:#e7f0e2;font-weight:700}
+td.n{text-align:right}
+.foot{margin:18px 0 6px;color:var(--mut);font-size:12.5px}
+@media (max-width:1280px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:820px){.upload{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:640px){.wrap{padding:16px}h1{font-size:21px}.kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.kpi .v{font-size:19px}.grid{grid-template-columns:minmax(0,1fr)}.card{padding:12px}.fg,.seg{width:100%}.seg button{flex:1}select{width:100%}.filters{gap:10px}.fgrow{display:flex;gap:10px;width:100%}.fgrow .fg{flex:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="demo">демо / пример работы · данные условные</span>
+  <h1 id="title">Производство — ноябрь 2026</h1>
+  <p class="sub" id="subtitle"></p>
+
+  <section class="upload">
+    <div class="drop card" id="drop">
+      <h2>Загрузите таблицу — дашборд пересоберётся</h2>
+      <p>Перетащите файл сюда или выберите. Файл читается прямо в браузере и никуда не отправляется.</p>
+      <div class="btns">
+        <button type="button" id="pick">Выбрать файл CSV</button>
+        <button type="button" class="sec" id="sample">Пример таблицы</button>
+        <button type="button" class="sec" id="dl">Скачать пример CSV</button>
+      </div>
+      <input type="file" id="file" accept=".csv,.txt,text/csv" hidden>
+      <div class="status" id="status" role="status" aria-live="polite"></div>
+    </div>
+    <div class="card">
+      <b>Какая таблица нужна</b>
+      <p class="note" style="margin:6px 0">Одна строка = один день по одной ферме. Названия колонок распознаются по смыслу:</p>
+      <ul class="cols">
+        <li>Дата, Ферма</li>
+        <li>Валовой надой, л; Сдано на продажу, л</li>
+        <li>Выручка с НДС, ₽; Жирность, %</li>
+        <li>Передано телятам, л; Поголовье коров</li>
+      </ul>
+      <p class="note" style="margin:8px 0 0"><b>Про .xlsx:</b> в рабочей версии принимаю .xlsx напрямую, здесь демо читает CSV (в Excel: «Сохранить как» → CSV). Разделитель «;» или «,» определяется сам.</p>
+    </div>
+  </section>
+
+  <section class="card sheetbox" id="sheetbox">
+    <div class="sheethead"><h3>Таблица, из которой построен дашборд</h3><span class="note" id="sheetinfo"></span></div>
+    <div class="sheet"><table id="sheet"></table></div>
+  </section>
+
+  <div class="filters" style="margin-top:16px">
+    <div class="fg"><span class="lb">Источник</span><div class="seg" id="seg"></div></div>
+    <div class="fgrow" style="display:flex;gap:14px">
+      <div class="fg"><label for="from">Период с</label><select id="from"></select></div>
+      <div class="fg"><label for="to">по</label><select id="to"></select></div>
+    </div>
+  </div>
+
+  <section class="kpis" id="kpis"></section>
+  <section class="grid" id="grid"></section>
+  <p class="foot">Демо / пример работы. Все цифры условные и созданы для показа. Вёрстка и набор графиков повторяют присланный макет, названия и данные заказчика не использованы. Графики рисуются на странице без внешних библиотек.</p>
+</div>
+
+<script>
+(function(){
+"use strict";
+var COLORS=["#2f6fdb","#f0872a","#27ae60","#9b59b6"];
+var MONTHS=["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
+var state={rows:[],farms:[],days:[],farm:"all",from:null,to:null,meta:{}};
+
+/* ---------- условные данные ---------- */
+function sampleRows(){
+  var rnd=(function(){var s=7;return function(){s=(s*9301+49297)%233280;return s/233280;};})();
+  var farms=[{n:"Ферма А",milk:17400,cows:500,fat:3.7,price:45.2,days:15},{n:"Ферма Б",milk:9750,cows:365,fat:4.1,price:47.8,days:16}];
+  var rows=[];
+  farms.forEach(function(f){
+    for(var d=1;d<=f.days;d++){
+      var milk=Math.round(f.milk*(1+(rnd()-.5)*.07));
+      var sold=Math.round(milk*(0.915+rnd()*.02));
+      var calf=Math.round(milk*(.05+rnd()*.03));
+      var fat=Math.round((f.fat+(rnd()-.5)*.3-(f.n==="Ферма А"&&d>9?.3:0))*100)/100;
+      var price=f.price+(rnd()-.5)*1.4;
+      rows.push({date:"2026-11-"+(d<10?"0":"")+d,farm:f.n,milk:milk,sold:sold,rev:Math.round(sold*price),fat:fat,calf:calf,cows:Math.round(f.cows+(rnd()-.5)*14)});
+    }
+  });
+  rows.sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:(a.farm<b.farm?-1:1);});
+  return rows;
+}
+var HEAD=["Дата","Ферма","Валовой надой, л","Сдано на продажу, л","Выручка с НДС, ₽","Жирность, %","Передано телятам, л","Поголовье коров"];
+function rowsToCsv(rows){
+  var out=[HEAD.join(";")];
+  rows.forEach(function(r){out.push([r.date.split("-").reverse().join("."),r.farm,r.milk,r.sold,r.rev,String(r.fat).replace(".",","),r.calf,r.cows].join(";"));});
+  return out.join("\r\n");
+}
+
+/* ---------- чтение CSV ---------- */
+function splitLine(line,sep){
+  var out=[],cur="",q=false;
+  for(var i=0;i<line.length;i++){
+    var c=line[i];
+    if(c==='"'){ if(q&&line[i+1]==='"'){cur+='"';i++;} else q=!q; }
+    else if(c===sep&&!q){out.push(cur);cur="";}
+    else cur+=c;
+  }
+  out.push(cur);return out;
+}
+function num(s){
+  if(s==null)return NaN;
+  s=String(s).replace(/[\s ]/g,"").replace(/[₽%]/g,"");
+  if(s==="")return NaN;
+  if(s.indexOf(",")>-1&&s.indexOf(".")>-1)s=s.replace(/,/g,"");
+  else s=s.replace(",",".");
+  return parseFloat(s);
+}
+function parseDate(s){
+  s=String(s||"").trim();var m;
+  if((m=s.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})/)))return m[3]+"-"+("0"+m[2]).slice(-2)+"-"+("0"+m[1]).slice(-2);
+  if((m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/)))return m[1]+"-"+("0"+m[2]).slice(-2)+"-"+("0"+m[3]).slice(-2);
+  return null;
+}
+function findCol(head,tests){
+  for(var i=0;i<head.length;i++){var h=head[i].toLowerCase();for(var j=0;j<tests.length;j++)if(tests[j].test(h))return i;}
+  return -1;
+}
+function parseCsv(text){
+  text=text.replace(/^﻿/,"");
+  var lines=text.split(/\r?\n/).filter(function(l){return l.trim()!=="";});
+  if(lines.length<2)throw new Error("В файле меньше двух строк: нужны заголовок и данные.");
+  var h=lines[0],cs=(h.match(/;/g)||[]).length,cc=(h.match(/,/g)||[]).length,ct=(h.match(/\t/g)||[]).length;
+  var sep=ct>cs&&ct>cc?"\t":cs>=cc?";":",";
+  var head=splitLine(h,sep).map(function(x){return x.trim();});
+  var ix={
+    date:findCol(head,[/дата|date|день/]),
+    farm:findCol(head,[/ферма|farm|источник|площадка/]),
+    milk:findCol(head,[/валов|надой.*вал|^надой/]),
+    sold:findCol(head,[/сдан|продаж/]),
+    rev:findCol(head,[/выруч|сумма|rev/]),
+    fat:findCol(head,[/жирност|fat/]),
+    calf:findCol(head,[/телят|calf/]),
+    cows:findCol(head,[/поголов|коров|cows/])
+  };
+  var need=[["date","Дата"],["farm","Ферма"],["milk","Валовой надой"],["sold","Сдано на продажу"],["rev","Выручка"]],miss=[];
+  need.forEach(function(p){if(ix[p[0]]<0)miss.push(p[1]);});
+  if(miss.length)throw new Error("Не нашёл колонки: "+miss.join(", ")+". Загляните в «Какая таблица нужна».");
+  var rows=[],bad=0;
+  for(var i=1;i<lines.length;i++){
+    var c=splitLine(lines[i],sep),d=parseDate(c[ix.date]);
+    var milk=num(c[ix.milk]);
+    if(!d||isNaN(milk)){bad++;continue;}
+    var g=function(k){return ix[k]<0?0:(isNaN(num(c[ix[k]]))?0:num(c[ix[k]]));};
+    rows.push({date:d,farm:(c[ix.farm]||"").trim()||"Без названия",milk:milk,sold:g("sold"),rev:g("rev"),fat:g("fat"),calf:g("calf"),cows:g("cows")});
+  }
+  if(!rows.length)throw new Error("Не нашёл ни одной строки с датой и надоем. Проверьте формат даты (ДД.ММ.ГГГГ).");
+  return {rows:rows,bad:bad,head:head,sep:sep,lines:lines,hasFat:ix.fat>=0,hasCows:ix.cows>=0,hasCalf:ix.calf>=0};
+}
+
+/* ---------- форматирование ---------- */
+function fmt(n,d){
+  if(!isFinite(n))return "—";
+  return n.toLocaleString("ru-RU",{minimumFractionDigits:d||0,maximumFractionDigits:d||0}).replace(/ /g," ");
+}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function farmColor(f){var i=state.farms.indexOf(f);return COLORS[(i<0?0:i)%COLORS.length];}
+
+/* ---------- загрузка данных ---------- */
+function setData(rows,meta){
+  state.rows=rows;
+  state.farms=[];rows.forEach(function(r){if(state.farms.indexOf(r.farm)<0)state.farms.push(r.farm);});
+  state.farms=state.farms.slice(0,4);
+  state.rows=rows.filter(function(r){return state.farms.indexOf(r.farm)>-1;});
+  var ds={};state.rows.forEach(function(r){ds[r.date]=1;});
+  state.days=Object.keys(ds).sort();
+  state.farm="all";state.from=state.days[0];state.to=state.days[state.days.length-1];
+  state.meta=meta||{};
+  buildControls();render();
+}
+function buildControls(){
+  var seg=document.getElementById("seg");seg.innerHTML="";
+  var opts=[["all","Все"]].concat(state.farms.map(function(f){return [f,f];}));
+  opts.forEach(function(o){
+    var b=document.createElement("button");b.type="button";b.textContent=o[1];
+    if(o[0]===state.farm)b.className="on";
+    b.onclick=function(){state.farm=o[0];Array.prototype.forEach.call(seg.children,function(x){x.className="";});b.className="on";render();};
+    seg.appendChild(b);
+  });
+  ["from","to"].forEach(function(id){
+    var s=document.getElementById(id);s.innerHTML="";
+    state.days.forEach(function(d){var o=document.createElement("option");o.value=d;o.textContent=dayLabel(d);s.appendChild(o);});
+    s.value=id==="from"?state.from:state.to;
+    s.onchange=function(){state[id]=s.value;if(state.from>state.to){if(id==="from"){state.to=state.from;document.getElementById("to").value=state.to;}else{state.from=state.to;document.getElementById("from").value=state.from;}}render();};
+  });
+}
+function dayLabel(d){var p=d.split("-");return parseInt(p[2],10)+" "+MONTHS[parseInt(p[1],10)-1];}
+
+/* ---------- таблица как в Excel ---------- */
+function colLetter(i){var s="";i++;while(i>0){var m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26);}return s;}
+function showSheet(csv){
+  var box=document.getElementById("sheetbox"),t=document.getElementById("sheet");
+  var sep=csv.sep,html="<thead><tr><th></th>";
+  for(var i=0;i<csv.head.length;i++)html+="<th>"+colLetter(i)+"</th>";
+  html+="</tr></thead><tbody><tr class=\"hdr\"><th>1</th>"+csv.head.map(function(h){return "<td>"+esc(h)+"</td>";}).join("")+"</tr>";
+  var max=Math.min(csv.lines.length,200);
+  for(var r=1;r<max;r++){
+    var c=splitLine(csv.lines[r],sep);
+    html+="<tr><th>"+(r+1)+"</th>"+c.map(function(x,k){return "<td"+(k>1?" class=\"n\"":"")+">"+esc(x)+"</td>";}).join("")+"</tr>";
+  }
+  html+="</tbody>";t.innerHTML=html;
+  document.getElementById("sheetinfo").textContent="Строк данных: "+(csv.lines.length-1)+(csv.lines.length>200?" (показаны первые 199)":"")+" · разделитель «"+(sep==="\t"?"Tab":sep)+"»";
+  box.className="sheetbox show";
+}
+function loadText(text,name,scroll){
+  var st=document.getElementById("status");
+  try{
+    var csv=parseCsv(text);
+    setData(csv.rows,{name:name});
+    showSheet(csv);
+    st.className="status ok";
+    st.textContent="Готово: "+name+" · прочитано строк: "+csv.rows.length+(csv.bad?" · пропущено: "+csv.bad:"")+". Дашборд пересобран.";
+    if(scroll)document.getElementById("kpis").scrollIntoView({behavior:"smooth",block:"start"});
+  }catch(e){st.className="status err";st.textContent=e.message;}
+}
+function readFile(f){
+  var st=document.getElementById("status");
+  if(/\.xlsx?$/i.test(f.name)){st.className="status err";st.textContent="Это файл Excel. В рабочей версии принимаю .xlsx напрямую, здесь демо читает CSV: в Excel «Сохранить как» → CSV.";return;}
+  var r=new FileReader();
+  r.onload=function(){
+    var txt=r.result;
+    if(txt.indexOf("�")>-1){var r2=new FileReader();r2.onload=function(){loadText(r2.result,f.name,true);};r2.readAsText(f,"windows-1251");}
+    else loadText(txt,f.name,true);
+  };
+  r.onerror=function(){st.className="status err";st.textContent="Не удалось прочитать файл.";};
+  r.readAsText(f,"utf-8");
+}
+
+/* ---------- расчёты ---------- */
+function sel(){
+  return state.rows.filter(function(r){return r.date>=state.from&&r.date<=state.to&&(state.farm==="all"||r.farm===state.farm);});
+}
+function sum(a,k){var s=0;a.forEach(function(r){s+=r[k];});return s;}
+function wavg(a,k,w){var s=0,t=0;a.forEach(function(r){s+=r[k]*r[w];t+=r[w];});return t?s/t:NaN;}
+function perFarm(a,f){return f(a.filter(function(r){return true;}));}
+
+/* ---------- KPI ---------- */
+function render(){
+  var rows=sel(),farms=state.farm==="all"?state.farms:[state.farm];
+  var first=state.days.length?dayLabel(state.from):"",last=state.days.length?dayLabel(state.to):"";
+  document.getElementById("subtitle").textContent=farms.join(", ")+" · период: "+first+" — "+last+" · строк в расчёте: "+rows.length;
+  var gross=sum(rows,"milk"),sold=sum(rows,"sold"),rev=sum(rows,"rev"),calf=sum(rows,"calf");
+  var fat=wavg(rows,"fat","milk");
+  function by(f,fn){return farms.map(function(n){return n+": "+fn(rows.filter(function(r){return r.farm===n;}));}).join(" · ");}
+  var multi=farms.length>1;
+  var k=[
+    ["Валовой надой, л",fmt(gross),multi?by(0,function(a){return fmt(sum(a,"milk"));}):"за выбранный период"],
+    ["Сдано на продажу, л",fmt(sold),gross?fmt(sold/gross*100,1)+" % от валового":"—"],
+    ["Выручка с НДС, ₽",fmt(rev),multi?by(0,function(a){return fmt(sum(a,"rev"));}):"за выбранный период"],
+    ["Средняя цена, ₽/л",sold?fmt(rev/sold,2):"—","выручка / сданное молоко"],
+    ["Средняя жирность, %",fmt(fat,2),multi?by(0,function(a){return fmt(wavg(a,"fat","milk"),2);}):"взвешено по надою"],
+    ["Передано телятам, л",fmt(calf),gross?fmt(calf/gross*100,1)+" % от валового":"—"]
+  ];
+  document.getElementById("kpis").innerHTML=k.map(function(x){return "<div class=\"card kpi\"><div class=\"t\">"+x[0]+"</div><div class=\"v\">"+x[1]+"</div><div class=\"s\">"+esc(x[2])+"</div></div>";}).join("");
+  drawAll(rows,farms);
+}
+
+/* ---------- графики ---------- */
+function niceTicks(min,max,n){
+  if(!isFinite(min)||!isFinite(max))return [0,1];
+  if(min===max){max=min+1;}
+  var span=max-min,step=Math.pow(10,Math.floor(Math.log(span/n)/Math.LN10)),err=span/n/step;
+  step*=err>=7.5?10:err>=3.5?5:err>=1.5?2:1;
+  var a=Math.floor(min/step)*step,b=Math.ceil(max/step)*step,t=[];
+  for(var v=a;v<=b+step/2;v+=step)t.push(Math.round(v/step*1e6)/1e6*step);
+  return t;
+}
+var CHARTS=[
+  {t:"Валовой надой по дням, л",type:"line",v:function(r){return r.milk;},d:0},
+  {t:"Выручка по дням с НДС, ₽",type:"bar",v:function(r){return r.rev;},d:0,zero:true},
+  {t:"Цена за литр с НДС, ₽",type:"line",v:function(r){return r.sold?r.rev/r.sold:NaN;},d:2},
+  {t:"Средняя жирность, %",type:"line",v:function(r){return r.fat||NaN;},d:2},
+  {t:"Надой на одну корову в день, л",type:"line",v:function(r){return r.cows?r.milk/r.cows:NaN;},d:1},
+  {t:"Поголовье коров на дойке",type:"line",v:function(r){return r.cows||NaN;},d:0},
+  {t:"Распределение валового надоя, л",type:"hbar"},
+  {t:"Передача телятам по дням, л",type:"bar",v:function(r){return r.calf;},d:0,zero:true}
+];
+function drawAll(rows,farms){
+  var g=document.getElementById("grid");
+  if(!g.children.length){
+    g.innerHTML=CHARTS.map(function(c,i){return "<div class=\"card ch\"><h3>"+c.t+"</h3><div class=\"plot\" id=\"p"+i+"\"></div><div class=\"leg\" id=\"l"+i+"\"></div></div>";}).join("");
+  }
+  var days=state.days.filter(function(d){return d>=state.from&&d<=state.to;});
+  CHARTS.forEach(function(c,i){
+    var el=document.getElementById("p"+i),lg=document.getElementById("l"+i);
+    if(!rows.length){el.innerHTML="<div class=\"empty\">Нет данных за выбранный период</div>";lg.innerHTML="";return;}
+    if(c.type==="hbar"){hbar(el,lg,rows,farms);return;}
+    var series=farms.map(function(f){
+      var map={};rows.forEach(function(r){if(r.farm===f)map[r.date]=c.v(r);});
+      return {n:f,col:farmColor(f),pts:days.map(function(d){return map[d]==null?NaN:map[d];})};
+    });
+    var any=series.some(function(s){return s.pts.some(function(v){return isFinite(v)&&v!==0;});});
+    if(!any){el.innerHTML="<div class=\"empty\">В таблице нет этой колонки</div>";lg.innerHTML="";return;}
+    c.type==="line"?line(el,series,days,c):bars(el,series,days,c);
+    lg.innerHTML=series.map(function(s){return "<span><i style=\"background:"+s.col+"\"></i>"+esc(s.n)+"</span>";}).join("");
+  });
+}
+function frame(el){var w=Math.max(el.clientWidth,200),h=el.clientHeight||240;return {w:w,h:h,l:46,r:8,t:8,b:24};}
+function scaleY(ticks,f){var lo=ticks[0],hi=ticks[ticks.length-1];return function(v){return f.t+(1-(v-lo)/(hi-lo))*(f.h-f.t-f.b);};}
+function axes(f,ticks,y,days,d){
+  var s="";
+  ticks.forEach(function(t){var yy=y(t);s+="<line x1=\""+f.l+"\" x2=\""+(f.w-f.r)+"\" y1=\""+yy+"\" y2=\""+yy+"\" stroke=\"#e6e9ef\"/><text x=\""+(f.l-6)+"\" y=\""+(yy+4)+"\" text-anchor=\"end\" font-size=\"11\" fill=\"#6b7385\">"+fmt(t,d>0&&Math.abs(ticks[1]-ticks[0])<1?d:0)+"</text>";});
+  return s;
+}
+function xlabels(f,days,xf){
+  var s="",step=Math.max(1,Math.ceil(days.length/Math.floor((f.w-f.l-f.r)/28)));
+  days.forEach(function(d,i){if(i%step===0)s+="<text x=\""+xf(i)+"\" y=\""+(f.h-6)+"\" text-anchor=\"middle\" font-size=\"11\" fill=\"#6b7385\">"+parseInt(d.split("-")[2],10)+"</text>";});
+  return s;
+}
+function range(series,zero){
+  var mn=Infinity,mx=-Infinity;
+  series.forEach(function(s){s.pts.forEach(function(v){if(isFinite(v)){if(v<mn)mn=v;if(v>mx)mx=v;}});});
+  if(zero)mn=Math.min(0,mn);
+  else{var p=(mx-mn)*.1||mx*.05||1;mn-=p;mx+=p;}
+  return niceTicks(mn,mx,5);
+}
+function line(el,series,days,c){
+  var f=frame(el),ticks=range(series,false),y=scaleY(ticks,f),n=days.length;
+  var x=function(i){return n<2?(f.l+f.w-f.r)/2:f.l+8+i*(f.w-f.l-f.r-16)/(n-1);};
+  var s=axes(f,ticks,y,days,c.d)+xlabels(f,days,x);
+  series.forEach(function(sr){
+    var d="",pen=false,dots="";
+    sr.pts.forEach(function(v,i){
+      if(!isFinite(v)){pen=false;return;}
+      d+=(pen?"L":"M")+x(i).toFixed(1)+" "+y(v).toFixed(1);pen=true;
+      dots+="<circle cx=\""+x(i).toFixed(1)+"\" cy=\""+y(v).toFixed(1)+"\" r=\"3\" fill=\"#fff\" stroke=\""+sr.col+"\" stroke-width=\"2\"><title>"+esc(sr.n)+", "+dayLabel(days[i])+": "+fmt(v,c.d)+"</title></circle>";
+    });
+    s+="<path d=\""+d+"\" fill=\"none\" stroke=\""+sr.col+"\" stroke-width=\"2.2\" stroke-linejoin=\"round\"/>"+dots;
+  });
+  el.innerHTML="<svg viewBox=\"0 0 "+f.w+" "+f.h+"\" role=\"img\" aria-label=\""+esc(c.t)+"\">"+s+"</svg>";
+}
+function bars(el,series,days,c){
+  var f=frame(el),ticks=range(series,true),y=scaleY(ticks,f),n=days.length,m=series.length;
+  var slot=(f.w-f.l-f.r)/n,x=function(i){return f.l+slot*(i+.5);};
+  var bw=Math.max(2,Math.min(18,slot*.8/m));
+  var s=axes(f,ticks,y,days,c.d)+xlabels(f,days,x),y0=y(0);
+  series.forEach(function(sr,k){
+    sr.pts.forEach(function(v,i){
+      if(!isFinite(v))return;
+      var bx=x(i)-bw*m/2+k*bw,by=y(v);
+      s+="<rect x=\""+bx.toFixed(1)+"\" y=\""+Math.min(by,y0).toFixed(1)+"\" width=\""+(bw-1).toFixed(1)+"\" height=\""+Math.max(0,Math.abs(y0-by)).toFixed(1)+"\" fill=\""+sr.col+"\" rx=\"1\"><title>"+esc(sr.n)+", "+dayLabel(days[i])+": "+fmt(v,c.d)+"</title></rect>";
+    });
+  });
+  el.innerHTML="<svg viewBox=\"0 0 "+f.w+" "+f.h+"\" role=\"img\" aria-label=\""+esc(c.t)+"\">"+s+"</svg>";
+}
+function hbar(el,lg,rows,farms){
+  var f=frame(el);f.l=Math.min(86,f.w*.28);f.b=40;
+  var data=farms.map(function(n){var a=rows.filter(function(r){return r.farm===n;});var m=sum(a,"milk"),so=sum(a,"sold"),ca=sum(a,"calf");return {n:n,parts:[so,ca,Math.max(0,m-so-ca)]};});
+  var PC=["#27ae60","#9b59b6","#95a5a6"],PN=["Сдача","Телятам","Прочее"];
+  var mx=Math.max.apply(null,data.map(function(d){return d.parts[0]+d.parts[1]+d.parts[2];}));
+  var ticks=niceTicks(0,mx,f.w<340?2:3),hi=ticks[ticks.length-1];
+  var X=function(v){return f.l+v/hi*(f.w-f.l-f.r-6);};
+  var ah=f.h-f.t-f.b,rh=ah/data.length,bh=Math.min(54,rh*.7),s="";
+  ticks.forEach(function(t){s+="<line x1=\""+X(t)+"\" x2=\""+X(t)+"\" y1=\""+f.t+"\" y2=\""+(f.t+ah)+"\" stroke=\"#e6e9ef\"/><text x=\""+X(t)+"\" y=\""+(f.t+ah+14)+"\" text-anchor=\"middle\" font-size=\"11\" fill=\"#6b7385\">"+fmt(t)+"</text>";});
+  data.forEach(function(d,i){
+    var cy=f.t+rh*(i+.5),x0=0,lab=d.n.length>11?d.n.slice(0,10)+"…":d.n;
+    s+="<text x=\""+(f.l-6)+"\" y=\""+(cy+4)+"\" text-anchor=\"end\" font-size=\"11\" fill=\"#6b7385\">"+esc(lab)+"</text>";
+    d.parts.forEach(function(p,k){
+      if(p<=0)return;
+      s+="<rect x=\""+X(x0).toFixed(1)+"\" y=\""+(cy-bh/2).toFixed(1)+"\" width=\""+(X(x0+p)-X(x0)).toFixed(1)+"\" height=\""+bh.toFixed(1)+"\" fill=\""+PC[k]+"\"><title>"+esc(d.n)+", "+PN[k]+": "+fmt(p)+" л</title></rect>";
+      x0+=p;
+    });
+  });
+  el.innerHTML="<svg viewBox=\"0 0 "+f.w+" "+f.h+"\" role=\"img\" aria-label=\"Распределение валового надоя\">"+s+"</svg>";
+  lg.innerHTML=PN.map(function(n,k){return "<span><i style=\"background:"+PC[k]+"\"></i>"+n+"</span>";}).join("");
+}
+
+/* ---------- события ---------- */
+var drop=document.getElementById("drop"),file=document.getElementById("file");
+document.getElementById("pick").onclick=function(){file.click();};
+file.onchange=function(){if(file.files[0])readFile(file.files[0]);file.value="";};
+["dragenter","dragover"].forEach(function(e){drop.addEventListener(e,function(ev){ev.preventDefault();drop.classList.add("over");});});
+["dragleave","drop"].forEach(function(e){drop.addEventListener(e,function(ev){ev.preventDefault();drop.classList.remove("over");});});
+drop.addEventListener("drop",function(ev){var f=ev.dataTransfer&&ev.dataTransfer.files[0];if(f)readFile(f);});
+var SAMPLE=rowsToCsv(sampleRows());
+document.getElementById("sample").onclick=function(){loadText(SAMPLE,"пример таблицы (условные данные)",false);document.getElementById("sheetbox").scrollIntoView({behavior:"smooth",block:"nearest"});};
+document.getElementById("dl").onclick=function(){
+  try{var b=new Blob(["﻿"+SAMPLE],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="primer_tablicy.csv";document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);}catch(e){}
+};
+var rt;window.addEventListener("resize",function(){clearTimeout(rt);rt=setTimeout(render,120);});
+
+loadText(SAMPLE,"пример таблицы (условные данные)",false);
+document.getElementById("status").className="status";
+document.getElementById("status").textContent="Сейчас показан пример на условных данных. Загрузите свой CSV, и всё пересоберётся.";
+})();
+</script>
+</body>
+</html>
