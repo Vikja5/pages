@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Каталог недвижимости — пример вёрстки</title>
+<style>
+@font-face{font-family:"Manrope";src:url("Manrope-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"Manrope";src:url("Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-display:swap}
+@font-face{font-family:"Manrope";src:url("Manrope-Bold.ttf") format("truetype");font-weight:700;font-display:swap}
+@font-face{font-family:"Manrope";src:url("Manrope-ExtraBold.ttf") format("truetype");font-weight:800;font-display:swap}
+:root{
+  --black:#0e0e0e;--paper:#f3f3f1;--ink:#111;--grey:#8a8a87;--rule:#cfcfcb;
+  --ui-bg:#e7e6e2;--ui-ink:#161616;--ui-mute:#76756f;
+  --font:"Manrope","Segoe UI",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ui-bg);color:var(--ui-ink);font-family:var(--font);font-size:16px;line-height:1.5;overflow-x:hidden}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--ui-ink);outline-offset:3px}
+
+/* обёртка */
+.wrap{max-width:1240px;margin:0 auto;padding:0 16px 56px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:22px 0 18px;border-bottom:1px solid #d3d2cd}
+.mark{font-size:12px;letter-spacing:.42em;text-transform:uppercase;color:var(--ui-ink);white-space:nowrap}
+.demo{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ui-mute);white-space:nowrap}
+.intro{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding:34px 0 22px;flex-wrap:wrap}
+.intro h1{margin:0;font-weight:800;font-size:clamp(26px,4.4vw,46px);line-height:1.04;letter-spacing:-.01em;text-transform:uppercase}
+.intro p{margin:0;max-width:430px;color:var(--ui-mute);font-size:15px}
+
+/* сцена со страницами 16:9 (холст 1600x900, масштабируется) */
+.stage{position:relative;width:100%;overflow:hidden;background:var(--black);touch-action:pan-y}
+.page{position:absolute;left:0;top:0;width:1600px;height:900px;transform-origin:0 0;overflow:hidden;display:none;font-family:var(--font)}
+.page.on{display:block}
+.page *{position:absolute;margin:0}
+.page img{object-fit:cover;display:block}
+.dark{background:var(--black);color:#fff}
+.light{background:var(--paper);color:var(--ink)}
+.wm{font-size:22px;letter-spacing:.42em;font-weight:400;text-transform:uppercase;white-space:nowrap}
+.dark .wm{color:#9b9b98}.light .wm{color:#6c6c69}
+.caps{text-transform:uppercase;white-space:nowrap}
+.h-xl{font-weight:800;text-transform:uppercase;line-height:1;letter-spacing:-.005em;white-space:nowrap}
+.cap{font-size:17px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.dark .cap{color:#d9d9d6}
+.lbl{font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--grey);white-space:nowrap}
+.price{font-weight:800;font-size:46px;line-height:1;white-space:nowrap;letter-spacing:-.01em}
+.pn{font-size:16px;color:var(--grey);bottom:34px;right:58px}
+.dm{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8d8d89;bottom:34px;white-space:nowrap}
+.rule-h{height:1px;background:#1a1a1a}
+.dark .rule-h{background:#3a3a38}
+.rule-v{width:1px;background:var(--rule)}
+.pin{width:30px;height:42px}
+
+/* управление */
+.ctrl{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 0 0;flex-wrap:wrap}
+.tabs{display:flex;flex-wrap:wrap}
+.tabs button{font:inherit;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ui-mute);background:none;border:0;border-bottom:1px solid transparent;padding:8px 0;margin-right:22px;cursor:pointer}
+.tabs button[aria-selected=true]{color:var(--ui-ink);border-bottom-color:var(--ui-ink)}
+.arrows{display:flex;align-items:center;gap:14px}
+.arrows button{width:46px;height:46px;border:1px solid #b9b8b2;background:none;color:var(--ui-ink);cursor:pointer;display:grid;place-items:center;padding:0}
+.arrows button:hover{border-color:var(--ui-ink)}
+.arrows button:disabled{opacity:.3;cursor:default}
+.count{font-size:13px;letter-spacing:.14em;color:var(--ui-mute);min-width:62px;text-align:center}
+.hint{font-size:13px;color:var(--ui-mute);margin:12px 0 0}
+.pdf{display:inline-flex;align-items:center;gap:10px;margin-top:26px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;text-decoration:none;border-bottom:1px solid var(--ui-ink);padding-bottom:4px}
+
+/* что получите */
+.get{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin:52px 0 0}
+.get div{border-top:1px solid var(--ui-ink);padding-top:16px}
+.get i{font-style:normal;font-size:12px;letter-spacing:.18em;color:var(--ui-mute)}
+.get b{display:block;font-weight:800;font-size:18px;text-transform:uppercase;letter-spacing:.01em;margin:10px 0 6px;line-height:1.2}
+.get span{color:var(--ui-mute);font-size:14.5px;line-height:1.5;display:block}
+.foot{margin-top:46px;padding-top:16px;border-top:1px solid #d3d2cd;font-size:12px;color:var(--ui-mute);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media (max-width:760px){
+  .get{grid-template-columns:1fr;gap:22px}
+  .tabs button{margin-right:14px;font-size:11px;letter-spacing:.1em}
+  .ctrl{flex-direction:column;align-items:stretch}
+  .arrows{justify-content:space-between}
+  .demo{letter-spacing:.08em}
+  .mark{letter-spacing:.3em}
+}
+
+/* печать в PDF */
+@page{size:1600px 900px;margin:0}
+@media print{
+  html,body{background:#0e0e0e;width:1600px}
+  .wrap{max-width:none;padding:0;margin:0}
+  .top,.intro,.ctrl,.hint,.pdf,.get,.foot{display:none!important}
+  .stage{height:auto!important;overflow:visible;background:none}
+  .page{display:block!important;position:relative!important;transform:none!important;break-after:page;page-break-after:always}
+  .page:last-child{break-after:auto;page-break-after:auto}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <span class="mark">Каталог / Пример</span>
+    <span class="demo">демо / пример работы</span>
+  </header>
+
+  <section class="intro">
+    <h1>Каталог<br>недвижимости</h1>
+    <p>Пример вёрстки в минималистичной стилистике: обложка, две страницы проектов с разной сеткой и финальная страница с контактами. Тексты, цены и контакты условные.</p>
+  </section>
+
+  <div class="stage" id="stage" aria-label="Страницы каталога">
+
+    <!-- 1. Обложка -->
+    <article class="page dark" data-name="Обложка" aria-label="Обложка">
+      <span class="wm" style="left:84px;top:62px">Каталог&nbsp;&nbsp;Пример</span>
+      <span class="lbl" style="left:84px;top:262px;color:#8d8d89">Коллекция проектов</span>
+      <h2 class="h-xl" style="left:78px;top:298px;font-size:118px">Жилые<br>проекты</h2>
+      <svg style="left:86px;top:540px;width:92px;height:74px;overflow:visible" viewBox="0 0 124 100" fill="none" stroke="#fff" stroke-width="2.6" aria-label="01"><ellipse cx="28" cy="50" rx="26" ry="48"/><path d="M78 18 L100 2 V100"/></svg>
+      <div class="rule-h" style="left:84px;top:742px;width:620px"></div>
+      <span class="cap" style="left:84px;top:768px">Квартиры&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;Пентхаусы&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;Резиденции</span>
+      <img src="img/tower_square.jpg" alt="Башня проекта" style="left:860px;top:62px;width:656px;height:776px">
+      <span class="dm" style="left:84px">демо / пример работы</span>
+      <span class="pn" style="color:#6f6f6c;right:84px">1</span>
+    </article>
+
+    <!-- 2. Проект 01, сетка как в референсе -->
+    <article class="page" data-name="Проект 01" aria-label="Проект 01">
+      <div class="dark" style="left:0;top:0;width:800px;height:900px">
+        <h2 class="h-xl" style="left:82px;top:78px;font-size:70px">Проект Пример</h2>
+        <svg style="left:86px;top:170px;width:58px;height:47px;overflow:visible" viewBox="0 0 124 100" fill="none" stroke="#fff" stroke-width="3" aria-label="01"><ellipse cx="28" cy="50" rx="26" ry="48"/><path d="M78 18 L100 2 V100"/></svg>
+        <img src="img/tower_square.jpg" alt="Вид на башню проекта" style="left:152px;top:190px;width:520px;height:520px">
+        <span class="cap" style="left:152px;top:742px">4 кв 0000&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;Квартиры, пентхаусы</span>
+        <span class="dm" style="left:84px;bottom:22px">демо / пример работы, данные условные</span>
+      </div>
+      <div class="light" style="left:800px;top:0;width:800px;height:900px">
+        <span class="wm" style="left:42px;top:50px">Каталог&nbsp;&nbsp;Пример</span>
+        <span class="caps" style="left:42px;top:140px;font-weight:800;font-size:20px;letter-spacing:.02em">Район Пример</span>
+        <span style="left:280px;top:112px;font-size:15px;color:#7a7a77;white-space:nowrap">Узнать подробнее</span>
+        <a href="tel:+70000000000" style="left:280px;top:136px;font-size:24px;text-decoration:none;white-space:nowrap">+7 000 000-00-00</a>
+        <div class="rule-v" style="left:528px;top:112px;height:56px"></div>
+        <span style="left:556px;top:112px;font-size:15px;color:#7a7a77;white-space:nowrap">Все проекты</span>
+        <a href="https://primer.example/" style="left:556px;top:136px;font-size:24px;text-decoration:none">primer.example</a>
+        <img src="img/tower_aerial.jpg" alt="Башня, вид сверху" style="left:42px;top:190px;width:212px;height:270px">
+        <img src="img/balcony_sunset.jpg" alt="Фасад и балконы на закате" style="left:266px;top:190px;width:534px;height:270px">
+        <div style="left:42px;top:474px;width:212px;height:372px;overflow:hidden">
+          <img src="img/map.jpg" alt="Схема расположения" style="left:0;top:0;width:212px;height:372px">
+          <svg class="pin" style="left:59px;top:66px" viewBox="0 0 30 42"><path d="M15 0C6.7 0 0 6.6 0 14.8 0 25.9 15 42 15 42s15-16.1 15-27.2C30 6.6 23.3 0 15 0z" fill="#0e0e0e"/><circle cx="15" cy="14.5" r="5.2" fill="#f3f3f1"/></svg>
+        </div>
+        <span class="price" style="left:298px;top:500px">от 00&nbsp;000&nbsp;000&nbsp;₽</span>
+        <span class="lbl" style="left:300px;top:556px">Стоимость</span>
+        <span class="price" style="left:298px;top:596px">от 000&nbsp;000&nbsp;₽</span>
+        <span class="lbl" style="left:300px;top:652px">Цена за м²</span>
+        <div class="rule-h" style="left:300px;top:692px;width:446px"></div>
+        <p style="left:300px;top:712px;width:446px;font-size:15.5px;line-height:1.48;color:#1c1c1c">Проект Пример — условный жилой комплекс для образца вёрстки. Здесь размещается описание из ваших материалов: архитектура и фасады, видовые характеристики, отделка, лобби и инфраструктура, окружение и парк рядом.</p>
+        <span class="pn" style="bottom:22px;right:54px">2</span>
+      </div>
+    </article>
+
+    <!-- 3. Проект 02, другая сетка -->
+    <article class="page light" data-name="Проект 02" aria-label="Проект 02">
+      <span class="wm" style="left:84px;top:58px">Каталог&nbsp;&nbsp;Пример</span>
+      <span style="left:1016px;top:46px;font-size:15px;color:#7a7a77;white-space:nowrap">Узнать подробнее</span>
+      <a href="tel:+70000000000" style="left:1016px;top:70px;font-size:22px;text-decoration:none;white-space:nowrap">+7 000 000-00-00</a>
+      <div class="rule-v" style="left:1250px;top:46px;height:52px"></div>
+      <span style="left:1278px;top:46px;font-size:15px;color:#7a7a77;white-space:nowrap">Все проекты</span>
+      <a href="https://primer.example/" style="left:1278px;top:70px;font-size:22px;text-decoration:none">primer.example</a>
+
+      <img src="img/balcony_sunset.jpg" alt="Фасад и балконы на закате" style="left:84px;top:138px;width:976px;height:430px;object-position:40% 50%">
+      <img src="img/tower_aerial.jpg" alt="Башня, вид сверху" style="left:1080px;top:138px;width:436px;height:430px;object-position:50% 30%">
+
+      <svg style="left:86px;top:612px;width:50px;height:40px;overflow:visible" viewBox="0 0 124 100" fill="none" stroke="#111" stroke-width="3.2" aria-label="02"><ellipse cx="28" cy="50" rx="26" ry="48"/><path d="M68 24 C68 10 80 2 94 2 C109 2 120 12 120 26 C120 38 112 46 102 56 L68 98 H122"/></svg>
+      <h2 class="h-xl" style="left:82px;top:668px;font-size:58px">Проект<br>Второй</h2>
+      <span class="lbl" style="left:84px;top:814px;color:#5f5f5c">4 кв 0000&nbsp;&nbsp;|&nbsp;&nbsp;Квартиры, пентхаусы</span>
+
+      <div class="rule-v" style="left:560px;top:612px;height:222px"></div>
+      <span style="left:600px;top:612px;font-weight:600;font-size:40px;line-height:1">00</span>
+      <span class="lbl" style="left:602px;top:662px">Этажей</span>
+      <span style="left:790px;top:612px;font-weight:600;font-size:40px;line-height:1;white-space:nowrap">0,0 м</span>
+      <span class="lbl" style="left:792px;top:662px">Потолки</span>
+      <span style="left:600px;top:722px;font-weight:600;font-size:40px;line-height:1">000</span>
+      <span class="lbl" style="left:602px;top:772px">Квартир</span>
+      <span style="left:790px;top:722px;font-weight:600;font-size:40px;line-height:1;white-space:nowrap">0,0 га</span>
+      <span class="lbl" style="left:792px;top:772px">Парк рядом</span>
+
+      <div class="rule-v" style="left:1040px;top:612px;height:222px"></div>
+      <span class="price" style="left:1080px;top:612px;font-size:40px">от 00&nbsp;000&nbsp;000&nbsp;₽</span>
+      <span class="lbl" style="left:1082px;top:662px">Стоимость</span>
+      <span class="price" style="left:1080px;top:722px;font-size:40px">от 000&nbsp;000&nbsp;₽</span>
+      <span class="lbl" style="left:1082px;top:772px">Цена за м²</span>
+
+      <span class="dm" style="left:84px;bottom:30px">демо / пример работы, данные условные</span>
+      <span class="pn" style="bottom:30px;right:84px">3</span>
+    </article>
+
+    <!-- 4. Контакты -->
+    <article class="page dark" data-name="Контакты" aria-label="Контакты">
+      <span class="wm" style="left:84px;top:62px">Каталог&nbsp;&nbsp;Пример</span>
+      <img src="img/tower_aerial.jpg" alt="Башня, вид сверху" style="left:84px;top:190px;width:380px;height:486px">
+      <span class="cap" style="left:84px;top:708px;color:#8d8d89">Все проекты в одном каталоге</span>
+
+      <h2 class="h-xl" style="left:560px;top:180px;font-size:92px">Свяжитесь<br>с нами</h2>
+      <div class="rule-h" style="left:564px;top:400px;width:952px"></div>
+
+      <span class="lbl" style="left:564px;top:440px">Телефон</span>
+      <a href="tel:+70000000000" style="left:564px;top:468px;font-size:34px;text-decoration:none;white-space:nowrap">+7 000 000-00-00</a>
+      <span class="lbl" style="left:1060px;top:440px">Почта</span>
+      <a href="mailto:info@primer.example" style="left:1060px;top:468px;font-size:34px;text-decoration:none">info@primer.example</a>
+
+      <span class="lbl" style="left:564px;top:566px">Сайт</span>
+      <a href="https://primer.example/" style="left:564px;top:594px;font-size:34px;text-decoration:none">primer.example</a>
+      <span class="lbl" style="left:1060px;top:566px">Офис продаж</span>
+      <span style="left:1060px;top:594px;font-size:34px;white-space:nowrap">г. Пример, ул. Условная, 0</span>
+
+      <div class="rule-h" style="left:564px;top:676px;width:952px"></div>
+      <p style="left:564px;top:704px;width:620px;font-size:15px;line-height:1.5;color:#8d8d89">Данные, цены и контакты в этом каталоге условные и показаны как пример вёрстки. Не является публичной офертой.</p>
+
+      <span class="dm" style="left:84px">демо / пример работы</span>
+      <span class="pn" style="color:#6f6f6c;right:84px">4</span>
+    </article>
+  </div>
+
+  <div class="ctrl">
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="arrows">
+      <button type="button" id="prev" aria-label="Предыдущая страница"><svg width="18" height="12" viewBox="0 0 18 12" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M17 6H1M6 1L1 6l5 5"/></svg></button>
+      <span class="count" id="count">01 / 04</span>
+      <button type="button" id="next" aria-label="Следующая страница"><svg width="18" height="12" viewBox="0 0 18 12" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M1 6h16M12 1l5 5-5 5"/></svg></button>
+    </div>
+  </div>
+  <p class="hint">Листайте кнопками, клавишами ← → или свайпом. Контакты в PDF кликабельные.</p>
+  <a class="pdf" href="primer_katalog.pdf" target="_blank" rel="noopener">Открыть PDF-версию <svg width="18" height="12" viewBox="0 0 18 12" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M1 6h16M12 1l5 5-5 5"/></svg></a>
+
+  <section class="get" aria-label="Что получите">
+    <div><i>01</i><b>PDF с кликабельными контактами</b><span>Телефон, почта и сайт открываются по нажатию; страницы 16:9 в едином стиле.</span></div>
+    <div><i>02</i><b>Редактируемый исходник</b><span>Файл вёрстки со всеми стилями и сеткой, чтобы менять тексты и цены без пересборки.</span></div>
+    <div><i>03</i><b>Два раунда правок</b><span>Типографика, отступы, композиция и замена материалов по вашим замечаниям.</span></div>
+  </section>
+
+  <footer class="foot">
+    <span>Каталог / Пример — демо / пример работы</span>
+    <span>Тексты, цены и контакты условные</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var stage=document.getElementById('stage');
+  var pages=[].slice.call(stage.querySelectorAll('.page'));
+  var tabs=document.getElementById('tabs');
+  var count=document.getElementById('count');
+  var prev=document.getElementById('prev'),next=document.getElementById('next');
+  var cur=0;
+  function pad(n){return (n<10?'0':'')+n}
+  pages.forEach(function(p,i){
+    var b=document.createElement('button');
+    b.type='button';b.setAttribute('role','tab');b.textContent=p.getAttribute('data-name');
+    b.addEventListener('click',function(){go(i)});
+    tabs.appendChild(b);
+  });
+  function fit(){
+    var s=stage.clientWidth/1600;
+    stage.style.height=(900*s)+'px';
+    pages.forEach(function(p){p.style.transform='scale('+s+')'});
+  }
+  function go(i){
+    cur=Math.max(0,Math.min(pages.length-1,i));
+    pages.forEach(function(p,k){p.classList.toggle('on',k===cur)});
+    [].forEach.call(tabs.children,function(b,k){b.setAttribute('aria-selected',k===cur?'true':'false')});
+    count.textContent=pad(cur+1)+' / '+pad(pages.length);
+    prev.disabled=cur===0;next.disabled=cur===pages.length-1;
+  }
+  prev.addEventListener('click',function(){go(cur-1)});
+  next.addEventListener('click',function(){go(cur+1)});
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key==='PageDown'){go(cur+1)}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){go(cur-1)}
+  });
+  var x0=null;
+  stage.addEventListener('touchstart',function(e){x0=e.touches[0].clientX},{passive:true});
+  stage.addEventListener('touchend',function(e){
+    if(x0===null)return;var dx=e.changedTouches[0].clientX-x0;x0=null;
+    if(Math.abs(dx)>40){go(cur+(dx<0?1:-1))}
+  });
+  window.addEventListener('resize',fit);
+  window.addEventListener('beforeprint',function(){pages.forEach(function(p){p.style.transform='none'})});
+  window.addEventListener('afterprint',fit);
+  var h=location.hash.match(/^#p(\d)$/);
+  fit();go(h?+h[1]-1:0);
+})();
+</script>
+</body>
+</html>
