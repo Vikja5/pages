@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Правка макета: было и стало</title>
+<style>
+:root{--bg:#fdf6ea;--ink:#3a0d0d;--muted:#6b4f4a;--line:#e6d9c6;--card:#fffaf1;--btn:#3a0606}
+*{box-sizing:border-box}
+html,body{margin:0;overflow-x:hidden}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 Arial,sans-serif}
+.tag{background:var(--btn);color:#fff;text-align:center;padding:8px 16px;font-size:13px}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px 48px}
+h1{font:600 28px/1.2 Georgia,"Times New Roman",serif;margin:0 0 8px}
+.lead{color:var(--muted);margin:0 0 28px}
+.cols{display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+@media(min-width:760px){.cols{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.col h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 10px;color:var(--muted)}
+.was img{width:100%;height:auto;border:1px solid var(--line);border-radius:12px;display:block}
+.notes{margin:12px 0 0;padding:0;list-style:none;font-size:14px;color:var(--muted)}
+.notes li{padding-left:22px;position:relative;margin-bottom:6px}
+.notes li:before{content:"!";position:absolute;left:0;top:1px;width:15px;height:15px;border-radius:50%;background:#b3392f;color:#fff;font-size:11px;line-height:15px;text-align:center}
+.after .box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px}
+.after h3{font:600 24px/1.25 Georgia,"Times New Roman",serif;margin:0 0 14px}
+.list{list-style:none;margin:0 0 20px;padding:0}
+.list li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--line)}
+.list li:last-child{border-bottom:0}
+.list svg{flex:0 0 20px;width:20px;height:20px;margin-top:2px;stroke:var(--ink);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px}
+.price{font:600 36px/1 Georgia,"Times New Roman",serif}
+.btn{display:inline-block;background:var(--btn);color:#fff;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:600}
+.btn.o{background:none;color:var(--ink);border:1px solid var(--ink)}
+.help{margin-top:18px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;color:var(--muted)}
+.res{margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
+.res h3{margin:0}
+.foot{margin-top:32px;font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="tag">демо / пример работы: правка вашего макета на реальном блоке «Тарифы»</div>
+<div class="wrap">
+<h1>Макет «Школа Эльзы Газиевой»: было и стало</h1>
+<p class="lead">Слева фрагмент вашего макета (скриншот из Figma). Справа тот же блок после правки. Так же приведу в порядок остальные блоки, в версии для телефона и для компьютера.</p>
+<div class="cols">
+<div class="col was">
+<h2>Было (ваш макет)</h2>
+<img src="was_tarify.jpg" alt="Фрагмент макета: тарифы и блок результатов">
+<ul class="notes">
+<li>Заголовок «Результаты учеников» набран другим шрифтом, чем цена и карточки: гротеск рядом с антиквой, нет единой иерархии.</li>
+<li>Пункты списка отмечены дефисами: без иконок, выглядит как черновик.</li>
+<li>Блок «Помочь с выбором формата» прижат к левому краю, без внутреннего поля.</li>
+<li>Отступы между карточкой тарифа и следующим блоком не выдержаны по ритму.</li>
+</ul>
+</div>
+<div class="col after">
+<h2>Стало (правка)</h2>
+<div class="box">
+<h3>Что входит в тариф</h3>
+<ul class="list">
+<li><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg>24 онлайн-лекции с доступом на 6 месяцев</li>
+<li><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg>Видео всех массажных приёмов</li>
+<li><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg>Печатное методическое пособие</li>
+<li><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg>Личный чат с преподавателем на 6 месяцев</li>
+<li><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg>Бессрочный доступ к чату мастеров</li>
+<li><svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg>Сертификат школы</li>
+</ul>
+<div class="row"><span class="price">59 000 ₽</span><a class="btn" href="#">Записаться в группу</a></div>
+<div class="help"><span>Помочь с выбором формата?</span><a class="btn o" href="#">Заказать звонок</a></div>
+<div class="res"><h3>Результаты учеников: фото до и после</h3></div>
+</div>
+</div>
+</div>
+<p class="foot">Что изменено: заголовки и цена в одной гарнитуре с засечками, текст без засечек; единый набор линейных иконок вместо дефисов; поля 16–24 px со всех сторон; ровные отступы между блоками. Цвета и тексты ваши, дизайн не перерисовываю.</p>
+</div>
+</body>
+</html>
