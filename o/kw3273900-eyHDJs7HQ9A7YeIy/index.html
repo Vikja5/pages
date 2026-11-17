@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Калькулятор материалов (демо)</title>
+<link rel="preload" href="fonts/Manrope-Regular.ttf" as="font" type="font/ttf" crossorigin>
+<style>
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-Regular.ttf") format("truetype");font-weight:400;font-display:block}
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-display:block}
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-Bold.ttf") format("truetype");font-weight:700;font-display:block}
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-ExtraBold.ttf") format("truetype");font-weight:800;font-display:block}
+:root{--bg:#f4f6f8;--card:#fff;--ink:#1b2430;--mute:#5d6b7a;--line:#dde3ea;--acc:#1f6f5c;--acc2:#e8f3ef;--warn:#b3261e}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Manrope",Arial,sans-serif;font-size:16px;line-height:1.5}
+.wrap{max-width:880px;margin:0 auto;padding:0 16px 40px}
+.demo{background:#fff4d6;border-bottom:1px solid #ecd58a;color:#6b5200;font-size:14px;text-align:center;padding:8px 16px;font-weight:600}
+header{padding:28px 0 8px}
+h1{font-size:28px;line-height:1.2;margin:0 0 8px;font-weight:800}
+header p{margin:0;color:var(--mute);max-width:60ch}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;margin-top:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+h2{font-size:18px;margin:0 0 14px;font-weight:700}
+label{display:block;font-weight:600;font-size:14px;margin-bottom:4px}
+.f{margin-bottom:14px}
+.f small{display:block;color:var(--mute);font-size:12px;margin-top:3px}
+input{width:100%;font:inherit;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+input:focus-visible,button:focus-visible{outline:3px solid #7fc4b0;outline-offset:1px}
+input.bad{border-color:var(--warn)}
+.err{color:var(--warn);font-size:13px;min-height:18px;margin:0 0 8px}
+.res{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.r{background:var(--acc2);border-radius:10px;padding:12px}
+.r span{display:block;font-size:12px;color:var(--mute);font-weight:600}
+.r b{display:block;font-size:22px;font-weight:800;color:var(--acc);overflow-wrap:anywhere}
+.r.main{grid-column:1/-1;background:var(--acc)}
+.r.main span{color:#cfe8e0}.r.main b{color:#fff;font-size:28px}
+.how{margin:14px 0 0;padding:0;list-style:none;font-size:13px;color:var(--mute)}
+.how li{padding:2px 0}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+button{font:inherit;font-weight:700;font-size:15px;border:0;border-radius:8px;padding:11px 16px;background:var(--acc);color:#fff;cursor:pointer;flex:1 1 120px;min-height:44px}
+button:hover{background:#185a4a}
+button.sec{background:#fff;color:var(--acc);border:1.5px solid var(--acc)}
+button.sec:hover{background:var(--acc2)}
+button svg{width:16px;height:16px;vertical-align:-3px;margin-right:6px}
+.note{font-size:13px;color:var(--mute);margin-top:18px}
+#sheet{display:none}
+@media(max-width:700px){.grid{grid-template-columns:minmax(0,1fr)}h1{font-size:24px}.r b{font-size:20px}.r.main b{font-size:26px}}
+@media print{
+  body{background:#fff}
+  .wrap>*{display:none!important}
+  .wrap>#sheet{display:block!important}
+  .demo{display:none}
+  #sheet h1{font-size:20px}
+  #sheet table{border-collapse:collapse;width:100%;margin:10px 0}
+  #sheet td,#sheet th{border:1px solid #999;padding:6px 8px;text-align:left;font-size:13px}
+  #sheet .stamp{font-size:12px;color:#555}
+}
+</style>
+</head>
+<body>
+<div class="demo">Демо / пример работы. Формулы и цифры условные, заказчик задаёт свои.</div>
+<div class="wrap">
+<header>
+  <h1>Калькулятор расхода материала</h1>
+  <p>Введите данные, формулы посчитают результат, его можно скачать в PDF, DOC или Excel.</p>
+</header>
+
+<div class="grid">
+  <section class="card" aria-labelledby="h-in">
+    <h2 id="h-in">Исходные данные</h2>
+    <div class="f"><label for="area">Площадь поверхности, м²</label><input id="area" type="number" inputmode="decimal" min="0" step="any" value="45"></div>
+    <div class="f"><label for="rate">Расход на 1 м² за один слой, кг</label><input id="rate" type="number" inputmode="decimal" min="0" step="any" value="1.2"></div>
+    <div class="f"><label for="layers">Количество слоёв</label><input id="layers" type="number" inputmode="numeric" min="1" step="1" value="2"></div>
+    <div class="f"><label for="reserve">Запас на потери, %</label><input id="reserve" type="number" inputmode="decimal" min="0" step="any" value="10"></div>
+    <div class="f"><label for="price">Цена за 1 кг, ₽</label><input id="price" type="number" inputmode="decimal" min="0" step="any" value="42"><small>Условная цена для примера.</small></div>
+    <p class="err" id="err" role="alert"></p>
+  </section>
+
+  <section class="card" aria-labelledby="h-out">
+    <h2 id="h-out">Результат</h2>
+    <div class="res" aria-live="polite">
+      <div class="r"><span>Масса без запаса</span><b id="o1">0 кг</b></div>
+      <div class="r"><span>Масса с запасом</span><b id="o2">0 кг</b></div>
+      <div class="r"><span>Мешков по 25 кг</span><b id="o3">0 шт.</b></div>
+      <div class="r main"><span>Стоимость материала</span><b id="o4">0 ₽</b></div>
+    </div>
+    <ul class="how">
+      <li>Масса = площадь × расход × слои</li>
+      <li>С запасом = масса × (1 + запас / 100)</li>
+      <li>Мешки = масса с запасом / 25, округление вверх</li>
+      <li>Стоимость = масса с запасом × цена за кг</li>
+    </ul>
+    <div class="btns">
+      <button type="button" id="b-pdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>Скачать PDF</button>
+      <button type="button" class="sec" id="b-doc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>Скачать DOC</button>
+      <button type="button" class="sec" id="b-xls"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>Скачать Excel</button>
+    </div>
+    <p class="note">Файлы создаются прямо в браузере, ничего не отправляется на сервер. PDF: в окне печати выберите «Сохранить как PDF».</p>
+  </section>
+</div>
+
+<div id="sheet"></div>
+</div>
+
+<script>
+(function(){
+  var ids=["area","rate","layers","reserve","price"];
+  var labels={area:"Площадь поверхности, м²",rate:"Расход на 1 м² за один слой, кг",layers:"Количество слоёв",reserve:"Запас на потери, %",price:"Цена за 1 кг, ₽"};
+  var BAG=25, last=null;
+  function $(i){return document.getElementById(i)}
+  function num(v){var n=parseFloat(String(v).replace(",","."));return isFinite(n)?n:NaN}
+  function fmt(n,d){return n.toLocaleString("ru-RU",{maximumFractionDigits:d===undefined?2:d})}
+  function calc(){
+    var v={},bad=[];
+    ids.forEach(function(i){
+      var n=num($(i).value);
+      var ok=!isNaN(n)&&n>=0&&(i!=="layers"||n>=1);
+      $(i).classList.toggle("bad",!ok);
+      if(!ok)bad.push(labels[i]);
+      v[i]=n;
+    });
+    if(bad.length){
+      $("err").textContent="Проверьте поле: "+bad[0]+" (число не меньше нуля, слоёв не меньше 1).";
+      ["o1","o2","o3","o4"].forEach(function(i){$(i).textContent="—"});
+      last=null;return;
+    }
+    $("err").textContent="";
+    v.layers=Math.round(v.layers);
+    var m=v.area*v.rate*v.layers;
+    var mr=m*(1+v.reserve/100);
+    var bags=Math.max(0,Math.ceil(mr/BAG-1e-9))+0;
+    var cost=mr*v.price;
+    $("o1").textContent=fmt(m)+" кг";
+    $("o2").textContent=fmt(mr)+" кг";
+    $("o3").textContent=fmt(bags,0)+" шт.";
+    $("o4").textContent=fmt(cost)+" ₽";
+    last={v:v,m:m,mr:mr,bags:bags,cost:cost};
+  }
+  function rows(){
+    var d=last.v;
+    return {
+      inp:[[labels.area,d.area],[labels.rate,d.rate],[labels.layers,d.layers],[labels.reserve,d.reserve],[labels.price,d.price]],
+      out:[["Масса без запаса, кг",last.m],["Масса с запасом, кг",last.mr],["Мешков по "+BAG+" кг, шт.",last.bags],["Стоимость материала, ₽",last.cost]]
+    };
+  }
+  function stamp(){return new Date().toLocaleDateString("ru-RU")}
+  function table(list,r2){
+    return "<table><tr><th>Показатель</th><th>Значение</th></tr>"+list.map(function(x){return "<tr><td>"+x[0]+"</td><td>"+(r2?fmt(x[1]):fmt(x[1],4))+"</td></tr>"}).join("")+"</table>";
+  }
+  function docHtml(){
+    var r=rows();
+    return "<h1>Расчёт расхода материала</h1><p class=\"stamp\">Демо / пример работы. Формулы и цифры условные. Дата: "+stamp()+"</p>"+
+      "<h2>Исходные данные</h2>"+table(r.inp,false)+"<h2>Результат</h2>"+table(r.out,true)+
+      "<p class=\"stamp\">Формулы: масса = площадь × расход × слои; с запасом = масса × (1 + запас/100); мешки = масса с запасом / "+BAG+" (вверх); стоимость = масса с запасом × цена за кг.</p>";
+  }
+  function save(blob,name){
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);a.download=name;
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000);
+  }
+  function need(){if(!last){$("err").textContent="Сначала исправьте данные: файл создаётся только по верным значениям.";return false}return true}
+  $("b-pdf").onclick=function(){
+    if(!need())return;
+    $("sheet").innerHTML=docHtml();
+    window.print();
+  };
+  $("b-doc").onclick=function(){
+    if(!need())return;
+    var html="<html xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:w=\"urn:schemas-microsoft-com:office:word\" xmlns=\"http://www.w3.org/TR/REC-html40\"><head><meta charset=\"utf-8\"><title>Расчёт</title><style>body{font-family:Arial,sans-serif}table{border-collapse:collapse}td,th{border:1px solid #999;padding:5px 8px;text-align:left}</style></head><body>"+docHtml()+"</body></html>";
+    save(new Blob(["﻿",html],{type:"application/msword"}),"raschet.doc");
+  };
+  $("b-xls").onclick=function(){
+    if(!need())return;
+    var r=rows();
+    function tr(a){var n=Math.round(a[1]*10000)/10000;return "<tr><td>"+a[0]+"</td><td x:num=\""+n+"\">"+n+"</td></tr>"}
+    var html="<html xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:x=\"urn:schemas-microsoft-com:office:excel\"><head><meta charset=\"utf-8\"></head><body><table border=\"1\">"+
+      "<tr><td colspan=\"2\"><b>Расчёт расхода материала (демо / пример работы, цифры условные)</b></td></tr>"+
+      "<tr><td colspan=\"2\"><b>Исходные данные</b></td></tr>"+r.inp.map(tr).join("")+
+      "<tr><td colspan=\"2\"><b>Результат</b></td></tr>"+r.out.map(tr).join("")+"</table></body></html>";
+    save(new Blob(["﻿",html],{type:"application/vnd.ms-excel"}),"raschet.xls");
+  };
+  ids.forEach(function(i){$(i).addEventListener("input",calc)});
+  window.addEventListener("afterprint",function(){$("sheet").innerHTML=""});
+  calc();
+})();
+</script>
+</body>
+</html>
