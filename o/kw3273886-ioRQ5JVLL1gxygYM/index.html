@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>АэроСервис — авиакомпания, Чита (макет главной страницы)</title>
+<meta name="description" content="Демо / пример работы: макет главной страницы авиакомпании «АэроСервис», Чита.">
+<link rel="preload" href="fonts/Manrope-Regular.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="fonts/Manrope-Bold.ttf" as="font" type="font/ttf" crossorigin>
+<style>
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-Regular.ttf") format("truetype");font-weight:400;font-display:block}
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-display:block}
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-Bold.ttf") format("truetype");font-weight:700;font-display:block}
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-ExtraBold.ttf") format("truetype");font-weight:800;font-display:block}
+@font-face{font-family:"ManropeFallback";src:local("Arial");size-adjust:102%;ascent-override:98%;descent-override:27%}
+:root{
+  --berry:#C63678;--berry-d:#A82A64;--teal:#415659;--teal-d:#2E3F42;--red:#860404;
+  --white:#fff;--bg:#F6F4F5;--line:#E4DEE1;--tint:#FBEFF4;--text:#415659;--muted:#6F8184;
+  --r:18px;--shadow:0 10px 30px rgba(65,86,89,.14);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{font-family:"Manrope","ManropeFallback",Arial,sans-serif;color:var(--text);background:var(--white);font-size:16px;line-height:1.55;overflow-x:hidden}
+img,svg{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.wrap{width:100%;max-width:1200px;margin:0 auto;padding:0 20px}
+h1,h2,h3{color:var(--teal-d);line-height:1.15;letter-spacing:-.01em}
+h2{font-size:clamp(26px,4vw,38px);font-weight:800;margin-bottom:8px}
+.lead{color:var(--muted);max-width:60ch;margin-bottom:28px}
+section{padding:64px 0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 24px;border-radius:14px;border:0;background:var(--berry);color:#fff;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .2s,transform .2s,box-shadow .2s}
+.btn:hover{background:var(--berry-d);transform:translateY(-2px);box-shadow:0 8px 18px rgba(198,54,120,.35)}
+.btn.ghost{background:transparent;color:var(--teal);border:2px solid var(--teal)}
+.btn.ghost:hover{background:var(--teal);color:#fff;box-shadow:none}
+
+/* demo strip */
+.demo{background:var(--teal-d);color:#fff;font-size:13px;text-align:center;padding:7px 12px;font-weight:600}
+/* header */
+header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.hbar{display:flex;align-items:center;gap:20px;min-height:68px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;color:var(--teal-d);white-space:nowrap}
+.logo b{color:var(--berry)}
+.logo svg{width:38px;height:38px;flex:none}
+nav{display:none;margin-left:auto;gap:24px}
+nav a{font-weight:600;font-size:15px;white-space:nowrap;padding:8px 0;border-bottom:2px solid transparent;transition:color .2s,border-color .2s}
+nav a:hover{color:var(--berry);border-color:var(--berry)}
+.hphone{display:none;font-weight:800;white-space:nowrap;color:var(--red)}
+.hbar .btn{margin-left:auto;min-height:42px;padding:0 14px;font-size:14px}
+@media(max-width:420px){.hbar{gap:6px}.logo{font-size:17px;gap:7px}.logo svg{width:32px;height:32px}.hbar .btn{padding:0 12px;font-size:13px}.wrap{padding:0 16px}.burger{width:40px;margin-right:-6px}}
+.burger{width:44px;height:44px;border:0;background:none;display:grid;place-content:center;gap:5px;cursor:pointer}
+.burger span{display:block;width:24px;height:2.5px;background:var(--teal);border-radius:2px}
+.mnav{display:none;flex-direction:column;border-top:1px solid var(--line);background:#fff;padding:8px 20px 16px}
+.mnav.open{display:flex}
+.mnav a{padding:12px 0;font-weight:600;border-bottom:1px solid var(--line)}
+@media(min-width:1160px){nav{display:flex}.burger{display:none}.hbar .btn{margin-left:0}.mnav{display:none!important}}
+@media(min-width:1160px) and (max-width:1300px){nav{gap:14px}nav a{font-size:14px}}
+@media(min-width:1380px){.hphone{display:block}}
+
+/* hero */
+.hero{position:relative;background:linear-gradient(135deg,var(--berry) 0%,#9E2B66 55%,var(--red) 100%);color:#fff;padding:48px 0 110px;overflow:hidden}
+.hero .map{position:absolute;right:-60px;top:0;width:min(760px,95%);height:100%;opacity:.5;pointer-events:none}
+.hero .wrap{position:relative}
+.hero h1{color:#fff;font-size:clamp(32px,6vw,60px);font-weight:800;max-width:15ch}
+.hero p.sub{font-size:clamp(16px,2vw,19px);max-width:46ch;margin:16px 0 0;opacity:.94}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.tags span{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:5px 14px;font-size:14px;font-weight:600}
+.reveal-hero>*{animation:rise .8s both}
+.reveal-hero>*:nth-child(2){animation-delay:.12s}.reveal-hero>*:nth-child(3){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+
+@media(max-width:700px){.hero .map{opacity:.28;right:-120px}}
+/* search */
+.search{position:relative;z-index:5;margin-top:-72px}
+.sbox{background:#fff;border-radius:22px;box-shadow:var(--shadow);padding:20px;border:1px solid var(--line)}
+.tabs{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none}
+.tabs button{border:0;background:var(--bg);padding:10px 18px;border-radius:12px;font-weight:700;cursor:pointer;white-space:nowrap;color:var(--teal)}
+.tabs button[aria-selected="true"]{background:var(--teal);color:#fff}
+.sform{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+.fld{display:flex;flex-direction:column;gap:4px;min-width:0}
+.fld label{font-size:13px;font-weight:700;color:var(--muted)}
+.fld select,.fld input{height:52px;border:1.5px solid var(--line);border-radius:12px;padding:0 14px;background:#fff;width:100%;min-width:0;font-weight:600;font-size:16px}
+.fld select:focus,.fld input:focus{border-color:var(--berry);outline:none;box-shadow:0 0 0 3px rgba(198,54,120,.2)}
+.swap{align-self:end;height:52px;width:52px;border-radius:12px;border:1.5px solid var(--line);background:#fff;cursor:pointer;display:grid;place-content:center;transition:transform .35s,background .2s}
+.swap:hover{background:var(--tint)}
+.swap svg{width:22px;height:22px;stroke:var(--berry)}
+.sform .btn{height:52px;width:100%}
+@media(min-width:900px){
+  .sform{grid-template-columns:minmax(0,1.2fr) 52px minmax(0,1.2fr) minmax(0,1fr) minmax(0,.7fr) auto;align-items:end}
+  .sform .btn{width:auto}
+}
+.result{display:none;margin-top:18px;border-radius:16px;background:var(--tint);border:1.5px solid #F0C3D6;padding:18px;animation:rise .45s both}
+.result.show{display:block}
+.result h3{font-size:20px;margin-bottom:4px}
+.result .row{display:flex;flex-wrap:wrap;gap:10px 28px;margin:10px 0 14px;font-weight:600}
+.result .row span{color:var(--muted);font-weight:600}
+.result small{display:block;color:var(--muted);margin-top:10px}
+.quick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:20px}
+.quick a{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;font-weight:700;font-size:15px;transition:transform .25s,box-shadow .25s,border-color .25s}
+.quick a:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--berry)}
+.ico{flex:none;width:42px;height:42px;border-radius:12px;background:var(--tint);display:grid;place-content:center}
+.ico svg{width:22px;height:22px;stroke:var(--berry);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@media(min-width:900px){.quick{grid-template-columns:repeat(6,minmax(0,1fr))}.quick a{flex-direction:column;text-align:center;padding:18px 10px}}
+
+/* destinations */
+.cards{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+@media(min-width:640px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:1000px){.cards{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.dest{position:relative;border-radius:var(--r);overflow:hidden;min-height:230px;color:#fff;padding:20px;display:flex;flex-direction:column;justify-content:flex-end;cursor:pointer;border:0;text-align:left;transition:transform .3s,box-shadow .3s}
+.dest:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.dest svg.bg{position:absolute;inset:0;width:100%;height:100%;transition:transform .6s}
+.dest:hover svg.bg{transform:scale(1.08)}
+.dest .in{position:relative}
+.dest h3{color:#fff;font-size:21px;font-weight:800}
+.dest p{font-size:14px;opacity:.92;margin-top:2px}
+.dest .price{display:inline-block;margin-top:10px;background:rgba(255,255,255,.95);color:var(--red);border-radius:10px;padding:4px 12px;font-weight:800;font-size:15px}
+.d1{background:linear-gradient(160deg,#C63678,#860404)}.d2{background:linear-gradient(160deg,#415659,#2E3F42)}.d3{background:linear-gradient(160deg,#A82A64,#415659)}.d4{background:linear-gradient(160deg,#860404,#C63678)}
+
+/* offers */
+.offers{background:var(--bg)}
+.ogrid{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+@media(min-width:800px){.ogrid{grid-template-columns:1.3fr 1fr}}
+.obig{background:linear-gradient(135deg,var(--teal) 0%,var(--teal-d) 100%);color:#fff;border-radius:var(--r);padding:32px;position:relative;overflow:hidden}
+.obig h3{color:#fff;font-size:clamp(24px,3.4vw,32px);margin-bottom:10px}
+.obig p{opacity:.9;max-width:42ch;margin-bottom:20px}
+.obig .big{font-size:clamp(40px,7vw,64px);font-weight:800;line-height:1;margin-bottom:14px}
+.obig .big small{font-size:.4em;font-weight:600;opacity:.85}
+.obig svg{position:absolute;right:-30px;bottom:-30px;width:240px;opacity:.16}
+.olist{display:grid;gap:14px}
+.oitem{background:#fff;border-radius:var(--r);border:1px solid var(--line);padding:20px;display:flex;justify-content:space-between;align-items:center;gap:12px;transition:transform .25s,box-shadow .25s}
+.oitem:hover{transform:translateX(4px);box-shadow:var(--shadow)}
+.oitem b{display:block;font-size:18px;color:var(--teal-d)}
+.oitem span{font-size:14px;color:var(--muted)}
+.oitem em{font-style:normal;font-weight:800;color:var(--red);white-space:nowrap}
+
+/* schedule */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:#fff}
+table{width:100%;border-collapse:collapse;min-width:620px}
+th{background:var(--teal);color:#fff;text-align:left;padding:14px 16px;font-size:14px;font-weight:700}
+td{padding:14px 16px;border-top:1px solid var(--line);font-weight:600;font-size:15px}
+tbody tr{transition:background .2s}
+tbody tr:hover{background:var(--tint)}
+.chip{display:inline-block;border-radius:8px;padding:2px 10px;background:var(--tint);color:var(--red);font-weight:700;font-size:13px;white-space:nowrap}
+.note{font-size:13px;color:var(--muted);margin-top:10px}
+.fleet{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;margin-top:28px}
+@media(min-width:760px){.fleet{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.air{background:var(--bg);border-radius:var(--r);padding:18px 20px;display:flex;gap:14px;align-items:center}
+.air svg{width:64px;flex:none;stroke:var(--berry);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.air b{font-size:18px;color:var(--teal-d);display:block}
+.air span{font-size:14px;color:var(--muted)}
+
+/* services */
+.svc{background:var(--teal-d);color:#fff}
+.svc h2{color:#fff}.svc .lead{color:#C7D3D5}
+.sgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+@media(min-width:640px){.sgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:1000px){.sgrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.sc{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:var(--r);padding:22px;transition:background .25s,transform .25s}
+.sc:hover{background:rgba(255,255,255,.13);transform:translateY(-4px)}
+.sc .ico{background:var(--berry);margin-bottom:14px}.sc .ico svg{stroke:#fff}
+.sc h3{color:#fff;font-size:18px;margin-bottom:6px}.sc p{font-size:14px;color:#D3DCDD}
+
+/* news */
+.ngrid{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+@media(min-width:760px){.ngrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.news{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:#fff;transition:transform .25s,box-shadow .25s}
+.news:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.news .pic{height:130px;display:grid;place-content:center}
+.news .pic svg{width:56px;stroke:#fff;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.news .tx{padding:18px}
+.news small{color:var(--berry);font-weight:700}
+.news h3{font-size:18px;margin:6px 0}
+.news p{font-size:14px;color:var(--muted)}
+
+/* faq */
+.fgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:32px}
+@media(min-width:900px){.fgrid{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);align-items:start}}
+.tarif{display:grid;gap:12px}
+.tr{border:1.5px solid var(--line);border-radius:var(--r);padding:18px 20px;background:#fff}
+.tr.hot{border-color:var(--berry);background:var(--tint)}
+.tr b{font-size:18px;color:var(--teal-d)}
+.tr p{font-size:14px;color:var(--muted);margin-top:4px}
+details{border-bottom:1px solid var(--line)}
+summary{list-style:none;cursor:pointer;padding:18px 40px 18px 0;font-weight:700;color:var(--teal-d);position:relative}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"";position:absolute;right:6px;top:50%;width:10px;height:10px;border-right:2.5px solid var(--berry);border-bottom:2.5px solid var(--berry);transform:translateY(-70%) rotate(45deg);transition:transform .25s}
+details[open] summary::after{transform:translateY(-30%) rotate(-135deg)}
+details p{padding:0 0 18px;color:var(--muted);max-width:60ch}
+
+/* cta + footer */
+.cta{background:linear-gradient(135deg,var(--berry),var(--red));color:#fff;border-radius:24px;padding:40px 28px;display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between}
+.cta h2{color:#fff;margin:0}.cta p{opacity:.92}
+.cta .btn{background:#fff;color:var(--red)}
+.cta .btn:hover{background:var(--tint)}
+footer{background:var(--teal-d);color:#C7D3D5;padding:56px 0 24px;margin-top:64px}
+.fcols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+@media(min-width:900px){.fcols{grid-template-columns:1.4fr 1fr 1fr 1.3fr}}
+.fcols h4{color:#fff;font-size:16px;margin-bottom:12px}
+.fcols a,.fcols p{display:block;font-size:14px;padding:4px 0}
+.fcols a:hover{color:#fff}
+.fcols .logo{color:#fff;margin-bottom:12px}
+.fcols .brand{grid-column:1/-1}
+@media(min-width:900px){.fcols .brand{grid-column:auto}}
+.copy{border-top:1px solid rgba(255,255,255,.15);margin-top:36px;padding-top:18px;font-size:13px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}
+.tel{white-space:nowrap}
+
+/* scroll reveal */
+.rv{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+.rv.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="plane" viewBox="0 0 24 24"><path d="M21 15.5v-1.6l-8-5V3.7a1.5 1.5 0 0 0-3 0v5.2l-8 5v1.6l8-2.4v4.4l-2 1.5v1.3l3.5-1 3.5 1v-1.3l-2-1.5v-4.4z"/></symbol>
+  </defs>
+</svg>
+
+<div class="demo">демо / пример работы — макет главной страницы, данные условные</div>
+
+<header>
+  <div class="wrap hbar">
+    <a class="logo" href="#top" aria-label="АэроСервис — на главную">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="11" fill="#C63678"/><path d="M8 27 L20 9 L32 27 L20 22.5 Z" fill="#fff"/><path d="M20 22.5 V31" stroke="#860404" stroke-width="2.4" stroke-linecap="round"/></svg>
+      <span>Аэро<b>Сервис</b></span>
+    </a>
+    <nav aria-label="Основное меню">
+      <a href="#search">Купить билеты</a>
+      <a href="#routes">Направления</a>
+      <a href="#schedule">Расписание</a>
+      <a href="#services">Услуги</a>
+      <a href="#news">Новости</a>
+      <a href="#faq">Справочник пассажира</a>
+      <a href="#contacts">Контакты</a>
+    </nav>
+    <a class="hphone tel" href="tel:+79143584111">8 (914) 358-41-11</a>
+    <a class="btn" href="#search">Купить билет</a>
+    <button class="burger" id="burger" aria-label="Открыть меню" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+  <div class="mnav" id="mnav">
+    <a href="#search">Купить билеты</a><a href="#routes">Направления</a><a href="#schedule">Расписание</a><a href="#services">Услуги</a><a href="#news">Новости</a><a href="#faq">Справочник пассажира</a><a href="#contacts">Контакты</a>
+  </div>
+</header>
+
+<main id="top">
+<section class="hero" style="padding-bottom:110px">
+  <svg class="map" viewBox="0 0 600 420" fill="none" aria-hidden="true">
+    <g stroke="#fff" stroke-width="2" stroke-dasharray="3 9" stroke-linecap="round">
+      <path d="M200 210 Q250 130 380 90"/><path d="M200 210 Q330 190 470 230"/><path d="M200 210 Q250 300 340 350"/><path d="M200 210 Q330 250 520 330"/>
+    </g>
+    <g fill="#fff"><circle cx="200" cy="210" r="9"/><circle cx="380" cy="90" r="6"/><circle cx="470" cy="230" r="6"/><circle cx="340" cy="350" r="6"/><circle cx="520" cy="330" r="6"/></g>
+    <circle cx="200" cy="210" r="22" stroke="#fff" stroke-width="2" opacity=".6"/>
+    <circle cx="200" cy="210" r="40" stroke="#fff" stroke-width="1.5" opacity=".3"/>
+  </svg>
+  <div class="wrap reveal-hero">
+    <h1>Рейсы по Забайкалью из Читы</h1>
+    <p class="sub">Региональные и социально значимые перевозки: Ан-2, Л-410 и вертолёт Ми-8 до отдалённых посёлков края.</p>
+    <div class="tags"><span>Чита</span><span>Ан-2</span><span>Л-410</span><span>Ми-8</span></div>
+  </div>
+</section>
+
+<div class="search" id="search">
+  <div class="wrap">
+    <div class="sbox rv">
+      <div class="tabs" role="tablist">
+        <button role="tab" aria-selected="true" data-tab="buy">Купить билет</button>
+        <button role="tab" aria-selected="false" data-tab="cont">Продолжить маршрут</button>
+      </div>
+      <form class="sform" id="sform" novalidate>
+        <div class="fld"><label for="from">Откуда</label>
+          <select id="from"><option>Чита</option><option>Красный Чикой</option><option>Кыра</option><option>Краснокаменск</option><option>Газимурский завод</option></select></div>
+        <button type="button" class="swap" id="swap" aria-label="Поменять местами"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v14M3 14l4 4 4-4M17 20V6M13 10l4-4 4 4"/></svg></button>
+        <div class="fld"><label for="to">Куда</label>
+          <select id="to"><option>Красный Чикой</option><option>Кыра</option><option>Краснокаменск</option><option>Газимурский завод</option><option>Чита</option></select></div>
+        <div class="fld"><label for="date">Дата вылета</label><input type="date" id="date"></div>
+        <div class="fld"><label for="pax">Пассажиры</label>
+          <select id="pax"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+        <button class="btn" type="submit">Найти рейсы</button>
+      </form>
+      <div class="result" id="result" role="status" aria-live="polite"></div>
+    </div>
+    <div class="quick rv">
+      <a href="#search"><span class="ico"><svg viewBox="0 0 24 24"><path d="M3 9a2 2 0 0 0 0 6v3h18v-3a2 2 0 0 1 0-6V6H3z"/><path d="M14 6v12" stroke-dasharray="2 3"/></svg></span>Купить билет</a>
+      <a href="#schedule"><span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>Расписание</a>
+      <a href="#faq"><span class="ico"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></span>Регистрация</a>
+      <a href="#contacts"><span class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>Мои бронирования</a>
+      <a href="#faq"><span class="ico"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 3-6.2M4 4v4h4"/></svg></span>Возврат билета</a>
+      <a href="#services"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg></span>Спецуслуги</a>
+    </div>
+  </div>
+</div>
+
+<section id="routes">
+  <div class="wrap">
+    <h2 class="rv">Популярные направления</h2>
+    <p class="lead rv">Рейсы из Читы в районы Забайкальского края. Нажмите на карточку, и маршрут подставится в форму поиска.</p>
+    <div class="cards">
+      <button class="dest d1 rv" data-to="Красный Чикой">
+        <svg class="bg" viewBox="0 0 300 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path d="M0 200 Q80 120 160 180 T300 140 V260 H0Z" fill="rgba(255,255,255,.12)"/><path d="M0 230 Q100 170 200 215 T300 190 V260 H0Z" fill="rgba(255,255,255,.12)"/><circle cx="235" cy="60" r="26" fill="rgba(255,255,255,.18)"/></svg>
+        <div class="in"><h3>Красный Чикой</h3><p>Чита — Красный Чикой</p><span class="price">от 3000 ₽</span></div></button>
+      <button class="dest d2 rv" data-to="Кыра">
+        <svg class="bg" viewBox="0 0 300 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path d="M0 190 L70 110 L120 170 L190 90 L300 200 V260 H0Z" fill="rgba(255,255,255,.12)"/><path d="M0 230 L90 160 L160 215 L300 150 V260 H0Z" fill="rgba(255,255,255,.1)"/><circle cx="60" cy="60" r="20" fill="rgba(255,255,255,.16)"/></svg>
+        <div class="in"><h3>Кыра</h3><p>Чита — Кыра</p><span class="price">от 3000 ₽</span></div></button>
+      <button class="dest d3 rv" data-to="Краснокаменск">
+        <svg class="bg" viewBox="0 0 300 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path d="M0 210 H300 V260 H0Z" fill="rgba(255,255,255,.12)"/><path d="M30 210 V150 H80 V210 M100 210 V120 H160 V210 M180 210 V165 H240 V210" fill="rgba(255,255,255,.14)"/><circle cx="240" cy="55" r="24" fill="rgba(255,255,255,.16)"/></svg>
+        <div class="in"><h3>Краснокаменск</h3><p>Чита — Краснокаменск</p><span class="price">от 3000 ₽</span></div></button>
+      <button class="dest d4 rv" data-to="Газимурский завод">
+        <svg class="bg" viewBox="0 0 300 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path d="M0 180 Q75 110 150 170 T300 120 V260 H0Z" fill="rgba(255,255,255,.12)"/><path d="M0 225 Q90 180 180 220 T300 190 V260 H0Z" fill="rgba(255,255,255,.12)"/><circle cx="70" cy="55" r="22" fill="rgba(255,255,255,.17)"/></svg>
+        <div class="in"><h3>Газимурский завод</h3><p>Чита — Газимурский завод</p><span class="price">от 3000 ₽</span></div></button>
+    </div>
+  </div>
+</section>
+
+<section class="offers" id="offers">
+  <div class="wrap">
+    <h2 class="rv">Специальные предложения</h2>
+    <p class="lead rv">Социально значимые перевозки по Забайкальскому краю.</p>
+    <div class="ogrid">
+      <div class="obig rv">
+        <svg viewBox="0 0 24 24" fill="#fff"><use href="#plane"/></svg>
+        <div class="big"><small>билеты</small><br><small>от</small> 3000 ₽</div>
+        <h3>Из Читы в районы края</h3>
+        <p>Красный Чикой, Кыра, Краснокаменск, Газимурский завод. Условия и наличие мест уточняйте при покупке.</p>
+        <a class="btn" style="background:#fff;color:var(--red)" href="#search">Выбрать рейс</a>
+      </div>
+      <div class="olist">
+        <div class="oitem rv"><div><b>Красный Чикой</b><span>самолёт, из Читы</span></div><em>от 3000 ₽</em></div>
+        <div class="oitem rv"><div><b>Кыра</b><span>самолёт, из Читы</span></div><em>от 3000 ₽</em></div>
+        <div class="oitem rv"><div><b>Краснокаменск</b><span>самолёт, из Читы</span></div><em>от 3000 ₽</em></div>
+        <div class="oitem rv"><div><b>Газимурский завод</b><span>самолёт, из Читы</span></div><em>от 3000 ₽</em></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="schedule">
+  <div class="wrap">
+    <h2 class="rv">Расписание рейсов</h2>
+    <p class="lead rv">Ближайшие даты и маршруты. Раздел показывает, как будет выглядеть таблица на сайте.</p>
+    <div class="tw rv">
+      <table>
+        <thead><tr><th>Дата</th><th>Маршрут</th><th>Тип судна</th><th>Вылет</th><th></th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <p class="note">Демо / пример работы: даты считаются от сегодняшнего дня, время и тип судна в таблице условные. Актуальное расписание заказчик подставит из своей системы.</p>
+    <div class="fleet">
+      <div class="air rv"><svg viewBox="0 0 64 40"><path d="M6 20h48M54 20l6-4M20 20l-6-12h6l10 12M20 20l-6 12h6l10-12M8 20l-4-6"/><path d="M12 12h40M12 28h40" opacity=".5"/></svg><div><b>Ан-2</b><span>местные и малые рейсы</span></div></div>
+      <div class="air rv"><svg viewBox="0 0 64 40"><path d="M4 22c10-6 36-6 54-2-4 6-40 8-54 2zM30 20l-4-12h6l8 12M30 22l-4 10h6l8-10M56 20l5-6"/></svg><div><b>Л-410</b><span>региональные перевозки</span></div></div>
+      <div class="air rv"><svg viewBox="0 0 64 40"><path d="M14 22a10 8 0 0 1 20-6h6l10 6-4 4H20a6 6 0 0 1-6-4zM6 8h44M28 8v8M52 22l8-6"/></svg><div><b>Ми-8</b><span>вертолётные рейсы</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="svc" id="services">
+  <div class="wrap">
+    <h2 class="rv">Дополнительные услуги</h2>
+    <p class="lead rv">Справочник пассажира и специальные услуги.</p>
+    <div class="sgrid">
+      <div class="sc rv"><span class="ico"><svg viewBox="0 0 24 24"><rect x="6" y="7" width="12" height="14" rx="2"/><path d="M9 7V4h6v3M10 11v6M14 11v6"/></svg></span><h3>Багаж</h3><p>Правила провоза багажа и ручной клади на рейсах.</p></div>
+      <div class="sc rv"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><path d="M12 8v6l-3 6M12 14l3 6M7 11h10"/></svg></span><h3>Специальные услуги</h3><p>Помощь маломобильным пассажирам и сопровождение.</p></div>
+      <div class="sc rv"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span><h3>Страхование</h3><p>Условия страхования пассажиров на авиарейсах.</p></div>
+      <div class="sc rv"><span class="ico"><svg viewBox="0 0 24 24"><path d="M5 20c0-4 3-6 7-6s7 2 7 6M8 7a2 2 0 1 0 0 .1M16 7a2 2 0 1 0 0 .1M12 4a2 2 0 1 0 0 .1"/></svg></span><h3>Перевозка животных</h3><p>Как оформить перевозку питомца на борту.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="news">
+  <div class="wrap">
+    <h2 class="rv">Новости и акции</h2>
+    <p class="lead rv">Информация для пассажиров и жителей края.</p>
+    <div class="ngrid">
+      <article class="news rv"><div class="pic" style="background:linear-gradient(135deg,#C63678,#860404)"><svg viewBox="0 0 24 24"><use href="#plane"/></svg></div><div class="tx"><small>Новости</small><h3>Рейсы в районы края</h3><p>Здесь будет заголовок и краткий анонс новости авиакомпании.</p></div></article>
+      <article class="news rv"><div class="pic" style="background:linear-gradient(135deg,#415659,#2E3F42)"><svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg></div><div class="tx"><small>Акции</small><h3>Специальные предложения</h3><p>Здесь будет описание текущей акции или специального тарифа.</p></div></article>
+      <article class="news rv"><div class="pic" style="background:linear-gradient(135deg,#A82A64,#415659)"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div><div class="tx"><small>Информация</small><h3>Для пассажиров</h3><p>Здесь будет полезная информация: правила, документы, изменения расписания.</p></div></article>
+    </div>
+  </div>
+</section>
+
+<section id="faq" style="padding-top:0">
+  <div class="wrap fgrid">
+    <div>
+      <h2 class="rv">Тарифы и условия</h2>
+      <p class="lead rv">Справочник пассажира: коротко о главном.</p>
+      <div class="tarif">
+        <div class="tr hot rv"><b>Социально значимые рейсы</b><p>Билеты по районам края от 3000 ₽.</p></div>
+        <div class="tr rv"><b>Условия перевозки</b><p>Правила авиакомпании и права пассажира.</p></div>
+        <div class="tr rv"><b>Возврат и обмен</b><p>Порядок оформления возврата билета.</p></div>
+      </div>
+    </div>
+    <div>
+      <h2 class="rv">Частые вопросы</h2>
+      <p class="lead rv">Ответы на вопросы пассажиров.</p>
+      <div class="rv">
+        <details><summary>Как купить билет?</summary><p>Выберите маршрут и дату в форме поиска наверху страницы или позвоните в авиакомпанию.</p></details>
+        <details><summary>Где находится офис в Чите?</summary><p>Г. Чита, ул. Звёздная, 20 А, офис 1. Работаем с понедельника по пятницу, с 08:00 до 17:00.</p></details>
+        <details><summary>Какими самолётами выполняются рейсы?</summary><p>Авиакомпания выполняет перевозки на Ан-2, Л-410 и вертолёте Ми-8.</p></details>
+        <details><summary>Можно ли вернуть билет?</summary><p>Порядок возврата зависит от тарифа и условий перевозки. Уточните у специалистов по телефону.</p></details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding:0">
+  <div class="wrap"><div class="cta rv">
+    <div><h2>Нужна помощь с билетом?</h2><p>Позвоните нам в рабочее время: понедельник — пятница, 08:00–17:00.</p></div>
+    <a class="btn tel" href="tel:+79143584111">8 (914) 358-41-11</a>
+  </div></div>
+</section>
+</main>
+
+<footer id="contacts">
+  <div class="wrap">
+    <div class="fcols">
+      <div class="brand"><a class="logo" href="#top"><svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="11" fill="#C63678"/><path d="M8 27 L20 9 L32 27 L20 22.5 Z" fill="#fff"/><path d="M20 22.5 V31" stroke="#860404" stroke-width="2.4" stroke-linecap="round"/></svg><span>Аэро<b style="color:#E78AB4">Сервис</b></span></a><p>Авиакомпания, г. Чита. Перевозки по Забайкальскому краю.</p></div>
+      <div><h4>Информация</h4><a href="#search">Купить билеты</a><a href="#schedule">Расписание</a><a href="#faq">Справочник пассажира</a><a href="#services">Специальные услуги</a></div>
+      <div><h4>О компании</h4><a href="#routes">Направления</a><a href="#news">Новости и акции</a><a href="#offers">Специальные предложения</a></div>
+      <div><h4>Контакты</h4><p class="tel">8 (914) 358-41-11</p><p>г. Чита, ул. Звёздная, 20 А, офис 1</p><p>Пн — Пт, 08:00–17:00</p></div>
+    </div>
+    <div class="copy"><span>АэроСервис, Чита</span><span>демо / пример работы — макет, не является сайтом авиакомпании</span></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // ---- данные демо ----
+  var DAYS=["вс","пн","вт","ср","чт","пт","сб"];
+  var SCHEDULE=[ // условные строки расписания
+    {to:"Красный Чикой",type:"Ан-2",time:"09:00"},
+    {to:"Кыра",type:"Ан-2",time:"10:30"},
+    {to:"Краснокаменск",type:"Л-410",time:"12:00"},
+    {to:"Газимурский завод",type:"Ми-8",time:"08:30"},
+    {to:"Красный Чикой",type:"Л-410",time:"14:00"},
+    {to:"Кыра",type:"Ан-2",time:"11:15"}
+  ];
+  var TYPE={"Красный Чикой":"Ан-2 / Л-410","Кыра":"Ан-2","Краснокаменск":"Л-410","Газимурский завод":"Ми-8"};
+
+  function fmt(d){return ("0"+d.getDate()).slice(-2)+"."+("0"+(d.getMonth()+1)).slice(-2)}
+  function iso(d){return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)}
+
+  // таблица
+  var tb=document.getElementById("tbody"),now=new Date(),html="";
+  SCHEDULE.forEach(function(r,i){
+    var d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1+i);
+    html+='<tr><td>'+fmt(d)+' <span class="chip">'+DAYS[d.getDay()]+'</span></td><td>Чита — '+r.to+'</td><td>'+r.type+'</td><td>'+r.time+'</td><td><a class="chip" href="#search" data-pick="'+r.to+'">Выбрать</a></td></tr>';
+  });
+  tb.innerHTML=html;
+
+  // форма поиска
+  var from=document.getElementById("from"),to=document.getElementById("to"),date=document.getElementById("date"),pax=document.getElementById("pax"),res=document.getElementById("result");
+  var min=new Date(now.getFullYear(),now.getMonth(),now.getDate()); date.min=iso(min);
+  date.value=iso(new Date(min.getFullYear(),min.getMonth(),min.getDate()+1));
+  function setTo(city){
+    var f=from.value;
+    if(city==="Чита"){return}
+    from.value="Чита";to.value=city;
+  }
+  function search(e){
+    if(e)e.preventDefault();
+    if(from.value===to.value){res.className="result show";res.innerHTML="<h3>Выберите разные пункты</h3><p>Пункт отправления и назначения совпадают.</p>";return}
+    var other=from.value==="Чита"?to.value:from.value;
+    var okRoute=(from.value==="Чита"||to.value==="Чита");
+    var d=new Date(date.value||iso(min));
+    if(!okRoute){res.className="result show";res.innerHTML="<h3>Прямого рейса нет</h3><p>Демо: рейсы выполняются из Читы и в Читу. Выберите Читу как пункт отправления или назначения.</p>";return}
+    res.className="result show";
+    res.innerHTML='<h3>'+from.value+' — '+to.value+'</h3>'+
+      '<div class="row"><div><span>Дата</span><br>'+fmt(d)+'.'+d.getFullYear()+'</div><div><span>Судно</span><br>'+TYPE[other]+'</div><div><span>Пассажиры</span><br>'+pax.value+'</div><div><span>Билет</span><br>от 3000 ₽</div></div>'+
+      '<a class="btn" href="#contacts">Забронировать (демо)</a>'+
+      '<small>Условный результат для демо: реальных рейсов и бронирования здесь нет.</small>';
+    res.scrollIntoView({behavior:"smooth",block:"nearest"});
+  }
+  document.getElementById("sform").addEventListener("submit",search);
+  document.getElementById("swap").addEventListener("click",function(e){
+    var a=from.value;from.value=to.value;to.value=a;
+    e.currentTarget.style.transform=e.currentTarget.style.transform?"":"rotate(180deg)";
+  });
+  document.querySelectorAll(".dest").forEach(function(b){
+    b.addEventListener("click",function(){setTo(b.dataset.to);document.getElementById("search").scrollIntoView({behavior:"smooth"});setTimeout(search,450)});
+  });
+  tb.addEventListener("click",function(e){var a=e.target.closest("[data-pick]");if(a){setTo(a.dataset.pick);setTimeout(search,350)}});
+  // вкладки
+  document.querySelectorAll(".tabs button").forEach(function(b){b.addEventListener("click",function(){
+    document.querySelectorAll(".tabs button").forEach(function(x){x.setAttribute("aria-selected","false")});
+    b.setAttribute("aria-selected","true");
+    if(b.dataset.tab==="cont"){var a=from.value;from.value=to.value==="Чита"?"Чита":to.value;to.value=a==="Чита"?"Красный Чикой":"Чита"}
+  })});
+  // меню
+  var bg=document.getElementById("burger"),mn=document.getElementById("mnav");
+  bg.addEventListener("click",function(){var o=mn.classList.toggle("open");bg.setAttribute("aria-expanded",o)});
+  mn.addEventListener("click",function(e){if(e.target.tagName==="A"){mn.classList.remove("open");bg.setAttribute("aria-expanded","false")}});
+  // появление блоков
+  var els=document.querySelectorAll(".rv");
+  if("IntersectionObserver" in window){
+    var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add("in");io.unobserve(x.target)}})},{threshold:.12});
+    els.forEach(function(el,i){el.style.transitionDelay=(i%4)*70+"ms";io.observe(el)});
+  }else{els.forEach(function(el){el.classList.add("in")})}
+})();
+</script>
+</body>
+</html>
