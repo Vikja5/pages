@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Сборщик заказов электрики: демо</title>
+<style>
+:root{
+  --bg:#f3f1ec; --card:#ffffff; --ink:#1f2328; --mute:#5d6570; --line:#ddd8cc;
+  --acc:#1d5c63; --acc-ink:#ffffff; --warn-bg:#fff4d6; --warn-ink:#6b4a00; --bad-bg:#fde6e3; --bad-ink:#8a2018;
+  --ok-bg:#e3f3ea; --ok-ink:#1b5a36;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#17191c;--card:#22262b;--ink:#eceae4;--mute:#a2a8b0;--line:#394048;--acc:#4fb3bd;--acc-ink:#0d1f22;
+  --warn-bg:#3a3014;--warn-ink:#f2d98a;--bad-bg:#40201d;--bad-ink:#f5b3ab;--ok-bg:#163326;--ok-ink:#9fdcb9}
+}
+*{box-sizing:border-box}
+html,body{margin:0;overflow-x:hidden}
+body{background:var(--bg);color:var(--ink);font:16px/1.45 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:16px}
+.demo-tag{display:inline-block;background:var(--ink);color:var(--bg);font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:3px}
+h1{font-size:1.55rem;line-height:1.2;margin:10px 0 6px}
+.lead{color:var(--mute);margin:0 0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px;margin:0 0 14px}
+.card h2{font-size:1.1rem;margin:0 0 10px}
+.cond{font-size:.85rem;color:var(--mute)}
+.line-title{font-weight:700;margin:4px 0 8px;font-size:1rem}
+.group{border-top:1px dashed var(--line);padding:10px 0}
+.group:first-of-type{border-top:0}
+.gh{display:flex;align-items:center;gap:8px;font-weight:600;margin-bottom:8px}
+.sw{width:16px;height:16px;border-radius:50%;border:1px solid var(--mute);flex:none}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:8px}
+label.f{display:flex;flex-direction:column;font-size:.8rem;color:var(--mute);gap:3px;min-width:0}
+input[type=number]{width:100%;font:inherit;font-size:16px;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+input:focus,button:focus,select:focus{outline:2px solid var(--acc);outline-offset:1px}
+.opts{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:6px}
+.opts label{display:flex;gap:6px;align-items:flex-start;font-size:.95rem}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+button{font:inherit;font-size:15px;padding:10px 14px;border-radius:6px;border:1px solid var(--acc);background:transparent;color:var(--acc);cursor:pointer;min-height:44px}
+button.primary{background:var(--acc);color:var(--acc-ink)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.msg{border-radius:6px;padding:9px 11px;margin:8px 0;font-size:.93rem}
+.msg.warn{background:var(--warn-bg);color:var(--warn-ink)}
+.msg.bad{background:var(--bad-bg);color:var(--bad-ink)}
+.msg.ok{background:var(--ok-bg);color:var(--ok-ink)}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--mute);white-space:nowrap}
+td.n,th.n{text-align:right;white-space:nowrap}
+tfoot td{font-weight:700;border-bottom:0}
+.id{font-family:Consolas,monospace;white-space:nowrap}
+@media (max-width:560px){
+  table.stack thead{display:none}
+  table.stack,table.stack tbody,table.stack tr,table.stack td,table.stack tfoot{display:block;width:100%}
+  table.stack tr{border:1px solid var(--line);border-radius:6px;margin-bottom:8px;padding:4px 6px}
+  table.stack td{border:0;padding:3px 2px;display:flex;justify-content:space-between;gap:10px;text-align:right}
+  table.stack td::before{content:attr(data-h);color:var(--mute);font-size:.78rem;text-align:left;flex:none}
+  table.stack td.name{display:block;text-align:left}
+  table.stack td.name::before{display:block}
+}
+.foot{font-size:.82rem;color:var(--mute);margin:18px 0}
+textarea.cart{width:100%;min-height:110px;font:13px/1.4 Consolas,monospace;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="demo-tag">демо / пример работы</span>
+  <h1>Сборщик заказов электрики</h1>
+  <p class="lead">Введите, сколько нужно розеток, выключателей и рамок по линейкам и цветам. Программа подберёт артикулы и упаковки так, чтобы закрыть потребность с минимумом лишнего.</p>
+  <p class="msg warn" id="condNote">Условные данные: артикулы, названия и цены придуманы для демонстрации. Номенклатура заказчика подключается заменой файла data.js.</p>
+  <div id="loadErr" class="msg bad hidden"></div>
+
+  <div class="card">
+    <h2>1. Потребность</h2>
+    <div id="inputs"></div>
+    <div class="opts" role="radiogroup" aria-label="Приоритет подбора">
+      <label><input type="radio" name="mode" value="left" checked> Сначала минимум остатков, потом цена</label>
+      <label><input type="radio" name="mode" value="price"> Сначала минимум цены, потом остатки</label>
+    </div>
+    <div class="btns">
+      <button class="primary" id="btnCalc" type="button">Подобрать</button>
+      <button id="btnExample" type="button">Подставить пример</button>
+      <button id="btnClear" type="button">Очистить</button>
+    </div>
+  </div>
+
+  <div id="result" class="hidden">
+    <div class="card"><h2>2. Подобранные артикулы</h2><div id="outMsgs"></div><div class="tw"><table class="stack" id="tblItems"></table></div></div>
+    <div class="card"><h2>3. Остатки (лишние компоненты)</h2><div class="tw"><table class="stack" id="tblLeft"></table></div></div>
+    <div class="card"><h2>4. Предупреждения по рамкам</h2><div id="frameMsgs"></div></div>
+    <div class="card"><h2>5. Экспорт</h2>
+      <div class="btns" style="margin-top:0">
+        <button id="btnCsv" type="button">Скачать CSV</button>
+        <button id="btnCartCopy" type="button">Копировать список для корзины</button>
+      </div>
+      <p class="cond">Список для корзины:</p>
+      <textarea class="cart" id="cartText" readonly aria-label="Список для корзины"></textarea>
+    </div>
+  </div>
+
+  <p class="foot">Демо / пример работы. Цифры условные. Подбор выполняется полным перебором (динамическое программирование) в вашем браузере, интернет не нужен.</p>
+</div>
+
+<script src="data.js"></script>
+<script>
+/* ===== SOLVER (чистая функция, без DOM) ===== */
+// need: { "A|white": {socket:7, frame1:2}, ... }  -> результат по каждой группе (линейка|цвет)
+function solveGroup(products, lineId, colorId, needIn, mode){
+  var dims = Object.keys(needIn).filter(function(k){return needIn[k]>0;});
+  var res = {picks:[], unmet:[], bought:{}, cost:0, need:{}};
+  dims.forEach(function(d){res.need[d]=needIn[d];});
+  var cand = products.filter(function(p){return p.line===lineId && p.color===colorId;});
+  // компоненты, которых нет ни в одном артикуле: не закрыть
+  var cover = {};
+  cand.forEach(function(p){p.items.forEach(function(it){cover[it.c]=1;});});
+  var active = [];
+  dims.forEach(function(d){ if(cover[d]) active.push(d); else res.unmet.push({c:d, n:needIn[d]}); });
+  if(!active.length) return res;
+  // варианты: (артикул, упаковка), вклад только в нужные размерности
+  var opts = [];
+  cand.forEach(function(p){
+    p.packs.forEach(function(pk){
+      var vec = active.map(function(d){
+        var s=0; p.items.forEach(function(it){ if(it.c===d) s+=it.n*pk.size; }); return s;
+      });
+      if(vec.some(function(v){return v>0;})){
+        var tot=0; p.items.forEach(function(it){tot+=it.n*pk.size;});
+        opts.push({p:p, pk:pk, vec:vec, tot:tot});
+      }
+    });
+  });
+  var radix = active.map(function(d){return needIn[d]+1;});
+  var N = 1; radix.forEach(function(r){N*=r;});
+  if(N>4000000){ res.tooBig=true; return res; }
+  var mul = []; var m=1; for(var i=0;i<radix.length;i++){mul.push(m); m*=radix[i];}
+  var INF = 1e15;
+  var tot = new Float64Array(N).fill(INF), cost = new Float64Array(N).fill(INF);
+  var par = new Int32Array(N).fill(-1), via = new Int32Array(N).fill(-1);
+  tot[0]=0; cost[0]=0;
+  function better(t1,c1,t2,c2){
+    if(mode==="price"){ return c1<c2 || (c1===c2 && t1<t2); }
+    return t1<t2 || (t1===t2 && c1<c2);
+  }
+  var cur = new Array(radix.length);
+  for(var s=0;s<N-1+1;s++){
+    if(tot[s]>=INF) continue;
+    var r=s; for(var k=0;k<radix.length;k++){cur[k]=r%radix[k]; r=(r-cur[k])/radix[k];}
+    if(s===N-1) continue; // цель достигнута: дальше докупать не нужно
+    for(var o=0;o<opts.length;o++){
+      var ns=0, changed=false;
+      for(var k2=0;k2<radix.length;k2++){
+        var v=cur[k2]+opts[o].vec[k2]; if(v>radix[k2]-1) v=radix[k2]-1;
+        if(v!==cur[k2]) changed=true; ns+=v*mul[k2];
+      }
+      if(!changed) continue;
+      var nt=tot[s]+opts[o].tot, nc=cost[s]+opts[o].pk.price;
+      if(better(nt,nc,tot[ns],cost[ns])){ tot[ns]=nt; cost[ns]=nc; par[ns]=s; via[ns]=o; }
+    }
+  }
+  var goal=N-1;
+  if(tot[goal]>=INF){ active.forEach(function(d){res.unmet.push({c:d,n:needIn[d]});}); return res; }
+  var counts = {};
+  for(var st=goal; st!==0; st=par[st]){ counts[via[st]]=(counts[via[st]]||0)+1; }
+  Object.keys(counts).forEach(function(oi){
+    var o2=opts[oi];
+    res.picks.push({p:o2.p, size:o2.pk.size, price:o2.pk.price, packs:counts[oi], pieces:counts[oi]*o2.pk.size});
+    o2.p.items.forEach(function(it){ res.bought[it.c]=(res.bought[it.c]||0)+it.n*o2.pk.size*counts[oi]; });
+    res.cost += o2.pk.price*counts[oi];
+  });
+  return res;
+}
+/* ===== /SOLVER ===== */
+
+(function(){
+  var C = window.CATALOG;
+  var $ = function(id){return document.getElementById(id);};
+  function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  if(!C || !C.products){ var e=$("loadErr"); e.textContent="Не загружена номенклатура (data.js). Положите data.js рядом с index.html."; e.classList.remove("hidden"); return; }
+  var compKeys = Object.keys(C.comps);
+  var cur = C.currency || "усл. ед.";
+
+  // ----- форма -----
+  var html="";
+  C.lines.forEach(function(L){
+    html += '<div class="line-title">'+esc(L.name)+'</div>';
+    C.colors.forEach(function(col){
+      html += '<div class="group"><div class="gh"><span class="sw" style="background:'+col.hex+'"></span>'+esc(col.name)+'</div><div class="fields">';
+      compKeys.forEach(function(k){
+        html += '<label class="f">'+esc(C.comps[k])+'<input type="number" inputmode="numeric" min="0" max="999" step="1" data-k="'+L.id+'|'+col.id+'|'+k+'" placeholder="0"></label>';
+      });
+      html += '</div></div>';
+    });
+  });
+  $("inputs").innerHTML = html;
+  var inputs = [].slice.call(document.querySelectorAll("#inputs input"));
+
+  function readNeed(){
+    var need = {}, bad = false;
+    inputs.forEach(function(inp){
+      var raw = inp.value.trim(); var n = raw===""?0:Number(raw);
+      if(!isFinite(n) || n<0 || Math.floor(n)!==n){ bad=true; inp.style.borderColor="#c0392b"; n=0; } else inp.style.borderColor="";
+      if(n>999){ n=999; inp.value=999; }
+      if(n>0){ var p=inp.dataset.k.split("|"); var g=p[0]+"|"+p[1]; (need[g]=need[g]||{})[p[2]]=n; }
+    });
+    return {need:need, bad:bad};
+  }
+  function name(id,arr){ for(var i=0;i<arr.length;i++) if(arr[i].id===id) return arr[i].name; return id; }
+
+  var lastRows = [];
+
+  function calc(){
+    var rd = readNeed();
+    var mode = document.querySelector('input[name=mode]:checked').value;
+    var out = $("outMsgs"); out.innerHTML="";
+    $("result").classList.remove("hidden");
+    if(rd.bad) out.innerHTML += '<div class="msg bad">Некоторые поля заполнены неверно (нужны целые числа от 0). Они приняты за 0.</div>';
+    var groups = Object.keys(rd.need);
+    if(!groups.length){
+      out.innerHTML += '<div class="msg warn">Потребность пуста: введите количество хотя бы в одно поле.</div>';
+      $("tblItems").innerHTML=""; $("tblLeft").innerHTML=""; $("frameMsgs").innerHTML=""; $("cartText").value=""; lastRows=[];
+      setExp(false); return;
+    }
+    var rows=[], lefts=[], total=0, unmet=[], toobig=[];
+    groups.forEach(function(g){
+      var p=g.split("|"); var r = solveGroup(C.products, p[0], p[1], rd.need[g], mode);
+      var gl = name(p[0],C.lines)+", "+name(p[1],C.colors).toLowerCase();
+      if(r.tooBig) toobig.push(gl);
+      r.unmet.forEach(function(u){ unmet.push(gl+": "+C.comps[u.c]+" × "+u.n); });
+      r.picks.sort(function(a,b){return a.p.id<b.p.id?-1:a.p.id>b.p.id?1:a.size-b.size;});
+      r.picks.forEach(function(x){ rows.push({id:x.p.id, name:x.p.name, line:name(p[0],C.lines), color:name(p[1],C.colors), size:x.size, packs:x.packs, pieces:x.pieces, price:x.price, sum:x.price*x.packs}); });
+      total += r.cost;
+      compKeys.forEach(function(k){
+        var b=r.bought[k]||0, nd=r.need[k]||0;
+        if(b>nd) lefts.push({grp:gl, c:C.comps[k], n:b-nd, bought:b, need:nd});
+      });
+    });
+    lastRows = rows;
+    if(unmet.length) out.innerHTML += '<div class="msg bad">Не закрыто: в номенклатуре нет подходящего артикула для: '+esc(unmet.join("; "))+'.</div>';
+    if(toobig.length) out.innerHTML += '<div class="msg bad">Слишком большая потребность для перебора в группе: '+esc(toobig.join("; "))+'. Разбейте заказ на части.</div>';
+    if(rows.length && !unmet.length && !toobig.length) out.innerHTML += '<div class="msg ok">Потребность закрыта полностью. Режим: '+(mode==="price"?"минимум цены, затем остатки":"минимум остатков, затем цена")+'.</div>';
+
+    // таблица артикулов
+    var t='<thead><tr><th>ID</th><th>Название</th><th class="n">Упаковка, шт</th><th class="n">Упаковок</th><th class="n">Штук</th><th class="n">Сумма, '+esc(cur)+'</th></tr></thead><tbody>';
+    rows.forEach(function(r){
+      t+='<tr><td class="id" data-h="ID">'+esc(r.id)+'</td><td class="name" data-h="Название">'+esc(r.name)+'</td><td class="n" data-h="Упаковка, шт">'+r.size+'</td><td class="n" data-h="Упаковок">'+r.packs+'</td><td class="n" data-h="Штук">'+r.pieces+'</td><td class="n" data-h="Сумма">'+r.sum+'</td></tr>';
+    });
+    t+='</tbody><tfoot><tr><td colspan="5">Итого (условные цены)</td><td class="n">'+total+' '+esc(cur)+'</td></tr></tfoot>';
+    $("tblItems").innerHTML = rows.length?t:"";
+
+    // остатки
+    if(lefts.length){
+      var l='<thead><tr><th>Группа</th><th>Компонент</th><th class="n">Куплено</th><th class="n">Нужно</th><th class="n">Остаток</th></tr></thead><tbody>';
+      lefts.forEach(function(x){ l+='<tr><td class="name" data-h="Группа">'+esc(x.grp)+'</td><td data-h="Компонент">'+esc(x.c)+'</td><td class="n" data-h="Куплено">'+x.bought+'</td><td class="n" data-h="Нужно">'+x.need+'</td><td class="n" data-h="Остаток"><b>+'+x.n+'</b></td></tr>'; });
+      $("tblLeft").innerHTML = l+'</tbody>';
+    } else $("tblLeft").innerHTML = rows.length?'<tbody><tr><td>Остатков нет: всё куплено ровно в нужном количестве.</td></tr></tbody>':"";
+
+    // рамки: по линейкам (модули любого цвета ставятся в рамки той же линейки)
+    var fm="";
+    C.lines.forEach(function(L){
+      var mods=0, posts=0, frames=0;
+      Object.keys(rd.need).forEach(function(g){
+        if(g.split("|")[0]!==L.id) return;
+        var n=rd.need[g];
+        mods += (n.socket||0)+(n["switch"]||0);
+        Object.keys(C.posts).forEach(function(fk){ if(n[fk]){ posts+=n[fk]*C.posts[fk]; frames+=n[fk]; } });
+      });
+      if(!mods && !frames) return;
+      if(!frames && mods) fm+='<div class="msg bad">'+esc(L.name)+': '+mods+' мод. не поместились в рамки: рамки не указаны.</div>';
+      else if(mods>posts) fm+='<div class="msg bad">'+esc(L.name)+': '+(mods-posts)+' мод. не поместились в рамки (модулей '+mods+', постов в рамках '+posts+'). Добавьте рамки.</div>';
+      else if(mods<posts) fm+='<div class="msg warn">'+esc(L.name)+': незаполненных постов в рамках: '+(posts-mods)+' (модулей '+mods+', постов '+posts+'). Понадобятся заглушки.</div>';
+      else fm+='<div class="msg ok">'+esc(L.name)+': посты заполнены полностью ('+mods+' из '+posts+').</div>';
+    });
+    $("frameMsgs").innerHTML = fm || '<div class="msg warn">Нет данных по линейкам.</div>';
+
+    // корзина
+    $("cartText").value = rows.map(function(r){ return r.id+" × "+r.packs+" (упак. "+r.size+" шт, всего "+r.pieces+" шт)"; }).join("\n");
+    setExp(rows.length>0);
+  }
+  function setExp(on){ $("btnCsv").disabled=!on; $("btnCartCopy").disabled=!on; }
+
+  function csvCell(v){ v=String(v); return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+  function exportCsv(){
+    var head=["ID","Название","Линейка","Цвет","Упаковка, шт","Упаковок","Штук","Цена упаковки","Сумма"];
+    var lines=[head.join(";")], total=0;
+    lastRows.forEach(function(r){ total+=r.sum; lines.push([r.id,r.name,r.line,r.color,r.size,r.packs,r.pieces,r.price,r.sum].map(csvCell).join(";")); });
+    lines.push(["","Итого (условные цены, "+cur+")","","","","","","",total].map(csvCell).join(";"));
+    lines.push("Демо / пример работы. Условные данные.");
+    var blob=new Blob(["﻿"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"});
+    var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="podbor_demo.csv";
+    document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href); a.remove();},500);
+  }
+  function copyCart(){
+    var ta=$("cartText"); ta.focus(); ta.select();
+    var ok=false; try{ ok=document.execCommand("copy"); }catch(e){}
+    if(!ok && navigator.clipboard) navigator.clipboard.writeText(ta.value);
+    var b=$("btnCartCopy"), t=b.textContent; b.textContent="Скопировано"; setTimeout(function(){b.textContent=t;},1500);
+  }
+
+  function setVals(map){ inputs.forEach(function(i){ i.value = map[i.dataset.k]||""; }); }
+  $("btnCalc").onclick=calc;
+  $("btnCsv").onclick=exportCsv;
+  $("btnCartCopy").onclick=copyCart;
+  $("btnClear").onclick=function(){ setVals({}); $("result").classList.add("hidden"); lastRows=[]; };
+  $("btnExample").onclick=function(){
+    setVals({
+      "A|white|socket":7,"A|white|switch":3,"A|white|frame1":2,"A|white|frame2":3,
+      "A|cream|socket":4,"A|cream|switch":2,
+      "B|white|socket":6,"B|white|switch":2,
+      "B|graphite|socket":5,"B|graphite|frame1":1,"B|graphite|frame2":2,
+      "B|cream|socket":3,"B|cream|frame2":1
+    });
+    calc();
+  };
+  setExp(false);
+})();
+</script>
+</body>
+</html>
