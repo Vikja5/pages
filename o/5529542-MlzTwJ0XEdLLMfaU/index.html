@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Тихие истории — демо читалки</title>
+<meta name="description" content="Демо / пример работы: сайт-читалка для цикла коротких новелл.">
+<link rel="preload" href="fonts/Manrope-Regular.ttf" as="font" type="font/ttf" crossorigin>
+<style>
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-Regular.ttf") format("truetype");font-weight:400;font-display:block}
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-display:block}
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-Bold.ttf") format("truetype");font-weight:700;font-display:block}
+@font-face{font-family:"ManropeFb";src:local("Arial");size-adjust:104%;ascent-override:96%}
+:root{--bg:#faf6ef;--surface:#fff;--ink:#241f1a;--mute:#6d645a;--line:#e6ddcf;--accent:#8a4b2a;--accent-ink:#fff;--soft:#f1e7d8}
+:root[data-theme="dark"]{--bg:#16140f;--surface:#1f1c16;--ink:#ece4d6;--mute:#a0978a;--line:#322d24;--accent:#e0a070;--accent-ink:#1a1209;--soft:#2a251c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16140f;--surface:#1f1c16;--ink:#ece4d6;--mute:#a0978a;--line:#322d24;--accent:#e0a070;--accent-ink:#1a1209;--soft:#2a251c}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Manrope","ManropeFb",Arial,sans-serif;line-height:1.5;overflow-x:hidden}
+#bar{position:fixed;left:0;top:0;height:4px;width:0;background:var(--accent);z-index:30;transition:width .1s}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:960px;margin:0 auto;padding:14px 16px}
+.logo{font-weight:700;font-size:18px;border:0;background:none;color:var(--ink);cursor:pointer;padding:0;font-family:inherit;white-space:nowrap}
+nav{display:flex;gap:6px;align-items:center}
+nav button,.btn{font-family:inherit;font-size:15px;font-weight:600;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:10px 14px;cursor:pointer;min-height:44px;white-space:nowrap}
+nav button.on{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.demo{background:var(--soft);color:var(--mute);font-size:13px;text-align:center;padding:6px 12px}
+main{max-width:960px;margin:0 auto;padding:8px 16px 120px}
+.view{display:none}.view.on{display:block}
+h1{font-size:clamp(28px,7vw,44px);line-height:1.15;margin:24px 0 12px}
+.lead{color:var(--mute);font-size:18px;max-width:60ch}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:16px;margin-top:28px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;text-align:left;cursor:pointer;font-family:inherit;color:var(--ink);display:flex;flex-direction:column;gap:8px;min-width:0}
+.card h2{margin:0;font-size:21px}
+.card .t{color:var(--accent);font-weight:600;font-size:14px}
+.card p{margin:0;color:var(--mute);font-style:italic;font-size:16px}
+.tag{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:13px;color:var(--mute)}
+article{max-width:65ch;margin:0 auto}
+article h1{margin-top:20px}
+.meta{color:var(--mute);font-size:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.text p{font-size:20px;line-height:1.7;margin:0 0 1.1em;hyphens:auto}
+.end{border-top:1px solid var(--line);margin-top:40px;padding-top:24px}
+.end h3{margin:0 0 6px;font-size:20px}
+.q{margin:16px 0}
+.q label{display:block;font-weight:600;margin-bottom:8px}
+.opts{display:flex;gap:8px;flex-wrap:wrap}
+.opts label{font-weight:400;border:1px solid var(--line);border-radius:10px;padding:10px 14px;min-height:44px;display:flex;align-items:center;gap:6px;background:var(--surface);cursor:pointer;margin:0}
+textarea{width:100%;min-height:80px;font:inherit;font-size:16px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface);color:var(--ink)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.ok{color:var(--accent);font-weight:600;margin-top:10px}
+#stats{position:fixed;right:10px;bottom:10px;width:min(300px,calc(100vw - 20px));background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,.18);z-index:40;font-size:13px}
+#stats summary{padding:10px 14px;font-weight:700;cursor:pointer;min-height:44px;display:flex;align-items:center}
+#stats ul{list-style:none;margin:0;padding:0 14px 12px;max-height:38vh;overflow:auto}
+#stats li{padding:4px 0;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:8px}
+#stats li b{color:var(--accent)}
+.about{max-width:62ch}
+.about p{font-size:18px;line-height:1.7}
+@media (max-width:420px){nav button{padding:10px}.text p{font-size:19px}}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div class="demo">демо / пример работы — всё условное, не настоящий проект</div>
+<header class="top">
+  <button class="logo" data-go="home">Тихие истории</button>
+  <nav>
+    <button data-go="home" id="nav-home" class="on">Новеллы</button>
+    <button data-go="about" id="nav-about">Об авторе</button>
+    <button id="theme" aria-label="Сменить тему">Тема</button>
+  </nav>
+</header>
+<main>
+  <section class="view on" id="v-home">
+    <h1>Цикл «Тихие истории»</h1>
+    <p class="lead">Десять коротких новелл о маленьких событиях, после которых что-то меняется. Читать удобно с телефона, на один вечер. <span class="tag">18+</span></p>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <section class="view" id="v-novel">
+    <article>
+      <div class="meta"><span id="n-time"></span><span class="tag">18+</span><span>демо / пример работы</span></div>
+      <h1 id="n-title"></h1>
+      <div class="text" id="n-text"></div>
+      <div class="end" id="n-end">
+        <h3>Два вопроса после чтения</h3>
+        <p class="meta">Анонимно, без имени и почты. В демо ответ никуда не уходит.</p>
+        <form id="fb">
+          <div class="q"><label>Дочитали с интересом?</label>
+            <div class="opts"><label><input type="radio" name="q1" value="да" required> Да</label><label><input type="radio" name="q1" value="частично"> Местами</label><label><input type="radio" name="q1" value="нет"> Не очень</label></div></div>
+          <div class="q"><label for="q2">Что запомнилось? (необязательно)</label><textarea id="q2" maxlength="300"></textarea></div>
+          <button class="btn primary" type="submit">Отправить отзыв</button>
+          <div class="ok" id="fb-ok" hidden>Отправлено (демо)</div>
+        </form>
+        <div class="actions">
+          <button class="btn" id="tg">Читать в Telegram</button>
+          <button class="btn primary" id="next">Следующая новелла</button>
+        </div>
+        <p class="meta" id="tg-note" hidden>Условная ссылка на Telegram-канал (в демо переход не выполняется).</p>
+      </div>
+    </article>
+  </section>
+
+  <section class="view" id="v-about">
+    <div class="about">
+      <h1>Об авторе</h1>
+      <p><span class="tag">пример</span></p>
+      <p>Автор пишет под псевдонимом Н. Тихонова. Это текст-заглушка: здесь будет короткий рассказ о себе, о том, как родился цикл, и как с автором можно связаться.</p>
+      <p>Тексты цикла не содержат откровенных сцен, но предназначены для взрослой аудитории, поэтому стоит пометка 18+.</p>
+    </div>
+  </section>
+</main>
+
+<details id="stats" open>
+  <summary>Аналитика дочитываний (демо)</summary>
+  <ul id="log"><li><span>Событий пока нет</span></li></ul>
+</details>
+
+<script>
+(function(){
+var N=[
+{t:"Последний трамвай",time:"12 мин",first:"Трамвай опаздывал, и Вера впервые за год не злилась.",
+ p:["Трамвай опаздывал, и Вера впервые за год не злилась. Она стояла на пустой остановке, держала в руках пакет с мандаринами и слушала, как где-то далеко звенят рельсы.","На соседней скамейке сидел старик в сером пальто. Он аккуратно чистил яблоко перочинным ножом, и кожура тянулась длинной лентой, ни разу не оборвавшись.","— Если не оборвётся, — сказал он, не поднимая глаз, — значит, всё будет хорошо. Я так делаю уже сорок лет. Пока не подводило.","Вера улыбнулась. Она знала, что это глупая примета, и всё равно смотрела на нож, затаив дыхание. Лента дошла почти до земли и осталась целой.","Трамвай появился из тумана тихо, как большое животное. Старик протянул ей половину яблока: «Берите. Дорога длинная».","В вагоне было тепло и почти пусто. Вера ехала, ела яблоко и думала, что завтра наконец позвонит сестре. Не потому, что примета, а потому, что можно просто взять и позвонить."]},
+{t:"Письмо без адреса",time:"9 мин",first:"Письмо лежало в книге, которую никто не открывал лет десять.",
+ p:["Письмо лежало в книге, которую никто не открывал лет десять. Конверт был чистый, без адреса и марки, только имя: «Тому, кто найдёт».","Лев читал его стоя у стеллажа. Незнакомый почерк просил об одном: не выбрасывать книгу и когда-нибудь передать её дальше.","Он закрыл конверт, вернул его на место и впервые за долгое время пошёл в библиотеку не за делом, а просто так."]},
+{t:"Ночной вахтёр",time:"14 мин",first:"К трём часам ночи в здании оставались только он и гул лифта.",
+ p:["К трём часам ночи в здании оставались только он и гул лифта. Вахтёр Матвей любил это время: никто не спешит, и можно допить чай, пока он не остыл.","Каждую ночь на пятом этаже кто-то оставлял включённой настольную лампу. Матвей выключал её и поднимался обратно. Однажды он решил подождать.","Утром на столе нашли записку: «Спасибо, что не гасите совсем». Лампу с тех пор оставляли гореть до рассвета."]}
+];
+var $=function(i){return document.getElementById(i)};
+var cur=0,fired={},seenEnd=false;
+var log=$("log"),bar=$("bar");
+
+// карточки
+var cards=$("cards");
+N.forEach(function(n,i){
+ var b=document.createElement("button");b.className="card";
+ b.innerHTML='<span class="t">'+n.time+' чтения</span><h2>'+n.t+'</h2><p>«'+n.first+'»</p>';
+ b.onclick=function(){open(i)};cards.appendChild(b);
+});
+
+// события
+function ev(name){
+ var key=cur+"|"+name; if(fired[key])return; fired[key]=1;
+ var first=log.querySelector("li span:only-child");if(first&&first.textContent==="Событий пока нет")log.innerHTML="";
+ var d=new Date(),ts=("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)+":"+("0"+d.getSeconds()).slice(-2);
+ var li=document.createElement("li");li.innerHTML="<span>"+name+"</span><b>"+ts+"</b>";
+ log.insertBefore(li,log.firstChild);
+}
+// условная цель Метрики: в реальном проекте здесь ym(ID,'reachGoal',name)
+
+function show(id){
+ ["home","novel","about"].forEach(function(v){$("v-"+v).classList.toggle("on",v===id)});
+ $("nav-home").classList.toggle("on",id==="home"||id==="novel");
+ $("nav-about").classList.toggle("on",id==="about");
+ bar.style.width="0";window.scrollTo(0,0);
+}
+function open(i){
+ cur=i;var n=N[i];
+ $("n-title").textContent=n.t;$("n-time").textContent=n.time+" чтения";
+ var h="";n.p.forEach(function(p,k){h+='<p'+(k===n.p.length-1?' id="last"':'')+'>'+p+'</p>'});
+ $("n-text").innerHTML=h;
+ $("fb").reset();$("fb-ok").hidden=true;$("tg-note").hidden=true;
+ $("next").textContent=i<N.length-1?"Следующая новелла":"К списку новелл";
+ show("novel");watchEnd();
+}
+var io;
+function watchEnd(){
+ if(io)io.disconnect();
+ io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting&&$("v-novel").classList.contains("on")){ev("дочитал до конца")}})},{threshold:1});
+ io.observe($("last"));
+}
+window.addEventListener("scroll",function(){
+ if(!$("v-novel").classList.contains("on")){bar.style.width="0";return}
+ var a=$("n-text"),r=a.getBoundingClientRect(),h=a.offsetHeight-window.innerHeight*0.5;
+ var p=Math.max(0,Math.min(1,(-r.top)/Math.max(h,1)));
+ bar.style.width=(p*100)+"%";
+ [25,50,75].forEach(function(m){if(p*100>=m)ev("прокрутка "+m+" %")});
+},{passive:true});
+
+document.querySelectorAll("[data-go]").forEach(function(b){b.onclick=function(){show(b.getAttribute("data-go"))}});
+$("tg").onclick=function(){ev("переход в Telegram");$("tg-note").hidden=false};
+$("fb").onsubmit=function(e){e.preventDefault();ev("отправка отзыва");$("fb-ok").hidden=false};
+$("next").onclick=function(){ev("следующая новелла");if(cur<N.length-1)open(cur+1);else show("home")};
+
+// тема
+var root=document.documentElement;
+$("theme").onclick=function(){
+ var dark=root.getAttribute("data-theme")?root.getAttribute("data-theme")==="dark":matchMedia("(prefers-color-scheme:dark)").matches;
+ root.setAttribute("data-theme",dark?"light":"dark");
+};
+})();
+</script>
+</body>
+</html>
