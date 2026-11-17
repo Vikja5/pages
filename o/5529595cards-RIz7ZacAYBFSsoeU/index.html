@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Три направления стиля для дизайн-бюро</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow-x:hidden}
+body{font-family:Arial,Helvetica,sans-serif;background:#e9e9ec;color:#111}
+.note{padding:12px 16px;text-align:center;font-size:13px;background:#111;color:#fff}
+.lbl{font-size:12px;letter-spacing:.12em;text-transform:uppercase;padding:28px 16px 10px;max-width:1100px;margin:0 auto;color:#444}
+.card{max-width:1100px;margin:0 auto 12px;overflow:hidden;position:relative}
+/* 1. НЕОБРУТАЛИЗМ */
+.a{background:#f4efe6;border:4px solid #111;padding:28px 20px 36px}
+.a nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+.a nav span{border:3px solid #111;padding:6px 12px;font-weight:700;background:#fff;box-shadow:4px 4px 0 #111;font-size:14px}
+.a h1{font:900 clamp(44px,13vw,132px)/.88 "Arial Black",Impact,sans-serif;letter-spacing:-.03em;text-transform:uppercase}
+.a h1 em{font-style:normal;background:#ff4fa3;padding:0 .12em;box-shadow:6px 6px 0 #111;display:inline-block;transform:rotate(-2deg)}
+.a h1 u{text-decoration:none;background:#4d7cff;color:#fff;padding:0 .12em;display:inline-block;transform:rotate(1.5deg)}
+.a p{max-width:520px;margin:22px 0;font-size:18px;font-weight:600}
+.a .btn{display:inline-block;border:3px solid #111;background:#ffd23f;padding:14px 22px;font-weight:900;box-shadow:6px 6px 0 #111;text-transform:uppercase;transition:.15s}
+.a .btn:hover{transform:translate(4px,4px);box-shadow:2px 2px 0 #111}
+.a .st{position:absolute;right:16px;top:70px;width:96px;height:96px;border-radius:50%;background:#ffd23f;border:3px solid #111;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:900;font-size:12px;transform:rotate(12deg);animation:spin 8s linear infinite}
+@keyframes spin{to{transform:rotate(372deg)}}
+/* 2. ЭДИТОРИАЛ */
+.b{background:#fbfaf7;padding:28px 20px 40px;border:1px solid #ddd}
+.b .top{display:flex;justify-content:space-between;font-size:12px;letter-spacing:.14em;text-transform:uppercase;border-bottom:1px solid #111;padding-bottom:12px}
+.b h1{font:400 clamp(44px,11vw,120px)/.95 Georgia,"Times New Roman",serif;letter-spacing:-.03em;margin:34px 0 10px}
+.b h1 i{font-style:italic;background:linear-gradient(transparent 62%,#ffd5c2 62%)}
+.b .grid{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;margin-top:26px}
+@media(min-width:720px){.b .grid{grid-template-columns:2fr 1fr 1fr}}
+.b .img{aspect-ratio:4/3;background:#111;position:relative;overflow:hidden}
+.b .img:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 35%,#ff8a5c 0,transparent 35%),radial-gradient(circle at 70% 70%,#e8e0d0 0,transparent 40%);transition:.6s}
+.b .img:hover:after{transform:scale(1.25) rotate(8deg)}
+.b .img:nth-child(2){background:#e8e0d0}.b .img:nth-child(2):after{background:radial-gradient(circle at 60% 40%,#111 0,transparent 30%)}
+.b .img:nth-child(3){background:#ffd5c2}.b .img:nth-child(3):after{background:radial-gradient(circle at 40% 60%,#fbfaf7 0,transparent 38%)}
+.b small{display:block;margin-top:6px;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+/* 3. AURORA + КИНЕТИКА */
+.c{background:#07070d;color:#fff;padding:28px 20px 0;isolation:isolate}
+.c .bl{position:absolute;border-radius:50%;filter:blur(70px);opacity:.75;z-index:-1;animation:fl 10s ease-in-out infinite alternate}
+.c .b1{width:320px;height:320px;background:#7c3aed;left:-60px;top:20px}
+.c .b2{width:300px;height:300px;background:#06b6d4;right:-40px;top:120px;animation-delay:-4s}
+.c .b3{width:240px;height:240px;background:#f472b6;left:40%;bottom:40px;animation-delay:-7s}
+@keyframes fl{to{transform:translate(40px,-30px) scale(1.2)}}
+.c .glass{display:inline-block;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.25);font-size:13px;margin:0 6px 6px 0}
+.c h1{font:800 clamp(44px,12vw,120px)/.95 Arial,sans-serif;letter-spacing:-.04em;margin:34px 0 14px}
+.c h1 span{background:linear-gradient(90deg,#a78bfa,#22d3ee,#f472b6);-webkit-background-clip:text;background-clip:text;color:transparent}
+.c p{max-width:480px;color:#cfd0e6;font-size:17px}
+.c .mq{margin:34px -20px 0;border-top:1px solid rgba(255,255,255,.2);padding:14px 0;white-space:nowrap;overflow:hidden;font:800 28px Arial,sans-serif}
+.c .mq div{display:inline-block;animation:mq 14s linear infinite}
+@keyframes mq{to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+.foot{max-width:1100px;margin:18px auto 40px;padding:0 16px;font-size:13px;color:#444}
+</style>
+</head>
+<body>
+<div class="note">демо / пример работы: три направления стиля для дизайн-бюро, выберите, и я соберу сайт в нём</div>
+
+<div class="lbl">Направление 1 · Необрутализм: громко, с характером</div>
+<div class="card a">
+<div class="st">портфолио<br>2026</div>
+<nav><span>Проекты</span><span>Студия</span><span>Услуги</span><span>Контакт</span></nav>
+<h1>Дизайн, <em>который</em> <u>видно</u></h1>
+<p>Бюро для тех, кто устал от одинаковых сайтов. Бренды, интерьеры, интерфейсы.</p>
+<a class="btn">Обсудить проект →</a>
+</div>
+
+<div class="lbl">Направление 2 · Editorial: журнал и галерея</div>
+<div class="card b">
+<div class="top"><span>Бюро Контур</span><span>Проекты · Студия · Контакт</span></div>
+<h1>Мы рисуем <i>среду</i>,<br>в которой хочется жить</h1>
+<div class="grid">
+<div><div class="img"></div><small>01 · Интерьер, жилой комплекс</small></div>
+<div><div class="img"></div><small>02 · Айдентика</small></div>
+<div><div class="img"></div><small>03 · Веб-дизайн</small></div>
+</div>
+</div>
+
+<div class="lbl">Направление 3 · Aurora и движущаяся типографика</div>
+<div class="card c">
+<div class="bl b1"></div><div class="bl b2"></div><div class="bl b3"></div>
+<span class="glass">Бренд</span><span class="glass">Интерьер</span><span class="glass">Веб</span>
+<h1>Дизайн в <span>движении</span></h1>
+<p>Студия, где идея становится системой: от концепции до живого сайта.</p>
+<div class="mq"><div>БРЕНД · ИНТЕРЬЕР · ВЕБ · ГРАФИКА · БРЕНД · ИНТЕРЬЕР · ВЕБ · ГРАФИКА · БРЕНД · ИНТЕРЬЕР · ВЕБ · ГРАФИКА · </div></div>
+</div>
+
+<p class="foot">Это только первый экран каждого направления, тексты и названия условные. Выберите, какое ближе, и я доведу до полного сайта: проекты, услуги, этапы работы, форма заявки.</p>
+</body>
+</html>
