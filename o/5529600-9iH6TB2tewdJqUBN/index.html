@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Шортсы из вашего видео — демо</title>
+<style>
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-Regular.woff2") format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-SemiBold.woff2") format("woff2");font-weight:600;font-display:swap}
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-Bold.woff2") format("woff2");font-weight:700;font-display:swap}
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-ExtraBold.woff2") format("woff2");font-weight:800;font-display:swap}
+:root{--ink:#1f2a33;--mute:#5d6b76;--bg:#f2f4f6;--card:#fff;--line:#d9e0e6;--acc:#3b6a8f;--accbg:#e7eff6;--gold:#f2c14e;--ok:#2f7d57;--dark:#1f2a44;--font:"Manrope","Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.5}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px}
+header{padding:24px 0 8px}
+.tag{display:inline-block;font-weight:700;font-size:.85rem;color:var(--mute);background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px}
+h1{font-size:clamp(1.6rem,6vw,2.6rem);line-height:1.15;margin:12px 0 8px;font-weight:800}
+h2.sec{font-size:clamp(1.3rem,4.5vw,1.7rem);margin:34px 0 6px;font-weight:800;line-height:1.2}
+.lede{color:var(--mute);margin:0 0 12px;max-width:64ch}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.price{margin:12px 0;border:2px solid var(--acc);border-radius:16px;background:#fff;overflow:hidden;box-shadow:0 6px 18px rgba(59,106,143,.16)}
+.price .ph{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;padding:7px 14px;background:var(--acc);color:#fff;font-weight:800;font-size:.95rem}
+.price .ph span{font-weight:600;font-size:.82rem;opacity:.95}
+.price .pr{display:grid;grid-template-columns:1fr 1fr}
+.price .pi{display:flex;flex-direction:column;padding:10px 14px;border-top:1px solid var(--line)}
+.price .pi:nth-child(-n+2){border-top:0}
+.price .pi:nth-child(even){border-left:1px solid var(--line)}
+.price .pi small{color:var(--mute);font-weight:700;font-size:.84rem;line-height:1.3}
+.price .pi b{color:var(--acc);font-size:1.4rem;font-weight:800;white-space:nowrap;line-height:1.2}
+@media(max-width:600px){.price .pr{grid-template-columns:1fr}.price .pi{flex-direction:row;align-items:center;justify-content:space-between;gap:10px;padding:6px 14px}.price .pi:nth-child(2){border-top:1px solid var(--line)}.price .pi:nth-child(even){border-left:0}.price .pi b{font-size:1.2rem}.price .pi small{font-size:.8rem}}
+.cta{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:11px 14px;border-radius:14px;background:var(--gold);color:#1b2733;font-weight:800;text-decoration:none;line-height:1.3;box-shadow:0 4px 0 rgba(27,39,51,.18);transition:transform .2s}
+.cta:hover,.cta:focus-visible{transform:translateY(-2px)}
+.cta i{font-style:normal;flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#1b2733;color:var(--gold);animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+@media(prefers-reduced-motion:reduce){.cta i{animation:none}html{scroll-behavior:auto}}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:14px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.card h3{margin:0;font-size:1.15rem;line-height:1.25}
+.card p{margin:0;color:var(--mute);font-size:.97rem}
+.from{display:inline-block;align-self:flex-start;border:2px solid var(--acc);background:var(--accbg);border-radius:12px;padding:3px 12px;font-weight:800;color:var(--dark);font-size:1.15rem;white-space:nowrap}
+.from span{font-weight:700;font-size:.85rem;color:var(--mute);white-space:normal}
+.card ul,.lv ul{margin:0;padding:0 0 0 1.1em;display:grid;gap:4px;font-size:.97rem}
+.card.wide{grid-column:1/-1}
+.lvls{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:4px}
+.lv{border:2px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px;background:#fff}
+.lv.l2{border-color:#9db6cf}.lv.l3{border-color:var(--acc);background:#f3f7fb}
+.lv h4{margin:0;font-size:1.05rem}
+.lv .lp{font-weight:800;font-size:1.25rem;color:var(--dark);white-space:nowrap}
+.lv .lp span{font-size:.82rem;font-weight:700;color:var(--mute)}
+.lv .inc{margin:0;font-weight:800;font-size:.88rem;color:var(--acc)}
+.fix{margin:6px 0 0;font-size:.92rem;color:var(--mute)}
+.samples{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:14px}
+.group{grid-column:1/-1;margin:10px 0 -4px;font-size:1.05rem;font-weight:800}
+.sample{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.slot{position:relative;background:linear-gradient(135deg,#27364f,#1f2a44);aspect-ratio:16/9;display:grid;place-items:center}
+.slot.v{aspect-ratio:9/16;max-height:520px;margin:0 auto;width:100%}
+.slot video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#111}
+.slot .soon{display:none;text-align:center;color:#fff;padding:14px;font-weight:800;line-height:1.3}
+.slot .soon small{display:block;font-weight:600;opacity:.8;margin-top:4px}
+.slot.empty video{display:none}
+.slot.empty .soon{display:block}
+.sample.s2{grid-column:span 2}
+@media(max-width:600px){.sample.s2{grid-column:auto}}
+.sb{padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.sb h3{margin:0;font-size:1rem}
+.sb p{margin:0;font-size:.93rem;color:var(--mute)}
+.src{color:var(--mute);font-size:.88rem;border-top:1px dashed var(--line);padding-top:6px;margin-top:2px}
+.styles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0}
+.st{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:4px}
+.st b{font-size:1rem;line-height:1.25}
+.st span{color:var(--mute);font-size:.9rem}
+.st em{font-style:normal;font-weight:700;font-size:.8rem;color:var(--acc);background:var(--accbg);border-radius:999px;padding:2px 10px;align-self:flex-start;margin-top:auto}
+.trendline{margin:6px 0 4px;font-weight:700;color:var(--dark)}.price .pi.lvrow{grid-column:1/-1;border-left:0;flex-direction:column;gap:4px}.lr{display:flex;flex-wrap:wrap;gap:4px 26px}.lr span{font-weight:700;color:var(--mute);font-size:.95rem}.lr b{color:var(--acc);font-size:1.3rem;margin-left:4px}@media(max-width:600px){.price .pi.lvrow{flex-direction:column;align-items:flex-start}}.upd{margin:0;font-weight:700}
+.upd small{display:block;color:var(--mute);font-weight:600}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0;padding:0;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 12px 12px 14px;font-size:.97rem}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--acc);color:#fff;font-weight:800;font-size:.9rem;margin-bottom:6px}
+.note{background:var(--accbg);border-radius:12px;padding:10px 14px;font-weight:600;margin:0}
+.no{background:#fff;border:2px dashed var(--line);border-radius:16px;padding:14px 16px;margin:12px 0}
+.no ul{margin:0;padding:0 0 0 1.1em;display:grid;gap:4px}
+.sound{background:#fff;border:1px solid var(--line);border-left:6px solid var(--gold);border-radius:12px;padding:12px 16px;margin:12px 0}
+footer{padding:10px 0 50px;color:var(--mute);font-size:.92rem}
+@media(max-width:900px){.styles{grid-template-columns:1fr 1fr}.steps{grid-template-columns:1fr 1fr}.samples{grid-template-columns:1fr 1fr}.lvls{grid-template-columns:1fr}}
+@media(max-width:600px){.cards,.samples,.styles,.steps{grid-template-columns:1fr}.card.wide{grid-column:auto}}
+</style>
+<style>.own{margin:14px 0;border:2px solid var(--acc);border-radius:16px;background:var(--accbg);padding:14px 16px}.own h3{margin:0 0 6px;font-size:1.15rem}.own p{margin:0 0 6px}.own ul{margin:6px 0 0;padding:0 0 0 1.1em;display:grid;gap:4px}.pnote{margin:10px 0 0;display:grid;gap:6px;font-size:.97rem}.pnote b{color:var(--dark)}.chips{display:flex;flex-wrap:wrap;gap:8px}.chips span{background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-weight:700;font-size:.9rem;color:var(--dark)}.ph-slot{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:#fff;font-weight:800;padding:14px;line-height:1.3}.ph-slot small{display:block;font-weight:600;opacity:.8}.price .pi.big{grid-column:1/-1;border-left:0;flex-direction:row;align-items:baseline;gap:14px;flex-wrap:wrap}</style>
+</head>
+<body>
+<header class="wrap">
+  <span class="tag">Демо / пример работы</span>
+  <h1>Шортсы, которые досматривают до конца</h1>
+  <div class="price" role="group" aria-label="Стоимость">
+    <div class="ph">Стоимость</div>
+    <div class="pr">
+      <div class="pi big"><small>Один шортс из вашего длинного видео (минимум 3 шортса)</small><b>от 300 ₽</b></div>
+    </div>
+  </div>
+  <div class="pnote">
+    <span><b>Что внутри каждого шортса:</b></span><div class="chips"><span>хук в первые секунды</span><span>нарезка лучших моментов</span><span>motion-графика</span><span>динамичные субтитры с подсветкой слов</span><span>зумы и наезды</span><span>вылетающий текст</span><span>мемные вставки и SFX</span><span>монтаж в бит музыки</span><span>чистка пауз и слов-паразитов</span></div>
+    <span><b>От чего зависит цена:</b> от длины вашего исходного видео. Если оно до 30 минут, шортс стоит 300 ₽. Если длиннее, добавляю 100 ₽ за каждые следующие 30 минут (например, видео на 45 минут — 400 ₽ за шортс). Точную цену назову, когда узнаю, сколько минут идёт ваше видео.</span>
+  </div>
+  <p class="trendline">Слежу за трендами и обновляю стили каждую неделю.</p>
+</header>
+<main class="wrap">
+<section aria-labelledby="h-own">
+  <div class="own">
+    <h3 id="h-own">Любой стиль, под вас</h3>
+    <p>Ролики ниже — витрина качества и стилей, а не потолок. Сделаю так, как нужно вам.</p>
+    <ul><li>Опишите идею или пришлите свой шаблон.</li><li>Пришлите референс — ссылку на ролик, который нравится, и я сделаю в похожем стиле.</li><li>Ваш фирстиль: цвета, шрифт и логотип.</li></ul>
+  </div>
+</section>
+<section aria-labelledby="h-o">
+  <h2 class="sec" id="h-o">Шортсы из длинного видео: примеры стилей</h2>
+  <p class="lede">От хайповых до спокойных. Выберите, что ближе к вашему каналу.</p>
+  <div class="samples">
+    <article class="sample"><div class="slot v" data-src="../../v/obrazec2_ozhivlenie_1_norilsk.mp4"><video controls muted playsinline preload="none" aria-label="Шортс: Норильск"><source type="video/mp4"></video><div class="soon">Образец готовится<small>Яркий шортс</small></div></div>
+      <div class="sb"><h3>Яркий шортс</h3><p>Иконки, плашки и вставки в полосе под лицом.</p><div class="src">Видео: yetbayev, «Норильск — самый компактный город России», CC BY 3.0 (Wikimedia Commons). Сокращено, добавлены субтитры и графика.</div></div></article>
+    <article class="sample"><div class="slot v" data-src="../../v/obrazec1_shorts_1.mp4"><video controls muted playsinline preload="none" aria-label="Шортс: субтитры-караоке"><source type="video/mp4"></video><div class="soon">Образец готовится<small>Субтитры-караоке</small></div></div>
+      <div class="sb"><h3>Субтитры-караоке</h3><p>Хук, крупные пословные субтитры, приближения на говорящем.</p><div class="src">Видео: «Как я попал в РАН + обзор теории механизмов! Лекция в Майкопе», А. Савватеев и Ко, канал «Маткульт-привет!», CC BY 3.0. Сокращено, добавлены субтитры и графика.</div></div></article>
+    <article class="sample"><div class="slot v" data-src="../../v/obrazec2_ozhivlenie_3_nasa.mp4"><video controls muted playsinline preload="none" aria-label="Шортс: плоская графика"><source type="video/mp4"></video><div class="soon">Образец готовится<small>Плоская графика</small></div></div>
+      <div class="sb"><h3>Плоская графика</h3><p>Иконки и анимация иллюстрируют каждую фразу.</p><div class="src">Источник: NASA (public domain), Скотт Келли. Видео сокращено, добавлены субтитры и графика.</div></div></article>
+    <article class="sample"><div class="slot v" data-src="../../v/obrazec1_shorts_2.mp4"><video controls muted playsinline preload="none" aria-label="Шортс: объяснялка"><source type="video/mp4"></video><div class="soon">Образец готовится<small>Объяснялка</small></div></div>
+      <div class="sb"><h3>Объяснялка</h3><p>Графика рисует то, о чём говорит лектор.</p><div class="src">Видео: «Как я попал в РАН + обзор теории механизмов! Лекция в Майкопе», А. Савватеев и Ко, канал «Маткульт-привет!», CC BY 3.0. Сокращено, добавлены субтитры и графика.</div></div></article>
+    <article class="sample"><div class="slot v" data-src="../../v/obrazec2_ozhivlenie_2_matematika.mp4"><video controls muted playsinline preload="none" aria-label="Спокойный шортс со схемами"><source type="video/mp4"></video><div class="soon">Образец готовится<small>Спокойный шортс со схемами</small></div></div>
+      <div class="sb"><h3>Спокойный шортс со схемами</h3><p>Мягкие плашки, схемы и формулы, спокойные цвета.</p><div class="src">Видео: Alexey Savateev, «Язык математики» (Wikimedia Commons), CC BY 3.0. Сокращено, добавлены субтитры и графика.</div></div></article>
+    <article class="sample"><div class="slot v" data-src="../../v/obrazec1_shorts_3.mp4"><video controls muted playsinline preload="none" aria-label="Шортс: ретро-плеер"><source type="video/mp4"></video><div class="soon">Образец готовится<small>Ретро-плеер</small></div></div>
+      <div class="sb"><h3>Ретро-плеер</h3><p>Окно видеоплеера, неон и синтвейв.</p><div class="src">Видео: «Как я попал в РАН + обзор теории механизмов! Лекция в Майкопе», А. Савватеев и Ко, канал «Маткульт-привет!», CC BY 3.0. Сокращено, добавлены субтитры и графика.</div></div></article>
+  </div>
+  <h2 class="sec">Рекламные шортсы: примеры стилей</h2>
+  <p class="lede">Для рекламы товара, услуги или бренда: коротко, ярко, с motion-графикой.</p>
+  <div class="samples">
+    <article class="sample"><div class="slot v" data-src="../../v/obrazec4_trend_variety_vet.mp4"><video controls muted playsinline preload="none" aria-label="Реклама ветеринарной клиники"><source type="video/mp4"></video><div class="soon">Образец готовится<small>Реклама ветеринарной клиники</small></div></div>
+      <div class="sb"><h3>Реклама ветеринарной клиники</h3><p>Прыгающие слова-плашки, эмоции, наезды и поп-арт.</p><div class="src">Фото: Pexels.</div></div></article>
+    <article class="sample"><div class="slot v" data-src="../../v/obrazec4_trend_kinetika.mp4"><video controls muted playsinline preload="none" aria-label="Динамичная рекламная заставка"><source type="video/mp4"></video><div class="soon">Образец готовится<small>Динамичная рекламная заставка</small></div></div>
+      <div class="sb"><h3>Динамичная рекламная заставка</h3><p>Крупные слова «играют» в такт музыке.</p></div></article>
+  </div>
+</section>
+</main>
+<footer class="wrap">Демо / пример работы. Чтобы назвать точную цену, пришлите ссылку на видео, его длину в минутах и площадки (YouTube Shorts, TikTok, Reels).</footer>
+<script>
+/* Образцы: если файла ещё нет, показываем плашку «Образец готовится». Звук выключен у всех видео. */
+(function(){
+  var slots = document.querySelectorAll('.slot[data-src]');
+  Array.prototype.forEach.call(slots, function(slot){
+    var v = slot.querySelector('video'), src = slot.getAttribute('data-src');
+    v.muted = true; v.autoplay = false; v.poster = src.replace(/\.mp4$/, '.jpg');
+    v.addEventListener('volumechange', function(){ /* звук включает только зритель */ });
+    var probe = document.createElement('video');
+    probe.muted = true; probe.preload = 'metadata';
+    function fail(){ slot.classList.add('empty'); probe.removeAttribute('src'); }
+    probe.addEventListener('loadedmetadata', function(){
+      v.querySelector('source').src = src; v.load();
+      probe.removeAttribute('src');
+    });
+    probe.addEventListener('error', fail);
+    v.addEventListener('error', function(){ if (v.error) fail(); }, true);
+    v.addEventListener('loadedmetadata', function(){ slot.classList.remove('empty'); });
+    probe.src = src;
+  });
+})();
+</script>
+</body>
+</html>
