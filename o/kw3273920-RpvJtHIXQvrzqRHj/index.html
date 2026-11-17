@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Правка дизайна лендинга: до и после</title>
+<style>
+@font-face{font-family:"Manrope";font-weight:400;font-display:block;src:url(fonts/Manrope-Regular.woff2) format("woff2")}
+@font-face{font-family:"Manrope";font-weight:600;font-display:block;src:url(fonts/Manrope-SemiBold.woff2) format("woff2")}
+@font-face{font-family:"Manrope";font-weight:700;font-display:block;src:url(fonts/Manrope-Bold.woff2) format("woff2")}
+@font-face{font-family:"Manrope";font-weight:800;font-display:block;src:url(fonts/Manrope-ExtraBold.woff2) format("woff2")}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#1f2433;--mut:#5d6477;--acc:#6b4ee6;--acc2:#e8e2ff;--bg:#f6f5fb;--line:#dcd9ea}
+html,body{overflow-x:hidden}
+body{font-family:Manrope,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+.demo{background:var(--ink);color:#fff;font-size:13px;font-weight:600;text-align:center;padding:8px 16px}
+h1.page{font-size:clamp(24px,5vw,38px);line-height:1.15;font-weight:800;margin:28px 0 8px;letter-spacing:-.01em}
+.lead{color:var(--mut);max-width:720px;margin-bottom:24px}
+.pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-bottom:12px}
+.col{min-width:0}
+.tag{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px;margin-bottom:8px}
+.tag.b{background:#ececec;color:#555}.tag.a{background:var(--acc);color:#fff}
+.frame{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;overflow:hidden;height:calc(100% - 34px)}
+.sec{margin:40px 0 8px}
+.sec h2{font-size:22px;font-weight:800;line-height:1.25}
+.sec p{color:var(--mut);font-size:15px;margin-top:4px}
+.notes{margin-top:10px;padding-left:18px;color:var(--mut);font-size:14px}
+.notes li{margin-bottom:3px}
+@media(max-width:720px){.pair{grid-template-columns:minmax(0,1fr)}.frame{height:auto}}
+
+/* ===== БЫЛО (типичные недочёты ИИ-вёрстки) ===== */
+.old{font-family:Georgia,"Times New Roman",serif;color:#333}
+.old h3.hero{font-family:"Courier New",monospace;font-size:27px;line-height:1.05;text-align:left;color:#222;font-weight:400}
+.old .sub{font-family:Verdana,sans-serif;font-size:11px;line-height:1.9;margin:8px 0 12px;color:#777}
+.old .btn{display:inline-block;font:15px "Comic Sans MS",cursive;background:#8a6df0;color:#fff;padding:6px 12px;border-radius:2px}
+.old .row{display:flex;gap:10px;margin-top:6px;align-items:flex-start}
+.old .row .t{font:19px Georgia,serif;margin-bottom:0}
+.old .row .p{font:12px Arial,sans-serif;line-height:1.2;color:#888}
+.old .ic{flex:none;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.old .ic.f{background:#8a6df0;border-radius:50%}
+.old .ic.o{border:2px solid #aaa;border-radius:4px}
+.old .ic.g{background:#ffd9d0;border-radius:10px;transform:translateY(5px)}
+.old .cards{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:start}
+.old .card{border:1px solid #ddd;padding:8px;font-size:11px}
+.old .card:nth-child(2){margin-top:14px;font-size:14px;padding:12px}
+.old .card b{display:block;font:13px "Courier New",monospace;margin-bottom:2px}
+.old .card .n{font:30px "Times New Roman",serif;color:#bbb}
+.old .card span.pp{font-family:Verdana;line-height:1.1;color:#999}
+
+/* ===== СТАЛО ===== */
+.new h3.hero{font-size:28px;line-height:1.15;font-weight:800;letter-spacing:-.01em;color:var(--ink)}
+.new .sub{font-size:15px;line-height:1.55;color:var(--mut);margin:10px 0 16px}
+.new .btn{display:inline-flex;align-items:center;font-weight:700;font-size:15px;line-height:1;background:var(--acc);color:#fff;padding:13px 20px;border-radius:10px}
+.new .row{display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px;align-items:start;margin-top:14px}
+.new .row .t{font-size:16px;font-weight:700;line-height:1.3}
+.new .row .p{font-size:14px;line-height:1.5;color:var(--mut)}
+.new .ic{width:40px;height:40px;border-radius:12px;background:var(--acc2);color:var(--acc);display:flex;align-items:center;justify-content:center}
+.new .ic svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.new .cards{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:stretch}
+.new .card{border:1px solid var(--line);border-radius:12px;padding:12px;font-size:13px;line-height:1.45;color:var(--mut)}
+.new .card b{display:block;font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px;line-height:1.3}
+.new .card .n{font-size:24px;font-weight:800;color:var(--acc);line-height:1;margin-bottom:8px}
+@media(max-width:420px){.old .cards,.new .cards{grid-template-columns:minmax(0,1fr)}.old .card:nth-child(2){margin-top:0}}
+footer{margin:40px 0 28px;padding-top:16px;border-top:1px solid var(--line);color:var(--mut);font-size:13px}
+</style>
+</head>
+<body>
+<div class="demo">демо / пример работы: условные тексты, не макет заказчика</div>
+<main class="wrap">
+<h1 class="page">Правка дизайна лендинга: было и стало</h1>
+<p class="lead">Пример на трёх типовых блоках лендинга школы. Слева частые недочёты вёрстки, собранной ИИ: разные шрифты, случайные размеры, иконки из разных наборов, блоки на разной высоте. Справа тот же блок после правки: одна пара шрифтов, шкала размеров, единый набор иконок, ровная сетка. Тексты условные.</p>
+
+<!-- БЛОК 1 -->
+<div class="sec"><h2>1. Первый экран: порядок шрифтов</h2><p>Иерархия заголовок, подзаголовок, кнопка.</p></div>
+<div class="pair">
+  <div class="col"><span class="tag b">Было</span>
+    <div class="frame old">
+      <h3 class="hero">Школа, где учиться интересно</h3>
+      <p class="sub">Занятия в удобное время, небольшие группы и понятная программа для каждого уровня подготовки</p>
+      <span class="btn">Записаться</span>
+    </div></div>
+  <div class="col"><span class="tag a">Стало</span>
+    <div class="frame new">
+      <h3 class="hero">Школа, где учиться интересно</h3>
+      <p class="sub">Занятия в удобное время, небольшие группы и понятная программа для каждого уровня подготовки.</p>
+      <span class="btn">Записаться</span>
+    </div></div>
+</div>
+<ul class="notes"><li>Один шрифт вместо четырёх (Courier, Verdana, Georgia, Comic Sans), два-три начертания.</li><li>Заголовок 28 px, подзаголовок 15 px с межстрочным 1,55, кнопка 15 px с ровными отступами.</li></ul>
+
+<!-- БЛОК 2 -->
+<div class="sec"><h2>2. Преимущества: единый стиль иконок</h2><p>Было три разных стиля: заливка, контур, эмодзи.</p></div>
+<div class="pair">
+  <div class="col"><span class="tag b">Было</span>
+    <div class="frame old">
+      <div class="row"><span class="ic f">&#9733;</span><div><div class="t">Небольшие группы</div><div class="p">Преподаватель успевает уделить внимание каждому</div></div></div>
+      <div class="row"><span class="ic o">&#9742;</span><div><div class="t">Удобное расписание</div><div class="p">Выбираете время, которое подходит вам</div></div></div>
+      <div class="row"><span class="ic g">&#127942;</span><div><div class="t">Понятная программа</div><div class="p">Видно, чему научитесь на каждом этапе</div></div></div>
+    </div></div>
+  <div class="col"><span class="tag a">Стало</span>
+    <div class="frame new">
+      <div class="row"><span class="ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c0-3.2 2.7-5.2 6-5.2s6 2 6 5.2"/><circle cx="17" cy="9" r="2.4"/><path d="M16.5 14c2.7 0 4.5 1.6 4.5 4.2"/></svg></span><div><div class="t">Небольшие группы</div><div class="p">Преподаватель успевает уделить внимание каждому</div></div></div>
+      <div class="row"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3.5v3M16 3.5v3"/></svg></span><div><div class="t">Удобное расписание</div><div class="p">Выбираете время, которое подходит вам</div></div></div>
+      <div class="row"><span class="ic"><svg viewBox="0 0 24 24"><path d="M5 5.5A2.5 2.5 0 0 1 7.5 3H19v15H7.5A2.5 2.5 0 0 0 5 20.5z"/><path d="M5 20.5V5.5M9 8h6"/></svg></span><div><div class="t">Понятная программа</div><div class="p">Видно, чему научитесь на каждом этапе</div></div></div>
+    </div></div>
+</div>
+<ul class="notes"><li>Все иконки: SVG, сетка 24 px, один контур 1,8 px, один цвет и одна плашка 40 px.</li><li>Текст выровнен по верхней линии иконки, у всех строк одинаковый шаг и размеры.</li></ul>
+
+<!-- БЛОК 3 -->
+<div class="sec"><h2>3. Блок «Как проходит обучение»: выравнивание карточек</h2><p>Карточки на разной высоте и с разными размерами текста.</p></div>
+<div class="pair">
+  <div class="col"><span class="tag b">Было</span>
+    <div class="frame old">
+      <div class="cards">
+        <div class="card"><span class="n">1</span><b>Знакомство</b><span class="pp">Определяем цели и текущий уровень</span></div>
+        <div class="card"><span class="n">2</span><b>Занятия</b><span class="pp">Регулярные уроки по программе, домашние задания и разбор ошибок</span></div>
+        <div class="card"><span class="n">3</span><b>Итог</b><span class="pp">Подводим итоги этапа</span></div>
+      </div>
+    </div></div>
+  <div class="col"><span class="tag a">Стало</span>
+    <div class="frame new">
+      <div class="cards">
+        <div class="card"><div class="n">1</div><b>Знакомство</b>Определяем цели и текущий уровень</div>
+        <div class="card"><div class="n">2</div><b>Занятия</b>Регулярные уроки по программе, домашние задания и разбор ошибок</div>
+        <div class="card"><div class="n">3</div><b>Итог</b>Подводим итоги этапа</div>
+      </div>
+    </div></div>
+</div>
+<ul class="notes"><li>Карточки одной высоты и на одной линии, цифры и заголовки одного размера, на телефоне встают в одну колонку.</li></ul>
+
+<footer>Демо / пример работы. Показан подход к правке; в вашем макете Figma (мобильная и компьютерная версии) то же делается по всем блокам: иконки, шрифты, сетка, доработка блоков по списку.</footer>
+</main>
+</body>
+</html>
