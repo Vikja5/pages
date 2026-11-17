@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Импорт товаров из XML в OpenCart: пример работы</title>
+<style>
+@font-face{font-family:"Manrope";src:url("Manrope-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"Manrope";src:url("Manrope-SemiBold.ttf") format("truetype");font-weight:600;font-display:swap}
+@font-face{font-family:"Manrope";src:url("Manrope-Bold.ttf") format("truetype");font-weight:700;font-display:swap}
+@font-face{font-family:"Manrope";src:url("Manrope-ExtraBold.ttf") format("truetype");font-weight:800;font-display:swap}
+:root{--ink:#1f2a33;--mute:#5d6b76;--bg:#f2f4f6;--card:#fff;--line:#d9e0e6;--acc:#3b6a8f;--accbg:#e7eff6;--gold:#f2c14e;--ok:#2f7d57;--okbg:#e4f3ec;--warn:#9a5b00;--warnbg:#fdf0d5;--font:"Manrope","Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box}
+html{overflow-x:hidden}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.5;overflow-x:hidden}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px}
+header{padding:28px 0 8px}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{display:inline-block;font-weight:700;font-size:.85rem;color:var(--mute);background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px}
+h1{font-size:clamp(1.6rem,6vw,2.5rem);line-height:1.15;margin:12px 0 8px;font-weight:800;overflow-wrap:anywhere}
+.lede{color:var(--mute);margin:0 0 8px;max-width:66ch}
+.cta{display:flex;align-items:center;gap:10px;margin:10px 0 12px;padding:11px 14px;border-radius:14px;background:var(--gold);color:#1b2733;font-weight:800;line-height:1.3;box-shadow:0 4px 0 rgba(27,39,51,.18)}
+.cta svg{flex:none;width:30px;height:30px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:0 0 16px;min-width:0}
+.card.lock{opacity:.5}
+.card h2{margin:0 0 4px;font-size:1.15rem;display:flex;align-items:center;gap:10px}
+.card h2 i{flex:none;font-style:normal;display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--acc);color:#fff;font-weight:800;font-size:.9rem}
+.s{margin:0 0 12px;color:var(--mute);font-size:.95rem}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+input[type=text],input[type=number],input[type=time],select{min-height:48px;border:1px solid var(--line);border-radius:12px;padding:8px 12px;font:inherit;font-size:16px;background:#fff;color:inherit;min-width:0}
+.row input[type=text]{flex:1 1 220px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:10px 18px;border:0;border-radius:12px;background:var(--acc);color:#fff;font:700 1rem var(--font);cursor:pointer}
+.btn.light{background:#fff;color:var(--acc);border:1px solid var(--acc)}
+.btn:disabled{opacity:.55;cursor:default}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.msg{margin:10px 0 0;font-weight:600;font-size:.95rem}
+.msg.ok{color:var(--ok)}.msg.bad{color:var(--warn)}
+.xmlbox{margin-top:12px;display:none}
+.xmlbox summary{cursor:pointer;font-weight:700;color:var(--acc);min-height:32px}
+pre{margin:8px 0 0;background:#1f2a33;color:#dbe7f0;border-radius:12px;padding:12px;font-size:.78rem;line-height:1.45;overflow:auto;max-height:260px;white-space:pre;max-width:100%}
+.facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.fact{background:var(--accbg);border:1px solid #c5d8e8;border-radius:999px;padding:4px 12px;font-weight:700;font-size:.9rem}
+.map{display:grid;gap:8px}
+.mrow{display:grid;grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr);gap:8px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:12px;background:#fafbfc}
+.mrow .to b{display:block}
+.mrow .to small{color:var(--mute);font-size:.82rem}
+.mrow select{width:100%}
+.mrow .ar{display:grid;place-items:center;color:var(--acc)}
+.mrow .ar svg{width:20px;height:20px}
+.opts{display:grid;gap:2px;margin-top:12px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.opt input{width:22px;height:22px;margin-top:2px;accent-color:var(--acc);flex:none}
+.split{display:grid;grid-template-columns:minmax(0,230px) minmax(0,1fr);gap:16px}
+.tree{list-style:none;margin:0;padding:0}
+.tree ul{list-style:none;margin:0 0 6px;padding:0 0 0 18px;border-left:2px solid var(--line);margin-left:9px}
+.tree button{display:flex;justify-content:space-between;gap:8px;width:100%;min-height:40px;align-items:center;text-align:left;border:0;background:transparent;font:inherit;cursor:pointer;padding:4px 8px;border-radius:8px;color:var(--ink)}
+.tree button:hover{background:var(--accbg)}
+.tree button.on{background:var(--accbg);font-weight:800;color:var(--acc)}
+.tree .top>button{font-weight:700}
+.tree em{font-style:normal;color:var(--mute);font-size:.85rem;flex:none}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.prod{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.ph{height:130px;display:grid;place-items:center;position:relative}
+.ph svg{width:120px;height:90px}
+.ph.none{background:#e9edf0;color:var(--mute);font-weight:700;font-size:.9rem}
+.new{position:absolute;top:8px;left:8px;background:var(--ok);color:#fff;font-weight:800;font-size:.78rem;border-radius:999px;padding:2px 10px}
+.pb{padding:12px 14px;display:flex;flex-direction:column;gap:8px;flex:1;min-width:0}
+.crumb{color:var(--mute);font-size:.8rem;overflow-wrap:anywhere}
+.pb h3{margin:0;font-size:1.02rem;line-height:1.25;overflow-wrap:anywhere}
+.pr{font-size:1.25rem;font-weight:800;color:var(--acc)}
+.pb p{margin:0;font-size:.9rem;color:var(--mute);overflow-wrap:anywhere}
+dl.at{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 10px;font-size:.88rem}
+dl.at dt{color:var(--mute)}dl.at dd{margin:0;font-weight:600;overflow-wrap:anywhere}
+ul.adv{list-style:none;margin:0;padding:0;display:grid;gap:3px;font-size:.88rem}
+ul.adv li{padding-left:20px;position:relative;overflow-wrap:anywhere}
+ul.adv li::before{content:"";position:absolute;left:3px;top:.45em;width:9px;height:5px;border-left:2px solid var(--ok);border-bottom:2px solid var(--ok);transform:rotate(-45deg)}
+.pdf{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:6px 12px;border:1px solid var(--acc);border-radius:10px;color:var(--acc);font-weight:700;font-size:.88rem;text-decoration:none;align-self:flex-start;margin-top:auto}
+.pdf svg{width:18px;height:18px;flex:none}
+.nopdf{color:var(--mute);font-size:.85rem;margin-top:auto}
+.sec{font-size:.78rem;font-weight:700;color:var(--mute)}
+.modes{display:grid;gap:8px;margin-bottom:12px}
+.mode{display:flex;gap:10px;align-items:center;min-height:48px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;cursor:pointer;flex-wrap:wrap;background:#fff}
+.mode input[type=radio]{width:20px;height:20px;accent-color:var(--acc);flex:none}
+.mode input[type=number],.mode input[type=time]{min-height:40px;width:92px;padding:4px 8px}
+.mode.on{border-color:var(--acc);background:var(--accbg)}
+.next{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px}
+.next .fact{background:#fff}
+.run{display:flex;gap:10px;flex-wrap:wrap}
+.run .btn.go{background:var(--ok);min-height:56px;font-size:1.05rem;flex:1 1 260px}
+.prog{display:none;margin-top:14px}
+.bar{height:12px;border-radius:999px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--ok);transition:width .4s ease}
+.steps{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:4px;font-size:.92rem}
+.steps li{color:var(--mute);display:flex;gap:8px;align-items:center}
+.steps li::before{content:"";flex:none;width:12px;height:12px;border-radius:50%;border:2px solid var(--line)}
+.steps li.cur{color:var(--ink);font-weight:700}
+.steps li.cur::before{border-color:var(--acc);border-top-color:transparent;animation:spin .7s linear infinite}
+.steps li.done{color:var(--ok)}.steps li.done::before{background:var(--ok);border-color:var(--ok)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.stats{display:none;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+.stat b{display:block;font-size:1.7rem;line-height:1.2}.stat span{color:var(--mute);font-size:.85rem}
+.stat.a b{color:var(--ok)}.stat.u b{color:var(--acc)}.stat.s b{color:var(--warn)}
+.log{display:grid;gap:8px;margin-top:14px}
+.entry{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fafbfc}
+.entry .h{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-weight:700}
+.entry .st{color:var(--ok);font-weight:700;font-size:.88rem}
+.badge{background:var(--accbg);color:var(--acc);border-radius:999px;padding:2px 10px;font-weight:700;font-size:.8rem}
+.entry .n{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:6px;font-size:.92rem}
+.entry .n b{font-weight:800}
+.entry .d{color:var(--mute);font-size:.82rem;margin-top:4px;overflow-wrap:anywhere}
+.empty{color:var(--mute);padding:8px 0}
+footer{padding:10px 0 50px;color:var(--mute);font-size:.92rem}
+@media(max-width:800px){.split{grid-template-columns:1fr}.cards{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.mrow{grid-template-columns:1fr;gap:4px;padding:8px 10px}.mrow .ar,.mrow .to small{display:none}.card{padding:14px}}
+@media(prefers-reduced-motion:reduce){.bar i{transition:none}.steps li.cur::before{animation:none}}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <div class="tags"><span class="tag">Демо / пример работы</span><span class="tag">Данные условные</span></div>
+  <h1>Каталог из XML-ссылки сам появляется на сайте OpenCart</h1>
+  <p class="lede">Покажу весь путь на условном каталоге: взяли XML по ссылке, сопоставили поля, увидели товары так, как они будут на сайте, поставили расписание и запустили импорт.</p>
+  <div class="cta"><svg viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="15" fill="#1b2733"/><path d="M15 8v13M9.5 16l5.5 5.5 5.5-5.5" fill="none" stroke="#f2c14e" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Это живой пример: подставьте ссылку, поменяйте соответствие полей и нажмите «Запустить импорт сейчас»</span></div>
+</header>
+<main class="wrap">
+
+<section class="card" id="s1"><h2><i>1</i>XML-ссылка поставщика</h2>
+  <p class="s">Адрес файла с товарами. Здесь он условный, на реальном сайте вы укажете свою ссылку.</p>
+  <div class="row"><input type="text" id="url" placeholder="https://адрес-вашего-фида/catalog.xml" aria-label="XML-ссылка"><button class="btn light" id="fill" type="button">Подставить условную</button><button class="btn" id="load" type="button">Загрузить XML</button></div>
+  <p class="msg" id="m1" role="status"></p>
+  <details class="xmlbox" id="xb"><summary>Посмотреть содержимое XML (условное)</summary><pre id="xmlpre" tabindex="0"></pre></details>
+  <div class="facts" id="facts"></div>
+</section>
+
+<section class="card lock" id="s2"><h2><i>2</i>Сопоставление полей</h2>
+  <p class="s">Слева поле на вашем сайте, справа тег из XML. Поменяйте любое соответствие: предпросмотр ниже обновится сразу.</p>
+  <div class="map" id="map"></div>
+  <div class="opts">
+    <label class="opt"><input type="checkbox" id="oCat" checked><span>Сохранить структуру: создать категории и подкатегории, как в XML</span></label>
+    <label class="opt"><input type="checkbox" id="oUpd" checked><span>Обновлять уже загруженные товары (цена, описание, фото)</span></label>
+    <label class="opt"><input type="checkbox" id="oSkip" checked><span>Пропускать товары без цены</span></label>
+  </div>
+</section>
+
+<section class="card lock" id="s3"><h2><i>3</i>Предпросмотр: как товары будут на сайте</h2>
+  <p class="s">Карточки собираются из XML по вашему сопоставлению. Выберите категорию в дереве, чтобы увидеть её товары.</p>
+  <div class="split"><nav aria-label="Дерево категорий"><ul class="tree" id="tree"></ul></nav><div class="cards" id="cards"></div></div>
+</section>
+
+<section class="card lock" id="s4"><h2><i>4</i>Периодическое обновление</h2>
+  <p class="s">Как часто забирать свежий XML: цены, наличие и новые товары подтянутся сами.</p>
+  <div class="modes" id="modes">
+    <label class="mode on"><input type="radio" name="md" value="day" checked><span>Раз в сутки, в</span><input type="time" id="tDay" value="03:00" aria-label="Время запуска"></label>
+    <label class="mode"><input type="radio" name="md" value="hour"><span>Каждый час</span></label>
+    <label class="mode"><input type="radio" name="md" value="custom"><span>Свой интервал: каждые</span><input type="number" id="nCus" min="1" max="23" value="6" aria-label="Интервал в часах"><span>ч</span></label>
+  </div>
+  <label class="opt"><input type="checkbox" id="oOn" checked><span>Автообновление включено</span></label>
+  <p class="s" style="margin:8px 0 0">Ближайшие запуски:</p>
+  <div class="next" id="next"></div>
+  <button class="btn light" id="sim" type="button">Показать, как сработает расписание</button>
+</section>
+
+<section class="card lock" id="s5"><h2><i>5</i>Импорт и журнал</h2>
+  <p class="s">Каждый запуск записывается: сколько товаров добавлено, обновлено и пропущено.</p>
+  <div class="run"><button class="btn go" id="go" type="button">Запустить импорт сейчас</button></div>
+  <div class="prog" id="prog" aria-live="polite"><div class="bar"><i id="barI"></i></div><ul class="steps" id="steps"></ul></div>
+  <div class="stats" id="stats" aria-live="polite"></div>
+  <div class="log" id="log"><div class="empty">Запусков пока не было. Нажмите «Запустить импорт сейчас».</div></div>
+  <p class="s" style="margin:12px 0 0">При повторном запуске в условном XML у части товаров меняется цена: так видно, как работает обновление.</p>
+</section>
+
+</main>
+<footer class="wrap">Демо / пример работы. Каталог, ссылки, PDF-файлы, время и журнал условные, это пример того, как всё устроено. Настройка делается под ваш XML и ваш сайт на OpenCart.</footer>
+
+<script type="text/plain" id="xmlsrc"><?xml version="1.0" encoding="UTF-8"?>
+<catalog date="условная">
+<categories>
+  <category id="1">Кухня</category>
+  <category id="11" parentId="1">Чайники</category>
+  <category id="12" parentId="1">Блендеры</category>
+  <category id="2">Уборка</category>
+  <category id="21" parentId="2">Пылесосы</category>
+  <category id="3">Климат</category>
+  <category id="31" parentId="3">Увлажнители</category>
+</categories>
+<offers>
+  <offer id="A101">
+    <name>Электрочайник Аква 1,7</name><vendor>Бренд Альфа</vendor><categoryId>11</categoryId><price>2490</price>
+    <picture>img/a101.jpg</picture>
+    <description>Быстро кипятит воду и отключается сам. Подходит для большой семьи.</description>
+    <param name="Объём">1,7 л</param><param name="Мощность">2200 Вт</param><param name="Корпус">нержавеющая сталь</param>
+    <advantages><item>Автоотключение при закипании</item><item>Съёмный фильтр от накипи</item></advantages>
+    <manual>https://example.com/pdf/a101.pdf</manual>
+  </offer>
+  <offer id="A102">
+    <name>Чайник стеклянный Аква Лайт 1,5</name><vendor>Бренд Альфа</vendor><categoryId>11</categoryId><price>2990</price>
+    <picture>img/a102.jpg</picture>
+    <description>Прозрачная колба с подсветкой: видно, как закипает вода.</description>
+    <param name="Объём">1,5 л</param><param name="Мощность">2000 Вт</param><param name="Корпус">закалённое стекло</param>
+    <advantages><item>Мягкая подсветка</item><item>Защита от работы без воды</item></advantages>
+    <manual>https://example.com/pdf/a102.pdf</manual>
+  </offer>
+  <offer id="A103">
+    <name>Блендер Вихрь 600</name><vendor>Бренд Бета</vendor><categoryId>12</categoryId><price>3790</price>
+    <picture>img/a103.jpg</picture>
+    <description>Погружной блендер для супов, пюре и коктейлей.</description>
+    <param name="Мощность">600 Вт</param><param name="Скоростей">2</param><param name="Насадки">венчик, измельчитель</param>
+    <advantages><item>Лёгкая съёмная ножка</item><item>Можно мыть в посудомойке</item></advantages>
+    <manual>https://example.com/pdf/a103.pdf</manual>
+  </offer>
+  <offer id="A104">
+    <name>Блендер стационарный Вихрь Про 1000</name><vendor>Бренд Бета</vendor><categoryId>12</categoryId><price>6490</price>
+    <picture>img/a104.jpg</picture>
+    <description>Мощная чаша с ножами из закалённой стали: измельчает лёд и орехи.</description>
+    <param name="Мощность">1000 Вт</param><param name="Чаша">1,8 л</param><param name="Скоростей">5</param>
+    <advantages><item>Режим для смузи одной кнопкой</item><item>Тихая работа</item><item>Крышка с мерным стаканом</item></advantages>
+    <manual>https://example.com/pdf/a104.pdf</manual>
+  </offer>
+  <offer id="A105">
+    <name>Пылесос Тихий ход 2000</name><vendor>Бренд Гамма</vendor><categoryId>21</categoryId><price>8990</price>
+    <picture>img/a105.jpg</picture>
+    <description>Пылесос с контейнером для сухой уборки квартиры.</description>
+    <param name="Мощность">2000 Вт</param><param name="Шум">68 дБ</param><param name="Контейнер">2 л</param>
+    <advantages><item>Фильтр тонкой очистки</item><item>Длинный шнур 7 м</item></advantages>
+    <manual>https://example.com/pdf/a105.pdf</manual>
+  </offer>
+  <offer id="A106">
+    <name>Робот-пылесос Круг S</name><vendor>Бренд Гамма</vendor><categoryId>21</categoryId><price>15490</price>
+    <picture>img/a106.jpg</picture>
+    <description>Сам убирает по расписанию и возвращается на зарядку.</description>
+    <param name="Время работы">120 мин</param><param name="Контейнер">0,5 л</param><param name="Управление">приложение</param>
+    <advantages><item>Объезжает препятствия</item><item>Уборка по расписанию</item></advantages>
+    <manual>https://example.com/pdf/a106.pdf</manual>
+  </offer>
+  <offer id="A107">
+    <name>Увлажнитель воздуха Свежесть 3 л</name><vendor>Бренд Дельта</vendor><categoryId>31</categoryId><price>3290</price>
+    <picture>img/a107.jpg</picture>
+    <description>Ультразвуковой увлажнитель для комнаты до 30 кв. м.</description>
+    <param name="Бак">3 л</param><param name="Работа без долива">до 24 ч</param><param name="Площадь">до 30 кв. м</param>
+    <advantages><item>Автоотключение без воды</item><item>Ночной режим</item></advantages>
+    <manual>https://example.com/pdf/a107.pdf</manual>
+  </offer>
+  <offer id="A108">
+    <name>Увлажнитель настольный Свежесть Мини</name><vendor>Бренд Дельта</vendor><categoryId>31</categoryId><price></price>
+    <picture>img/a108.jpg</picture>
+    <description>Компактная модель для рабочего стола.</description>
+    <param name="Бак">0,5 л</param><param name="Питание">USB</param><param name="Площадь">до 8 кв. м</param>
+    <advantages><item>Работает от USB</item></advantages>
+    <manual></manual>
+  </offer>
+</offers>
+</catalog></script>
+
+<script>
+(function(){
+  var $ = function(i){ return document.getElementById(i); };
+  var DEMO_URL = 'https://example.com/feed/catalog.xml';
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var wait = function(ms){ return reduce ? Math.min(ms, 60) : ms; };
+
+  /* ===== Данные подставляются здесь: поля сайта и варианты тегов XML ===== */
+  var TARGETS = [
+    { k:'title', n:'Название товара', h:'карточка товара', def:'name' },
+    { k:'cat',   n:'Категория', h:'дерево каталога', def:'categoryId' },
+    { k:'price', n:'Цена', h:'цена товара', def:'price' },
+    { k:'photo', n:'Главное фото', h:'изображение', def:'picture' },
+    { k:'desc',  n:'Описание', h:'вкладка «Описание»', def:'description' },
+    { k:'attrs', n:'Характеристики', h:'атрибуты товара', def:'param' },
+    { k:'adv',   n:'Преимущества', h:'блок «Преимущества»', def:'advantages' },
+    { k:'pdf',   n:'PDF-файл', h:'инструкция для скачивания', def:'manual' }
+  ];
+  var SOURCES = [
+    ['name','<name>'],['vendor','<vendor>'],['id','<offer id>'],['categoryId','<categoryId>'],['price','<price>'],
+    ['picture','<picture>'],['description','<description>'],['param','<param> (все параметры)'],
+    ['advantages','<advantages> (список)'],['manual','<manual>'],['none','не загружать']
+  ];
+  var KIND = { '11':'kettle','12':'blender','21':'vacuum','31':'humid' };
+  var HUE = { '11':[200,235],'12':[18,350],'21':[150,190],'31':[260,215] };
+  var ICON = {
+    kettle:'<path d="M38 70 44 36H76L82 70Z"/><rect x="48" y="28" width="24" height="8" rx="2"/><path d="M82 44q18 4 0 22" fill="none"/><path d="M44 42 30 34" fill="none"/>',
+    blender:'<path d="M44 20H76L70 62H50Z"/><rect x="42" y="62" width="36" height="14" rx="3"/><rect x="46" y="12" width="28" height="8" rx="2"/>',
+    vacuum:'<circle cx="48" cy="58" r="18"/><circle cx="48" cy="58" r="5"/><path d="M62 48 90 22 104 30" fill="none" stroke-width="5"/>',
+    humid:'<rect x="40" y="38" width="40" height="36" rx="8"/><path d="M52 30q-6-8 0-14M62 30q-6-8 0-14M72 30q-6-8 0-14" fill="none"/>'
+  };
+
+  /* ===== Разбор XML ===== */
+  var cats = {}, offers = [];
+  function parseXml(){
+    var doc = new DOMParser().parseFromString($('xmlsrc').textContent.trim(), 'application/xml');
+    cats = {}; offers = [];
+    [].forEach.call(doc.querySelectorAll('categories > category'), function(c){
+      cats[c.getAttribute('id')] = { id:c.getAttribute('id'), parent:c.getAttribute('parentId') || '', name:c.textContent.trim() };
+    });
+    [].forEach.call(doc.querySelectorAll('offers > offer'), function(o){
+      var t = function(n){ var e = o.querySelector(n); return e ? e.textContent.trim() : ''; };
+      offers.push({
+        id:o.getAttribute('id'), name:t('name'), vendor:t('vendor'), categoryId:t('categoryId'), price:t('price'),
+        picture:t('picture'), description:t('description'), manual:t('manual'),
+        param:[].map.call(o.querySelectorAll('param'), function(p){ return [p.getAttribute('name'), p.textContent.trim()]; }),
+        advantages:[].map.call(o.querySelectorAll('advantages > item'), function(i){ return i.textContent.trim(); })
+      });
+    });
+  }
+  parseXml();
+  var drift = {}; /* условное изменение цен в фиде при повторных запусках */
+  function priceOf(o){ return drift[o.id] !== undefined ? String(drift[o.id]) : o.price; }
+  function srcVal(o, key){
+    if (key === 'none') return null;
+    if (key === 'id') return o.id;
+    if (key === 'price') return priceOf(o);
+    return o[key];
+  }
+
+  var map = {}; TARGETS.forEach(function(t){ map[t.k] = t.def; });
+  var imported = {}; /* id -> цена на сайте */
+  var runs = 0, busy = false, filterCat = '';
+
+  function el(tag, cls, txt){ var e = document.createElement(tag); if (cls) e.className = cls; if (txt !== undefined) e.textContent = txt; return e; }
+  function rub(v){ var n = parseInt(v, 10); return isNaN(n) ? null : n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₽'; }
+  function catPath(id){ var p = [], c = cats[id]; while (c) { p.unshift(c.name); c = cats[c.parent]; } return p; }
+  function val(o, tk){ return srcVal(o, map[tk]); }
+  function hasPrice(o){ var v = val(o, 'price'); return v !== null && v !== '' && !isNaN(parseInt(v, 10)); }
+  function catId(o){ var v = val(o, 'cat'); return (v && cats[v]) ? v : ''; }
+
+  /* ===== Шаг 1 ===== */
+  var loaded = false;
+  $('fill').addEventListener('click', function(){ $('url').value = DEMO_URL; $('m1').textContent = ''; $('url').focus(); });
+  $('load').addEventListener('click', function(){
+    var m = $('m1'); m.className = 'msg';
+    if ($('url').value.trim() !== DEMO_URL) { m.classList.add('bad'); m.textContent = 'В этом примере работает только условная ссылка. Нажмите «Подставить условную».'; return; }
+    $('load').disabled = true; m.textContent = 'Загружаем XML...';
+    setTimeout(function(){
+      m.classList.add('ok'); m.textContent = 'XML прочитан без ошибок. Ниже: что в нём нашлось.';
+      var f = $('facts'); f.textContent = '';
+      var topN = Object.keys(cats).filter(function(k){ return !cats[k].parent; }).length;
+      [offers.length + ' товаров', Object.keys(cats).length + ' категорий (' + topN + ' верхних)', '8 полей на товар'].forEach(function(t){ f.appendChild(el('span', 'fact', t)); });
+      $('xmlpre').textContent = $('xmlsrc').textContent.trim();
+      $('xb').style.display = 'block';
+      loaded = true;
+      ['s2','s3','s4','s5'].forEach(function(i){ $(i).classList.remove('lock'); $(i).removeAttribute('inert'); });
+      $('load').disabled = false; $('load').textContent = 'Загрузить XML ещё раз';
+      renderMap(); renderTree(); renderCards(); renderNext();
+    }, wait(700));
+  });
+  ['s2','s3','s4','s5'].forEach(function(i){ $(i).setAttribute('inert', ''); });
+
+  /* ===== Шаг 2: сопоставление ===== */
+  function renderMap(){
+    var box = $('map'); box.textContent = '';
+    TARGETS.forEach(function(t){
+      var r = el('div', 'mrow'), to = el('div', 'to'), ar = el('div', 'ar');
+      to.appendChild(el('b', '', t.n)); to.appendChild(el('small', '', t.h));
+      ar.innerHTML = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      var s = el('select'); s.setAttribute('aria-label', 'Тег XML для поля «' + t.n + '»');
+      SOURCES.forEach(function(p){ var op = el('option', '', p[1]); op.value = p[0]; if (p[0] === map[t.k]) op.selected = true; s.appendChild(op); });
+      s.addEventListener('change', function(){ map[t.k] = s.value; renderTree(); renderCards(); });
+      r.appendChild(to); r.appendChild(ar); r.appendChild(s); box.appendChild(r);
+    });
+  }
+  $('oCat').addEventListener('change', function(){ if (!$('oCat').checked) filterCat = ''; renderTree(); renderCards(); });
+
+  /* ===== Шаг 3: дерево и карточки ===== */
+  function countIn(id){
+    return offers.filter(function(o){ var c = catId(o); while (c) { if (c === id) return true; c = cats[c].parent; } return false; }).length;
+  }
+  function renderTree(){
+    var ul = $('tree'); ul.textContent = '';
+    var keep = $('oCat').checked;
+    function item(id){
+      var li = el('li', cats[id].parent ? '' : 'top'), b = el('button'); b.type = 'button';
+      if (filterCat === id) b.className = 'on';
+      b.appendChild(el('span', '', cats[id].name)); b.appendChild(el('em', '', String(countIn(id))));
+      b.addEventListener('click', function(){ filterCat = (filterCat === id) ? '' : id; renderTree(); renderCards(); });
+      li.appendChild(b);
+      var kids = Object.keys(cats).filter(function(k){ return cats[k].parent === id; });
+      if (kids.length) { var sub = el('ul'); kids.forEach(function(k){ sub.appendChild(item(k)); }); li.appendChild(sub); }
+      return li;
+    }
+    var all = el('li', 'top'), ab = el('button'); ab.type = 'button'; if (!filterCat) ab.className = 'on';
+    ab.appendChild(el('span', '', 'Все товары')); ab.appendChild(el('em', '', String(offers.length)));
+    ab.addEventListener('click', function(){ filterCat = ''; renderTree(); renderCards(); });
+    all.appendChild(ab); ul.appendChild(all);
+    if (!keep) { var n = el('li', 'empty', 'Структура выключена: товары лягут в общий список без категорий.'); ul.appendChild(n); return; }
+    Object.keys(cats).filter(function(k){ return !cats[k].parent; }).forEach(function(k){ ul.appendChild(item(k)); });
+  }
+  function inCat(o, id){ var c = catId(o); while (c) { if (c === id) return true; c = cats[c].parent; } return false; }
+  function renderCards(){
+    var box = $('cards'); box.textContent = '';
+    var list = offers.filter(function(o){ return !filterCat || inCat(o, filterCat); });
+    if (!list.length) { box.appendChild(el('div', 'empty', 'В этой категории товаров нет.')); return; }
+    list.forEach(function(o){
+      var c = el('article', 'prod');
+      var cid = catId(o), photo = val(o, 'photo'), ph;
+      if (typeof photo === 'string' && /^img\//.test(photo)) {
+        var hue = HUE[o.categoryId] || [210, 240];
+        ph = el('div', 'ph'); ph.style.background = 'linear-gradient(135deg,hsl(' + hue[0] + ',55%,48%),hsl(' + hue[1] + ',50%,28%))';
+        ph.innerHTML = '<svg viewBox="0 0 120 90" aria-hidden="true" fill="rgba(255,255,255,.22)" stroke="#fff" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">' + (ICON[KIND[o.categoryId]] || ICON.kettle) + '</svg>';
+      } else { ph = el('div', 'ph none', 'Фото не загружено'); }
+      if (imported[o.id] !== undefined) ph.appendChild(el('span', 'new', 'Уже на сайте'));
+      c.appendChild(ph);
+      var b = el('div', 'pb');
+      var cr = val(o, 'cat');
+      var path = (cid && $('oCat').checked) ? catPath(cid).join(' / ') : (cr === null ? '' : ($('oCat').checked ? 'Без категории' : 'Без категории (структура выключена)'));
+      if (path) b.appendChild(el('div', 'crumb', path));
+      var tt = val(o, 'title'); b.appendChild(el('h3', '', tt === null ? 'Без названия' : (Array.isArray(tt) ? flat(tt) : tt)));
+      var pv = val(o, 'price'); b.appendChild(el('div', 'pr', pv === null ? 'Цена не загружается' : (rub(pv) || 'Цена не указана')));
+      var d = val(o, 'desc'); if (d !== null && d !== '') b.appendChild(el('p', '', Array.isArray(d) ? flat(d) : d));
+      var at = val(o, 'attrs');
+      if (at && at.length) {
+        b.appendChild(el('div', 'sec', 'Характеристики'));
+        if (Array.isArray(at) && Array.isArray(at[0])) { var dl = el('dl', 'at'); at.forEach(function(p){ dl.appendChild(el('dt', '', p[0])); dl.appendChild(el('dd', '', p[1])); }); b.appendChild(dl); }
+        else b.appendChild(el('p', '', flat(at)));
+      }
+      var ad = val(o, 'adv');
+      if (ad && ad.length) {
+        b.appendChild(el('div', 'sec', 'Преимущества'));
+        var ul = el('ul', 'adv'); (Array.isArray(ad) ? ad : [ad]).forEach(function(x){ ul.appendChild(el('li', '', flat(x))); }); b.appendChild(ul);
+      }
+      var pf = val(o, 'pdf');
+      if (typeof pf === 'string' && /^https?:\/\/\S+\.pdf$/.test(pf)) {
+        var a = el('a', 'pdf'); a.href = '#'; a.title = 'Ссылка условная';
+        a.innerHTML = '<svg viewBox="0 0 18 18" aria-hidden="true"><path d="M4 1.5h7l4 4v11H4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M11 1.5v4h4M6.5 10.5h5M6.5 13h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+        a.appendChild(document.createTextNode('Инструкция (PDF)'));
+        a.addEventListener('click', function(e){ e.preventDefault(); });
+        b.appendChild(a);
+      } else if (pf !== null) b.appendChild(el('div', 'nopdf', 'PDF-файла нет'));
+      c.appendChild(b); box.appendChild(c);
+    });
+  }
+  function flat(v){ return Array.isArray(v) ? v.map(function(x){ return Array.isArray(x) ? x.join(': ') : x; }).join(', ') : String(v); }
+
+  /* ===== Шаг 4: расписание ===== */
+  function mode(){ return document.querySelector('input[name=md]:checked').value; }
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+  function fmt(d){ return pad(d.getDate()) + '.' + pad(d.getMonth() + 1) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+  function renderNext(){
+    [].forEach.call(document.querySelectorAll('.mode'), function(l){ l.classList.toggle('on', l.querySelector('input[type=radio]').checked); });
+    var box = $('next'); box.textContent = '';
+    if (!$('oOn').checked) { box.appendChild(el('span', 'fact', 'Автообновление выключено')); return; }
+    var now = new Date(), t = [], m = mode(), i, d;
+    if (m === 'day') {
+      var hm = ($('tDay').value || '03:00').split(':');
+      d = new Date(now); d.setHours(+hm[0], +hm[1], 0, 0); if (d <= now) d.setDate(d.getDate() + 1);
+      for (i = 0; i < 3; i++) { t.push(new Date(d)); d.setDate(d.getDate() + 1); }
+    } else {
+      var step = m === 'hour' ? 1 : Math.min(23, Math.max(1, parseInt($('nCus').value, 10) || 1));
+      d = new Date(now); d.setMinutes(0, 0, 0); d.setHours(d.getHours() + step);
+      for (i = 0; i < 3; i++) { t.push(new Date(d)); d.setHours(d.getHours() + step); }
+    }
+    t.forEach(function(x){ box.appendChild(el('span', 'fact', fmt(x))); });
+  }
+  [].forEach.call(document.querySelectorAll('#s4 input'), function(i){ i.addEventListener('change', renderNext); i.addEventListener('input', renderNext); });
+  $('sim').addEventListener('click', function(){
+    if (busy) return;
+    if (!$('oOn').checked) { $('next').textContent = ''; $('next').appendChild(el('span', 'fact', 'Включите автообновление, чтобы показать запуск')); return; }
+    $('s5').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    runImport('по расписанию');
+  });
+
+  /* ===== Шаг 5: импорт ===== */
+  var STEPS = ['Скачиваем XML по ссылке', 'Сопоставляем поля', 'Создаём и проверяем категории', 'Загружаем фото и PDF-файлы', 'Записываем товары на сайт'];
+  $('go').addEventListener('click', function(){ runImport('вручную'); });
+  function runImport(kind){
+    if (busy) return; busy = true;
+    $('go').disabled = true; $('sim').disabled = true;
+    var prog = $('prog'), bar = $('barI'), ul = $('steps'); ul.textContent = ''; bar.style.width = '0';
+    $('stats').style.display = 'none'; prog.style.display = 'block';
+    var lis = STEPS.map(function(s){ var li = el('li', '', s); ul.appendChild(li); return li; });
+    runs++;
+    if (runs >= 2) { drift.A102 = (drift.A102 || 2990) - 100; drift.A105 = (drift.A105 || 8990) + 300; }
+    var i = 0;
+    (function step(){
+      if (i > 0) lis[i - 1].className = 'done';
+      if (i >= lis.length) { bar.style.width = '100%'; finish(kind); return; }
+      lis[i].className = 'cur'; bar.style.width = Math.round(i / lis.length * 100 + 8) + '%'; i++;
+      setTimeout(step, wait(520));
+    })();
+  }
+  function finish(kind){
+    var add = 0, upd = 0, skip = 0, same = 0;
+    offers.forEach(function(o){
+      if (!hasPrice(o) && $('oSkip').checked) { skip++; return; }
+      var p = priceOf(o);
+      if (imported[o.id] === undefined) { imported[o.id] = p; add++; }
+      else if (!$('oUpd').checked) { same++; }
+      else if (imported[o.id] !== p) { imported[o.id] = p; upd++; }
+      else same++;
+    });
+    var st = $('stats'); st.textContent = ''; st.style.display = 'grid';
+    var data = [['Добавлено', add, 'a'], ['Обновлено', upd, 'u'], ['Пропущено', skip, 's'], ['Без изменений', same, '']];
+    data.forEach(function(x){
+      var d = el('div', 'stat ' + x[2]), b = el('b', '', '0'); d.appendChild(b); d.appendChild(el('span', '', x[0])); st.appendChild(d);
+      var n = 0, goal = x[1];
+      (function tick(){ b.textContent = n; if (n < goal) { n++; setTimeout(tick, wait(90)); } })();
+    });
+    var secs = (2.4 + Math.random() * 0.8).toFixed(1).replace('.', ',');
+    var log = $('log'); if (runs === 1 || log.querySelector('.empty')) log.textContent = '';
+    var e = el('div', 'entry'), h = el('div', 'h'), now = new Date();
+    h.appendChild(el('span', '', pad(now.getDate()) + '.' + pad(now.getMonth() + 1) + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds())));
+    h.appendChild(el('span', 'badge', kind)); h.appendChild(el('span', 'st', 'Готово за ' + secs + ' с'));
+    e.appendChild(h);
+    var n = el('div', 'n');
+    [['добавлено', add], ['обновлено', upd], ['пропущено', skip], ['без изменений', same]].forEach(function(x){ var s = el('span'); s.appendChild(el('b', '', String(x[1]))); s.appendChild(document.createTextNode(' ' + x[0])); n.appendChild(s); });
+    e.appendChild(n);
+    if (skip) e.appendChild(el('div', 'd', 'Пропущено: товары без цены (A108). Их можно загружать, сняв галочку в шаге 2.'));
+    if (upd) e.appendChild(el('div', 'd', 'Обновлены цены: A102, A105.'));
+    log.insertBefore(e, log.firstChild);
+    renderCards();
+    $('prog').style.display = 'none';
+    $('go').disabled = false; $('sim').disabled = false; busy = false;
+  }
+})();
+</script>
+</body>
+</html>
