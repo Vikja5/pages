@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Бот записи для барбершопа: клиент записывается сам, администратор получает заявку — бот в Telegram (демо)</title>
+<meta name="description" content="Демо / пример работы: Бот записи для барбершопа: клиент записывается сам, администратор получает заявку">
+<link rel="preload" href="fonts/Manrope-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/Manrope-ExtraBold.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-Regular.woff2") format("woff2");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-SemiBold.woff2") format("woff2");font-weight:600;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-Bold.woff2") format("woff2");font-weight:700;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope";src:url("fonts/Manrope-ExtraBold.woff2") format("woff2");font-weight:800 900;font-style:normal;font-display:block}
+@font-face{font-family:"Manrope Fallback";src:local("Arial");size-adjust:104%}
+:root{--accent:#2563eb;--accent2:#7c3aed;--bg:#fff;--fg:#0f172a;--mute:#5b6478;--card:#f4f6fb;--line:rgba(15,23,42,.12);--r:18px;--font:"Manrope","Manrope Fallback",Arial,sans-serif;--ease:cubic-bezier(.2,.7,.1,1);
+--acc-soft:color-mix(in srgb,var(--accent) 12%,var(--bg));--acc-dark:color-mix(in srgb,var(--accent) 82%,#000)}
+[data-theme=dark]{--bg:#0b1020;--fg:#eef1f8;--mute:#a1abc4;--card:#141b33;--line:rgba(255,255,255,.13)}
+[data-radius=sharp]{--r:6px}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:17px;line-height:1.6;overflow-x:hidden}
+h1,h2,h3,p{margin:0}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+svg{display:block}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.wrap{max-width:1160px;margin:0 auto;padding:0 clamp(16px,4vw,36px)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:12px 26px;border-radius:calc(var(--r) * 3);border:2px solid transparent;background:linear-gradient(135deg,var(--accent),var(--acc-dark));color:#fff;font-weight:700;font-size:1rem;text-decoration:none;cursor:pointer;white-space:nowrap;transition:transform .25s var(--ease),box-shadow .25s var(--ease),filter .25s}
+.btn:hover{transform:translateY(-3px);box-shadow:0 14px 30px color-mix(in srgb,var(--accent) 38%,transparent);filter:brightness(1.06)}
+.btn:active{transform:translateY(0)}
+.btn.ghost{background:transparent;color:var(--fg);border-color:var(--line)}
+.btn.ghost:hover{border-color:var(--accent);box-shadow:none;color:var(--accent)}
+.btn.sm{min-height:42px;padding:8px 18px;font-size:.93rem}
+.ico{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.fld{display:grid;gap:6px;font-weight:600;font-size:.92rem}
+.fld input,.fld select,.fld textarea{width:100%;min-height:50px;padding:12px 14px;border-radius:calc(var(--r) * .7);border:1.5px solid var(--line);background:var(--bg);font-weight:400;font-size:1rem;transition:border-color .2s,box-shadow .2s}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 18%,transparent)}
+.fld.bad input{border-color:#d92d20}
+.fld .err{color:#d92d20;font-weight:600;font-size:.85rem;min-height:1em}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:.9rem;color:var(--mute);cursor:pointer}
+.chk input{width:20px;height:20px;margin-top:2px;accent-color:var(--accent);flex:none}
+.ok{display:none;padding:14px 16px;border-radius:calc(var(--r) * .7);background:color-mix(in srgb,#16a34a 14%,var(--bg));border:1.5px solid #16a34a;font-weight:600}
+.ok.show{display:block;animation:pop .5s var(--ease)}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+.js .rv{opacity:0;transform:translateY(26px);transition:opacity .8s var(--ease),transform .8s var(--ease);transition-delay:calc(var(--i,0) * 70ms)}
+.js .rv.in{opacity:1;transform:none}
+.demo-pill{position:fixed;left:12px;bottom:12px;z-index:60;max-width:calc(100vw - 24px);padding:7px 14px;border-radius:999px;background:#111827;color:#fff;font-size:.78rem;font-weight:700;letter-spacing:.01em;box-shadow:0 6px 20px rgba(0,0,0,.28);pointer-events:none}
+.demo-pill i{display:inline-block;width:8px;height:8px;border-radius:50%;background:#facc15;margin-right:8px;animation:pulse 1.8s infinite}
+@keyframes pulse{50%{opacity:.35}}
+.sr{position:absolute;left:-9999px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}.js .rv{opacity:1;transform:none}}
+@media print{.demo-pill,.noprint{display:none!important}}
+
+body{background:radial-gradient(1200px 600px at 85% -10%,color-mix(in srgb,var(--accent) 22%,transparent),transparent),radial-gradient(900px 500px at -10% 110%,color-mix(in srgb,var(--accent2) 18%,transparent),transparent),var(--bg);min-height:100vh}
+.main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,400px);gap:clamp(24px,5vw,72px);align-items:center;padding:clamp(20px,4vw,48px) 0 90px;min-height:100vh}
+.tag{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:99px;background:var(--acc-soft);color:var(--accent);font-weight:700;font-size:.85rem;margin-bottom:16px}
+.tag i{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 1.6s infinite}
+h1{font-size:clamp(1.9rem,4.8vw,3.3rem);line-height:1.1;font-weight:800;letter-spacing:-.02em}
+h1 em{font-style:normal;background:linear-gradient(120deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{margin-top:16px;color:var(--mute);font-size:1.08rem;max-width:34em}
+.hint{margin-top:18px;display:inline-flex;gap:10px;align-items:center;padding:10px 16px;border-radius:14px;background:#fef3c7;color:#713f12;font-weight:700;font-size:.92rem}
+.feat{display:grid;gap:10px;margin:26px 0 0;padding:0;list-style:none}
+.feat li{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:16px;background:var(--card);border:1px solid var(--line);transition:.3s var(--ease)}
+.feat li:hover{transform:translateX(6px);border-color:var(--accent)}
+.feat svg{flex:none;color:var(--accent);margin-top:2px}.feat b{display:block}.feat span{color:var(--mute);font-size:.9rem}
+.adm{margin-top:22px;display:none;gap:10px}.adm.on{display:grid}
+.adm h2{font-size:1rem;font-weight:800;color:var(--mute)}
+.note{padding:14px 16px;border-radius:16px;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 12px 30px color-mix(in srgb,var(--accent) 18%,transparent);animation:pop .5s var(--ease);font-size:.92rem}
+.note b{color:var(--accent)}.note div{display:flex;gap:8px;justify-content:space-between}.note div span:first-child{color:var(--mute)}
+.phone{width:100%;max-width:400px;height:min(80vh,700px);min-height:520px;margin:0 auto;display:flex;flex-direction:column;border-radius:34px;overflow:hidden;background:#fff;color:#0f172a;box-shadow:0 40px 90px rgba(15,23,42,.35),0 0 0 9px #111827;position:relative}
+.ph-top{display:flex;align-items:center;gap:12px;padding:12px 16px;background:linear-gradient(135deg,var(--accent),var(--acc-dark));color:#fff}
+.ava{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-weight:800;font-size:1.15rem;flex:none}
+.ph-top b{display:block;line-height:1.2}.ph-top small{opacity:.85}
+.ph-top button{margin-left:auto;background:rgba(255,255,255,.18);border:0;border-radius:10px;color:#fff;font-weight:700;font-size:.8rem;padding:8px 12px;cursor:pointer;white-space:nowrap}
+.ph-top button:hover{background:rgba(255,255,255,.32)}
+.chat{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:8px;background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 9%,#f4f6fa),color-mix(in srgb,var(--accent2) 9%,#eef1f6));scroll-behavior:smooth}
+.m{max-width:84%;padding:9px 13px 7px;border-radius:16px;line-height:1.45;font-size:.96rem;animation:in .35s var(--ease);word-wrap:break-word;overflow-wrap:anywhere;white-space:pre-line}
+.m small{display:block;text-align:right;font-size:.68rem;opacity:.55;margin-top:2px}
+.m.b{align-self:flex-start;background:#fff;border-bottom-left-radius:5px;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.m.u{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:5px}
+.m.b b{font-weight:800}
+@keyframes in{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+.typ{align-self:flex-start;background:#fff;border-radius:16px;border-bottom-left-radius:5px;padding:12px 14px;display:flex;gap:4px;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.typ i{width:7px;height:7px;border-radius:50%;background:#94a3b8;animation:bn 1s infinite}.typ i:nth-child(2){animation-delay:.15s}.typ i:nth-child(3){animation-delay:.3s}
+@keyframes bn{40%{transform:translateY(-5px);background:var(--accent)}}
+.kb{align-self:stretch;display:grid;gap:6px;animation:in .4s var(--ease)}
+.kb .row{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px}
+.kb button{min-height:42px;padding:8px 10px;border:0;border-radius:11px;background:color-mix(in srgb,var(--accent) 14%,#fff);color:var(--acc-dark);font-weight:700;font-size:.9rem;cursor:pointer;transition:.2s;overflow-wrap:anywhere}
+.kb button:hover{background:var(--accent);color:#fff;transform:translateY(-2px)}
+.kb button:disabled{opacity:.45;cursor:default;transform:none}
+.menu{display:flex;gap:6px;overflow-x:auto;padding:8px 10px 0;background:#fff;scrollbar-width:none}
+.menu::-webkit-scrollbar{display:none}
+.menu button{flex:none;min-height:38px;padding:6px 14px;border-radius:99px;border:1.5px solid color-mix(in srgb,var(--accent) 40%,#fff);background:#fff;color:var(--acc-dark);font-weight:700;font-size:.85rem;cursor:pointer;white-space:nowrap}
+.menu button:hover{background:var(--accent);color:#fff}
+.inp{display:flex;gap:8px;padding:8px 10px 12px;background:#fff}
+.inp input{flex:1;min-width:0;min-height:46px;border-radius:99px;border:1.5px solid #dbe1ea;padding:8px 16px;background:#f8fafc;color:#0f172a;font-size:1rem}
+.inp input:focus{outline:none;border-color:var(--accent)}
+.inp button{flex:none;width:46px;height:46px;border-radius:50%;border:0;background:var(--accent);color:#fff;cursor:pointer;display:grid;place-items:center;transition:.2s}
+.inp button:hover{transform:scale(1.08)}
+.toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:#111827;color:#fff;padding:8px 14px;border-radius:12px;font-size:.82rem;font-weight:700;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap}
+.toast.on{opacity:1}
+@media (max-width:900px){.main{grid-template-columns:minmax(0,1fr);min-height:0}.phone{order:-1;height:min(78vh,640px)}.phone{box-shadow:0 20px 50px rgba(15,23,42,.3),0 0 0 6px #111827}}
+@media (max-width:420px){.phone{border-radius:24px}h1{font-size:1.8rem}.wrap{padding:0 18px}}
+</style>
+</head>
+<body>
+<div class="wrap main">
+<div class="rv"><span class="tag"><i></i><span id="tag"></span></span><h1 id="h1"></h1><p class="lead" id="lead"></p>
+<div class="hint" id="hint"></div><ul class="feat" id="feat"></ul>
+<div class="adm" id="adm"><h2 id="admh"></h2><div id="adml" style="display:grid;gap:10px"></div></div></div>
+<div class="phone rv" role="application" aria-label="Демо-чат бота">
+<div class="ph-top"><div class="ava" id="ava"></div><div><b id="bn"></b><small id="bu"></small></div><button type="button" id="rs">Начать заново</button></div>
+<div class="chat" id="chat" aria-live="polite"></div>
+<div class="menu" id="menu"></div>
+<form class="inp" id="form" autocomplete="off"><input id="ti" placeholder="Сообщение" aria-label="Сообщение"><button type="submit" aria-label="Отправить">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/></svg></button></form>
+<div class="toast" id="toast"></div>
+</div></div>
+<script type="application/json" id="cfg">{"title": "Бот записи для *барбершопа*: клиент записывается сам, администратор получает заявку", "tag": "Telegram-бот · демо", "lead": "Пример диалога: услуги и цены, ответы на частые вопросы и запись на удобное время. Заявка мгновенно уходит администратору.", "hint": "Это живой пример: нажимайте кнопки в чате или пишите сообщения.", "accent": "#229ed9", "accent2": "#7c3aed", "theme": "light", "bot": {"name": "Барбершоп Бородач", "username": "borodach_demo_bot", "avatar": "Б"}, "features": [{"title": "Запись без звонков", "text": "Клиент выбирает услугу, дату и оставляет контакт.", "icon": "cal"}, {"title": "Цены и ответы на вопросы", "text": "Бот отвечает на частые вопросы круглосуточно.", "icon": "chat"}, {"title": "Заявка администратору", "text": "Сообщение с деталями приходит в рабочий чат.", "icon": "send"}, {"title": "Напоминания и рассылки", "text": "Можно подключить напоминание за час и акции.", "icon": "clock"}], "admin_title": "Что получит администратор", "admin_note": "Новая заявка на запись", "labels": {"service": "Услуга", "date": "Когда", "name": "Имя", "phone": "Телефон"}, "start": "start", "fallback": "Я пока понимаю только кнопки меню. Выберите пункт ниже.", "menu": [{"t": "Услуги и цены", "to": "prices"}, {"t": "Записаться", "to": "book"}, {"t": "Вопросы", "to": "faq"}, {"t": "Контакты", "to": "contacts"}], "nodes": {"start": {"text": ["Здравствуйте! Я бот барбершопа «Бородач».", "Помогу выбрать услугу, узнать цену и записаться. Это демо-версия, данные условные."], "buttons": [[{"t": "Услуги и цены", "to": "prices"}, {"t": "Записаться", "to": "book"}], [{"t": "Частые вопросы", "to": "faq"}, {"t": "Контакты", "to": "contacts"}]]}, "prices": {"text": "**Услуги и цены** (условные):\n\nСтрижка: от 1 500 ₽\nБорода: от 900 ₽\nСтрижка и борода: от 2 200 ₽\nДетская стрижка: от 1 000 ₽", "buttons": [[{"t": "Записаться", "to": "book"}], [{"t": "В начало", "to": "start"}]]}, "book": {"text": "Что хотите сделать?", "buttons": [[{"t": "Стрижка", "to": "when", "set": {"service": "Стрижка"}}, {"t": "Борода", "to": "when", "set": {"service": "Борода"}}], [{"t": "Стрижка и борода", "to": "when", "set": {"service": "Стрижка и борода"}}], [{"t": "Назад", "to": "start"}]]}, "when": {"text": "Выбрано: **{service}**. На какой день записать?", "buttons": [[{"t": "Сегодня", "to": "name", "set": {"date": "Сегодня"}}, {"t": "Завтра", "to": "name", "set": {"date": "Завтра"}}], [{"t": "В выходные", "to": "name", "set": {"date": "В выходные"}}]]}, "name": {"text": "Как к вам обращаться?", "ask": {"key": "name", "type": "text", "next": "phone", "placeholder": "Ваше имя", "error": "Напишите, пожалуйста, имя."}}, "phone": {"text": "Спасибо, {name}! Напишите номер телефона для подтверждения записи.", "ask": {"key": "phone", "type": "phone", "next": "done", "placeholder": "+7 (000) 000-00-00", "error": "Не похоже на номер. Пример: +7 000 000-00-00"}}, "done": {"text": ["Готово, {name}! Вы записаны: **{service}**, {date}.", "Администратор подтвердит время сообщением на {phone}."], "notify": ["service", "date", "name", "phone"], "buttons": [[{"t": "В начало", "to": "start"}]]}, "faq": {"text": "Выберите вопрос:", "buttons": [[{"t": "Как отменить запись?", "to": "faq1"}], [{"t": "Можно ли с ребёнком?", "to": "faq2"}], [{"t": "Как оплатить?", "to": "faq3"}], [{"t": "В начало", "to": "start"}]]}, "faq1": {"text": "Отменить или перенести запись можно за 3 часа до визита ответным сообщением в этом чате.", "buttons": [[{"t": "Другой вопрос", "to": "faq"}, {"t": "Записаться", "to": "book"}]]}, "faq2": {"text": "Да, у нас есть детская стрижка. Для малышей подберём удобное время без очереди.", "buttons": [[{"t": "Другой вопрос", "to": "faq"}, {"t": "Записаться", "to": "book"}]]}, "faq3": {"text": "Наличными, картой или переводом после услуги.", "buttons": [[{"t": "Другой вопрос", "to": "faq"}, {"t": "Записаться", "to": "book"}]]}, "contacts": {"text": "Адрес: г. Казань, ул. Примерная, 1 (условный).\nРежим работы: ежедневно 10:00–21:00.\nТелефон: +7 (000) 000-00-00.", "buttons": [[{"t": "Записаться", "to": "book"}], [{"t": "В начало", "to": "start"}]]}}, "demo_note": "демо / пример работы, данные условные"}</script>
+<script>
+const CFG=JSON.parse(document.getElementById('cfg').textContent);
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=(n,d)=>(Number.isFinite(n)?n:0).toLocaleString('ru-RU',{maximumFractionDigits:d==null?0:d,minimumFractionDigits:d||0});
+const money=n=>fmt(Math.round(n))+' ₽';
+const ICONS={
+check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/>',
+clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
+tool:'<path d="M14.5 6.5a4 4 0 005 5L21 13l-8 8a2.1 2.1 0 01-3-3l8-8z"/><path d="M13 6l-3-3-6 6 3 3"/>',leaf:'<path d="M5 19C5 10 10 5 20 4c0 10-5 15-14 15z"/><path d="M5 19c3-5 6-8 10-10"/>',
+heart:'<path d="M12 20s-8-5-8-11a4.5 4.5 0 018-2.7A4.5 4.5 0 0120 9c0 6-8 11-8 11z"/>',bolt:'<path d="M13 3L5 14h6l-1 7 8-11h-6z"/>',
+home:'<path d="M4 11l8-7 8 7v9H4z"/><path d="M10 20v-6h4v6"/>',chart:'<path d="M4 20V4M4 20h16"/><path d="M8 16v-4M12 16V8M16 16v-7"/>',
+doc:'<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5M10 16h5"/>',mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
+pin:'<path d="M12 21s-7-6-7-11a7 7 0 0114 0c0 5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/>',
+car:'<path d="M5 16l1.5-5a2 2 0 012-1.5h7a2 2 0 012 1.5L19 16M4 16h16v3H4z"/><circle cx="8" cy="16" r="1"/><circle cx="16" cy="16" r="1"/>',
+cut:'<circle cx="6" cy="7" r="2.5"/><circle cx="6" cy="17" r="2.5"/><path d="M8 8.5L20 18M8 15.5L20 6"/>',
+cup:'<path d="M5 8h12v5a5 5 0 01-5 5h-2a5 5 0 01-5-5zM17 9h2a2 2 0 010 5h-2M7 21h8"/>',
+book:'<path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2zM4 19a2 2 0 012-2h13"/>',
+box:'<path d="M3 8l9-5 9 5v8l-9 5-9-5zM3 8l9 5 9-5M12 13v8"/>',
+cam:'<path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="3.5"/>',
+gear:'<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>',
+send:'<path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/>',download:'<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>',play:'<path d="M7 4l13 8-13 8z"/>',
+cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',pc:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+chat:'<path d="M4 5h16v11H9l-5 4z"/>',table:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M3 15h18M9 5v14"/>',code:'<path d="M8 8l-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/>'};
+const ICON_KEYS=Object.keys(ICONS);
+const ico=(n,i)=>'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">'+(ICONS[n]||ICONS[ICON_KEYS[(i||0)%ICON_KEYS.length]])+'</svg>';
+function logo(name,size){const l=esc((name||'D').replace(/[^A-Za-zЀ-ӿ0-9]/g,'').slice(0,1).toUpperCase()||'D');
+return '<svg width="'+(size||38)+'" height="'+(size||38)+'" viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--accent)"/><stop offset="1" stop-color="var(--accent2)"/></linearGradient></defs><rect width="40" height="40" rx="12" fill="url(#lg)"/><text x="20" y="27" text-anchor="middle" font-family="Manrope,Arial" font-weight="800" font-size="21" fill="#fff">'+l+'</text></svg>';}
+function applyTheme(){const r=document.documentElement;
+if(CFG.accent)r.style.setProperty('--accent',CFG.accent);
+r.style.setProperty('--accent2',CFG.accent2||CFG.accent||'#7c3aed');
+if(CFG.theme==='dark')r.setAttribute('data-theme','dark');
+if(CFG.radius==='sharp')r.setAttribute('data-radius','sharp');}
+function reveal(){const els=$$('.rv');if(!('IntersectionObserver' in window)){els.forEach(e=>e.classList.add('in'));return;}
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12,rootMargin:'0px 0px -6% 0px'});
+els.forEach((e,i)=>{if(!e.style.getPropertyValue('--i'))e.style.setProperty('--i',i%4);io.observe(e);});
+setTimeout(()=>els.forEach(e=>{if(e.getBoundingClientRect().top<innerHeight)e.classList.add('in');}),120);}
+function download(name,mime,content){const b=new Blob(['﻿'+content],{type:mime+';charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}
+const phoneOk=v=>/^\+?[0-9\s()\-]{10,}$/.test(String(v).trim());
+function demoPill(){const d=document.createElement('div');d.className='demo-pill';d.innerHTML='<i></i>'+esc(CFG.demo_note||'демо / пример работы, данные условные');document.body.appendChild(d);}
+function htmlDoc(title,body,extraCss){return '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>'+esc(String(title).replace(/\*/g,''))+'</title><style>body{font-family:Arial,sans-serif;font-size:11pt;color:#111}table{border-collapse:collapse;width:100%}td,th{border:1px solid #888;padding:5px 8px;text-align:left}th{background:#e8e8e8}h1{font-size:18pt}h2{font-size:13pt}'+(extraCss||'')+'</style></head><body>'+body+'</body></html>';}
+document.documentElement.classList.add('js');
+applyTheme();
+
+(function(){
+const C=CFG,B=C.bot||{},N=C.nodes;
+$('#tag').textContent=C.tag||'Telegram-бот';
+$('#h1').innerHTML=String(C.title||B.name).split('*').map((w,i)=>i%2?'<em>'+esc(w)+'</em>':esc(w)).join('');
+$('#lead').textContent=C.lead||'';
+$('#hint').innerHTML=ico('play')+'<span>'+esc(C.hint||'Это живой пример: нажимайте кнопки в чате или пишите сообщения.')+'</span>';
+$('#feat').innerHTML=(C.features||[]).map((f,i)=>'<li class="rv">'+ico(f.icon||'check',i)+'<div><b>'+esc(f.title)+'</b><span>'+esc(f.text||'')+'</span></div></li>').join('');
+$('#ava').textContent=(B.avatar||B.name||'B').slice(0,1).toUpperCase();
+$('#bn').textContent=B.name;$('#bu').textContent=(B.username?'@'+B.username+' · ':'')+'бот';
+$('#admh').textContent=C.admin_title||'Что получит администратор';
+const chat=$('#chat');let vars={},pending=null,busy=false,tok=0;
+const T=()=>new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+const sub=s=>String(s).replace(/\{(\w+)\}/g,(m,k)=>vars[k]!=null?vars[k]:'—');
+const rich=s=>esc(sub(s)).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+const scroll=()=>{chat.scrollTop=chat.scrollHeight;};
+function bubble(t,who){const d=document.createElement('div');d.className='m '+who;d.innerHTML=who==='b'?rich(t)+'<small>'+T()+'</small>':esc(t)+'<small>'+T()+'</small>';chat.appendChild(d);scroll();return d;}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2200);}
+function kbRemove(){$$('.kb',chat).forEach(k=>k.querySelectorAll('button').forEach(b=>b.disabled=true));}
+function notify(n){const rows=n.notify===true?Object.entries(vars):(n.notify||[]).map(k=>[k,vars[k]]);
+const lab=C.labels||{};const el=document.createElement('div');el.className='note';el.innerHTML='<b>'+esc(C.admin_note||'Новая заявка')+'</b>'+rows.map(r=>'<div><span>'+esc(lab[r[0]]||r[0])+'</span><span>'+esc(r[1]==null?'—':r[1])+'</span></div>').join('');
+$('#adm').classList.add('on');$('#adml').prepend(el);}
+async function show(id){const n=N[id];if(!n)return;const my=++tok;busy=true;pending=null;$('#ti').placeholder='Сообщение';
+if(n.set)Object.assign(vars,n.set);
+const msgs=Array.isArray(n.text)?n.text:[n.text];
+for(const m of msgs){const ty=document.createElement('div');ty.className='typ';ty.innerHTML='<i></i><i></i><i></i>';chat.appendChild(ty);scroll();await wait(Math.min(900,350+String(m).length*6));if(my!==tok)return;ty.remove();bubble(m,'b');}
+if(n.notify)notify(n);
+if(n.buttons&&n.buttons.length){const kb=document.createElement('div');kb.className='kb';n.buttons.forEach(row=>{const r=document.createElement('div');r.className='row';row.forEach(b=>{const x=document.createElement('button');x.type='button';x.textContent=sub(b.t);x.onclick=()=>{if(busy)return;if(b.url){toast('В демо ссылка не открывается');return;}kbRemove();if(b.set)Object.assign(vars,b.set);bubble(b.t,'u');show(b.to);};r.appendChild(x);});kb.appendChild(r);});chat.appendChild(kb);scroll();}
+if(n.ask){pending=n.ask;$('#ti').placeholder=n.ask.placeholder||'Введите ответ';$('#ti').focus({preventScroll:true});}
+busy=false;}
+function ok(a,v){if(a.type==='phone')return phoneOk(v);if(a.type==='number')return /^\d+$/.test(v.trim());return v.trim().length>0;}
+$('#form').addEventListener('submit',async e=>{e.preventDefault();const v=$('#ti').value.trim();if(!v||busy)return;$('#ti').value='';bubble(v,'u');kbRemove();
+if(/^\/start\b/i.test(v)){vars={};return show(C.start);}
+if(pending){if(!ok(pending,v)){busy=true;await wait(400);bubble(pending.error||'Не получилось разобрать, попробуйте ещё раз.','b');busy=false;return;}
+const a=pending;vars[a.key]=v;return show(a.next);}
+busy=true;await wait(500);bubble(C.fallback||'Я пока понимаю только кнопки меню. Выберите пункт ниже.','b');busy=false;});
+$('#menu').innerHTML=(C.menu||[]).map((b,i)=>'<button type="button" data-i="'+i+'">'+esc(b.t)+'</button>').join('');
+$('#menu').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||busy)return;const m=C.menu[b.dataset.i];kbRemove();bubble(m.t,'u');if(m.set)Object.assign(vars,m.set);show(m.to);});
+function restart(){tok++;chat.innerHTML='';vars={};$('#adml').innerHTML='';$('#adm').classList.remove('on');bubble('/start','u');show(C.start);}
+$('#rs').onclick=restart;
+if(!(C.menu||[]).length)$('#menu').style.display='none';
+reveal();demoPill();restart();
+})();
+</script>
+</body>
+</html>

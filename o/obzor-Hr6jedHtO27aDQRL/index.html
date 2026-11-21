@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Обзор шаблонов</title>
+<style>
+:root{--ink:#1B2733;--mute:#586674;--bg:#F1F4F8;--card:#fff;--line:#D8E0E8;--ok:#1F7A4D;--okbg:#E2F4EA;--wip:#9A5B00;--wipbg:#FFF0D6;--no:#8A2B2B;--nobg:#FBE3E3;--acc:#2F5D8A}
+@media (prefers-color-scheme:dark){:root{--ink:#E8EEF4;--mute:#9DAAB8;--bg:#10161D;--card:#18212B;--line:#2A3644;--ok:#7BD9A5;--okbg:#17372A;--wip:#F2C14E;--wipbg:#3A2E12;--no:#F19A9A;--nobg:#3A1C1C;--acc:#7FB1E3}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;font-size:16px;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding:0 16px}
+header{padding:32px 0 8px}
+h1{margin:0 0 8px;font-size:clamp(1.6rem,4vw,2.4rem)}
+.lead{color:var(--mute);max-width:70ch;margin:0}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 0}
+h2{margin:40px 0 6px;font-size:1.4rem}
+.sub{margin:0 0 16px;color:var(--mute)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;text-decoration:none;color:inherit;transition:transform .2s,box-shadow .2s}
+a.card:hover{transform:translateY(-4px);box-shadow:0 14px 34px rgba(20,35,43,.16)}
+.shot{position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--line);border-bottom:1px solid var(--line)}
+.shot iframe{position:absolute;left:0;top:0;width:1280px;height:800px;border:0;transform-origin:0 0;pointer-events:none;background:#fff}
+.shot.none{display:flex;align-items:center;justify-content:center;color:var(--mute);font-weight:600;text-align:center;padding:16px}
+.body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.body h3{margin:0;font-size:1.1rem}
+.body p{margin:0;color:var(--mute);font-size:.95rem}
+.tag{display:inline-block;font-weight:700;font-size:.8rem;padding:3px 10px;border-radius:999px;align-self:flex-start}
+.ok{background:var(--okbg);color:var(--ok)}.wip{background:var(--wipbg);color:var(--wip)}.no{background:var(--nobg);color:var(--no)}
+.open{margin-top:auto;font-weight:700;color:var(--acc)}
+ul.blocks{margin:0;padding-left:1.1em;color:var(--mute);font-size:.95rem}
+.note{margin:40px 0 60px;color:var(--mute);font-size:.95rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Обзор шаблонов</h1>
+<p class="lead">Всё, из чего диспетчер и субагент собирают демо и страницы откликов. Нажми на карточку, чтобы открыть шаблон целиком. Состояние на 21.11.2026.</p>
+<div class="legend"><span class="tag ok">Готово</span><span class="tag wip">Не проверено / доработать</span><span class="tag no">Нет</span></div>
+</header>
+
+<h2>Сайты</h2>
+<p class="sub">Один шаблон <b>site</b>. Блоки (город, каталог, формы, графика, калькулятор, страницы, языки) включаются ключами config.</p>
+<div class="grid">
+<a class="card" href="./fast_demo/examples_built/site.html"><div class="shot"><iframe loading="lazy" src="./fast_demo/examples_built/site.html" tabindex="-1"></iframe></div><div class="body"><span class="tag ok">Готово</span><h3>Сайт услуг, базовый</h3><p>Шапка, первый экран, услуги с ценами «от», как работаем, FAQ, форма.</p><span class="open">Открыть →</span></div></a>
+<a class="card" href="./fast_demo/examples_built/site_bloki.html"><div class="shot"><iframe loading="lazy" src="./fast_demo/examples_built/site_bloki.html" tabindex="-1"></iframe></div><div class="body"><span class="tag wip">Готово, многостраничность не проверена</span><h3>Сайт со всеми 7 блоками</h3><ul class="blocks"><li>выбор города со склонениями</li><li>каталог с фильтром и «Заказать»</li><li>формы вкладками с загрузкой фото</li><li>графика первого экрана</li><li>встроенный калькулятор</li><li>несколько страниц</li><li>языки</li></ul><span class="open">Открыть →</span></div></a>
+</div>
+
+<h2>Видео-страницы откликов</h2>
+<p class="sub">4 вида × 2 режима цены = 8 шаблонов. «С ценой» — цена по прайсу на странице и в письме; «без цены» — цену вписывает Alex.</p>
+<div class="grid">
+<a class="card" href="./video_shablon/_primer/shorts/index.html"><div class="shot"><iframe loading="lazy" src="./video_shablon/_primer/shorts/index.html" tabindex="-1"></iframe></div><div class="body"><span class="tag ok">Готово</span><h3>Шортсы из длинного видео — с ценой</h3><p>Динамичный шортс решено не делать, остаётся «Объяснялка».</p><span class="open">Открыть →</span></div></a>
+<a class="card" href="./video_shablon/_primer/shorts_bezcen/index.html"><div class="shot"><iframe loading="lazy" src="./video_shablon/_primer/shorts_bezcen/index.html" tabindex="-1"></iframe></div><div class="body"><span class="tag ok">Готово</span><h3>Шортсы — без цены</h3><p>Цену заказчику вписывает Alex.</p><span class="open">Открыть →</span></div></a>
+<a class="card" href="./video_shablon/_primer/reklama/index.html"><div class="shot"><iframe loading="lazy" src="./video_shablon/_primer/reklama/index.html" tabindex="-1"></iframe></div><div class="body"><span class="tag ok">Готово</span><h3>Рекламные ролики — с ценой</h3><p>«Из ваших материалов».</p><span class="open">Открыть →</span></div></a>
+<a class="card" href="./video_shablon/_primer/reklama_bezcen/index.html"><div class="shot"><iframe loading="lazy" src="./video_shablon/_primer/reklama_bezcen/index.html" tabindex="-1"></iframe></div><div class="body"><span class="tag ok">Готово</span><h3>Рекламные ролики — без цены</h3><p></p><span class="open">Открыть →</span></div></a>
+<a class="card" href="./video_shablon/_primer/long/index.html"><div class="shot"><iframe loading="lazy" src="./video_shablon/_primer/long/index.html" tabindex="-1"></iframe></div><div class="body"><span class="tag wip">Готово, десктоп глазами не смотрели</span><h3>Обработка длинного видео — с ценой</h3><p>Два крупных окна.</p><span class="open">Открыть →</span></div></a>
+<div class="card"><div class="shot none">Страницы-примера нет, шаблон есть<br>(sablony\long_bez_ceny.json)</div><div class="body"><span class="tag wip">Страница-пример не собрана</span><h3>Обработка длинного — без цены</h3><p></p></div></div>
+<a class="card" href="./video_shablon/_primer/universal/index.html"><div class="shot"><iframe loading="lazy" src="./video_shablon/_primer/universal/index.html" tabindex="-1"></iframe></div><div class="body"><span class="tag wip">Готово, десктоп глазами не смотрели</span><h3>Универсальная (прочее) — с ценой</h3><p>Четыре вертикальных ролика, в том числе «щенок на петухе».</p><span class="open">Открыть →</span></div></a>
+<div class="card"><div class="shot none">Страницы-примера нет, шаблон есть<br>(sablony\universal_bez_ceny.json)</div><div class="body"><span class="tag wip">Страница-пример не собрана</span><h3>Универсальная — без цены</h3><p></p></div></div>
+</div>
+
+<h2>Остальные группы демо</h2>
+<p class="sub">Шаблоны fast_demo. Блоков, как у сайтов, нет и впрок не делаем: доделаем, если живой заказ упрётся в нехватку функции.</p>
+<div class="grid">
+<a class="card" href="./fast_demo/examples_built/calc.html"><div class="shot"><iframe loading="lazy" src="./fast_demo/examples_built/calc.html" tabindex="-1"></iframe></div><div class="body"><span class="tag ok">Готово</span><h3>calc — калькулятор, смета, квиз</h3><p>Поля, смета, выгрузка PDF/DOC/XLS, форма заявки.</p><span class="open">Открыть →</span></div></a>
+<a class="card" href="./fast_demo/examples_built/dash.html"><div class="shot"><iframe loading="lazy" src="./fast_demo/examples_built/dash.html" tabindex="-1"></iframe></div><div class="body"><span class="tag ok">Готово</span><h3>dash — дашборд, отчёт, парсер</h3><p>KPI, график, таблица с поиском, выгрузка CSV/XLS.</p><span class="open">Открыть →</span></div></a>
+<a class="card" href="./fast_demo/examples_built/bot.html"><div class="shot"><iframe loading="lazy" src="./fast_demo/examples_built/bot.html" tabindex="-1"></iframe></div><div class="body"><span class="tag ok">Готово</span><h3>bot — бот Telegram</h3><p>Телефон с чатом, кнопки, сбор имени и телефона.</p><span class="open">Открыть →</span></div></a>
+<a class="card" href="./fast_demo/examples_built/doc.html"><div class="shot"><iframe loading="lazy" src="./fast_demo/examples_built/doc.html" tabindex="-1"></iframe></div><div class="body"><span class="tag ok">Готово</span><h3>doc — КП, смета, договор</h3><p>Форма слева, документ справа, выгрузка PDF/DOC/XLS.</p><span class="open">Открыть →</span></div></a>
+<a class="card" href="./fast_demo/examples_built/script.html"><div class="shot"><iframe loading="lazy" src="./fast_demo/examples_built/script.html" tabindex="-1"></iframe></div><div class="body"><span class="tag ok">Готово</span><h3>script — скрипт, парсер, автоматизация</h3><p>Параметры, код, терминал с логом, таблица результата.</p><span class="open">Открыть →</span></div></a>
+<div class="card"><div class="shot none">Группа Г (ИИ и автоматизация, Make, n8n): отдельного шаблона нет, идёт через script</div><div class="body"><span class="tag no">Нет отдельного шаблона</span><h3>Автоматизация / ИИ</h3><p>Доделать, если появятся заказы.</p></div></div>
+</div>
+
+<p class="note">Предпросмотры уменьшены, внутри они живые. Старая витрина с тремя уровнями сайта больше не нужна.</p>
+</div>
+<script>
+function fit(){document.querySelectorAll('.shot iframe').forEach(function(f){var w=f.parentElement.clientWidth;f.style.transform='scale('+(w/1280)+')'})}
+addEventListener('resize',fit);addEventListener('load',fit);fit();
+</script>
+</body>
+</html>
