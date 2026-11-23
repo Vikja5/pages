@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ORVÉ · бутик одежды (демо)</title>
+<meta name="description" content="Демо-сайт вымышленного бутика ORVÉ: видео первого экрана движется вместе с прокруткой.">
+<meta name="theme-color" content="#16171c">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2316171c'/%3E%3Ccircle cx='32' cy='32' r='17' fill='none' stroke='%23ff7a59' stroke-width='5'/%3E%3C/svg%3E">
+<link rel="preload" href="assets/fonts/unbounded-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<a class="skip" href="#main">К содержанию</a>
+<div class="env" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true"></div>
+<div class="demo-badge">демо / пример работы</div>
+
+<header class="top">
+  <a class="logo" href="#top" aria-label="ORVÉ, наверх">ORV<span>É</span></a>
+  <nav aria-label="Разделы">
+    <a href="#collections">Коллекции</a>
+    <a href="#about">О бутике</a>
+    <a href="#fitting" class="btn btn-sm magnetic">Примерка</a>
+  </nav>
+</header>
+
+<section class="hero" id="top" aria-label="Первый экран">
+  <div class="stage">
+    <div class="poster"></div>
+    <video id="hero" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
+    <div class="scrim" aria-hidden="true"></div>
+    <svg class="ring" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="126" style="stroke-dashoffset:var(--ld,126)"/></svg>
+    <div class="progress" aria-hidden="true"><i></i></div>
+
+    <div class="band b1" data-a="0" data-b="0.24" data-fx="scatter">
+      <p class="kicker chip">Бутик-ателье · новая коллекция</p>
+      <h1 class="split">Одежда, в которой легко</h1>
+      <p class="hint">Прокрутите, и зал оживёт</p>
+    </div>
+    <div class="band b2" data-a="0.27" data-b="0.5" data-fx="drift">
+      <p class="kicker chip">01 · Отбор</p>
+      <h2 class="split">Каждую вещь выбрали руками</h2>
+    </div>
+    <div class="band b3" data-a="0.53" data-b="0.74" data-fx="part">
+      <p class="kicker chip">02 · Посадка</p>
+      <h2 class="split">Подгоним по фигуре за&nbsp;один визит</h2>
+    </div>
+    <div class="band b4" data-a="0.77" data-b="1" data-fx="rise">
+      <p class="kicker chip">03 · Примерка</p>
+      <h2 class="split">Приходите примерить без спешки</h2>
+      <p class="sub">Стилист, кофе и примерочная только для вас.</p>
+      <div class="cta-row"><a href="#fitting" class="btn magnetic">Записаться на примерку</a><a href="#collections" class="btn btn-ghost magnetic">Коллекции</a></div>
+    </div>
+  </div>
+</section>
+
+<main id="main" tabindex="-1">
+  <div class="marquee" aria-hidden="true">
+    <div class="track"><span>Шерсть ✦ Шёлк ✦ Лён ✦ Кашемир ✦ Пошив по фигуре ✦ Капсульный гардероб ✦ </span><span>Шерсть ✦ Шёлк ✦ Лён ✦ Кашемир ✦ Пошив по фигуре ✦ Капсульный гардероб ✦ </span></div>
+  </div>
+
+  <section class="collections" id="collections">
+    <div class="head reveal">
+      <p class="kicker">Коллекции сезона</p>
+      <h2 class="big">Три настроения<br><em>одного гардероба</em></h2>
+    </div>
+    <div class="cards">
+      <article class="card reveal">
+        <div class="pic"><img src="assets/f1.jpg" alt="" loading="lazy" width="800" height="1000"><span class="tone t1"></span><span class="tag">01</span></div>
+        <div class="meta"><h3>Город</h3><p>Пальто, жакеты, брюки прямого кроя</p><span class="price">от 12 900 ₽</span></div>
+      </article>
+      <article class="card reveal">
+        <div class="pic"><img src="assets/f2.jpg" alt="" loading="lazy" width="800" height="1000"><span class="tone t2"></span><span class="tag">02</span></div>
+        <div class="meta"><h3>Вечер</h3><p>Платья из шёлка и вискозы, мягкий трикотаж</p><span class="price">от 9 500 ₽</span></div>
+      </article>
+      <article class="card reveal">
+        <div class="pic"><img src="assets/f3.jpg" alt="" loading="lazy" width="800" height="1000"><span class="tone t3"></span><span class="tag">03</span></div>
+        <div class="meta"><h3>Выходные</h3><p>Лён, хлопок, свободные силуэты</p><span class="price">от 5 900 ₽</span></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="about" id="about">
+    <div class="about-img" aria-hidden="true"><div class="par" data-speed="0.15"></div></div>
+    <div class="about-text reveal">
+      <p class="kicker">О бутике</p>
+      <h2 class="big">Маленький зал,<br>большая <em>примерочная</em></h2>
+      <p>ORVÉ для тех, кто устал от бесконечных вешалок масс-маркета. Мы держим короткую линейку вещей, но каждую можно примерить, обсудить и подогнать прямо здесь.</p>
+      <p class="muted">Это демо-сайт: название, тексты и цены придуманы для примера работы.</p>
+    </div>
+  </section>
+
+  <section class="perks">
+    <h2 class="big reveal">Почему <em>к нам</em></h2>
+    <ol class="perk-list">
+      <li class="reveal"><span class="n">01</span><div><h3>Стилист на примерке</h3><p>Подберёт образ под повод и соберёт капсулу из того, что уже есть у вас.</p></div></li>
+      <li class="reveal"><span class="n">02</span><div><h3>Подгонка по фигуре</h3><p>Длина, талия, рукава: небольшие правки делаем в своём ателье.</p></div></li>
+      <li class="reveal"><span class="n">03</span><div><h3>Отложим вещь</h3><p>Понравилось на сайте? Напишите, и мы оставим размер до вашего визита.</p></div></li>
+      <li class="reveal"><span class="n">04</span><div><h3>Спокойный визит</h3><p>Примерка по записи: без очереди, примерочная только ваша.</p></div></li>
+    </ol>
+  </section>
+
+  <section class="fitting" id="fitting">
+    <div class="fit-wrap reveal">
+      <div>
+        <p class="kicker">Запись на примерку</p>
+        <h2 class="big">Выберите<br><em>удобное время</em></h2>
+        <p class="muted">Демо-форма: данные никуда не отправляются.</p>
+      </div>
+      <form class="form" id="fitForm" novalidate>
+        <label>Имя<input name="name" autocomplete="off" placeholder="Как к вам обращаться"></label>
+        <label>Телефон<input name="phone" type="tel" autocomplete="off" placeholder="+7 ___ ___-__-__"></label>
+        <label>Что ищете
+          <select name="kind"><option>Образ на каждый день</option><option>Вечерний образ</option><option>Капсульный гардероб</option><option>Подгонка вещи</option></select>
+        </label>
+        <label>Дата визита<input name="date" type="date"></label>
+        <button class="btn magnetic" type="submit">Записаться</button>
+        <p class="form-msg" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+
+  <section class="contacts">
+    <div class="c-grid reveal">
+      <div><p class="kicker">Адрес</p><p>Адрес бутика<br>(даст заказчик)</p></div>
+      <div><p class="kicker">Часы</p><p>Часы работы<br>(даст заказчик)</p></div>
+      <div><p class="kicker">Связь</p><p>Телефон и мессенджеры<br>(даст заказчик)</p></div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <span class="logo">ORV<span>É</span></span>
+  <span>Демо / пример работы. Бренд вымышленный.</span>
+  <span class="credit">Видео: Pexels</span>
+</footer>
+
+<script src="assets/app.js"></script>
+</body>
+</html>
